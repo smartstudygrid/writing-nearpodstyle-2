@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartStudyGrid.com — IGCSE Learning Platform</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- jsPDF & html2canvas for PDF Generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- Tone.js for Audio Feedback -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+            },
+            edu: {
+              dark: '#080d1a',
+              card: '#131f37',
+              border: '#1e2d4a',
+              accent: '#38bdf8'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    .dark ::-webkit-scrollbar-thumb { background: #1e2d4a; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .glass-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); }
+    .dark .glass-panel { background: rgba(19, 31, 55, 0.85); }
+  </style>
+</head>
+
+<body class="bg-slate-100 dark:bg-[#080d1a] text-slate-800 dark:text-slate-100 min-h-screen flex flex-col font-sans selection:bg-sky-500 selection:text-white antialiased transition-colors duration-200">
+
+  <!-- TOP HEADER -->
+  <header class="bg-white dark:bg-edu-card/90 border-b border-slate-200 dark:border-edu-border sticky top-0 z-40 px-4 py-2.5 flex items-center justify-between shadow-sm dark:shadow-xl">
+    <div class="flex items-center gap-3">
+      <div class="bg-gradient-to-tr from-sky-500 to-emerald-500 p-2 rounded-xl text-slate-900 shadow-md flex items-center justify-center font-extrabold text-base">
+        ⚡
+      </div>
+      <div>
+        <h1 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white tracking-wide flex items-center gap-2">
+          SmartStudyGrid.com <span class="text-[10px] bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-400 border border-sky-300 dark:border-sky-800 px-2 py-0.5 rounded-full font-mono">IGCSE 0510/0511</span>
+        </h1>
+        <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">Interactive Student Progress & Teacher-Led Platform</p>
+      </div>
+    </div>
+
+    <!-- User Bar, Theme Toggle & Firebase Status -->
+    <div class="flex items-center gap-2.5">
+      <!-- FIREBASE STATUS INDICATOR (MOVED TO HEADER) -->
+      <div class="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-[11px]">
+        <span id="firebaseStatusDot" class="w-2 h-2 rounded-full bg-amber-400"></span>
+        <span id="firebaseStatusText" class="text-slate-600 dark:text-slate-300 font-mono hidden md:inline">Connecting...</span>
+      </div>
+
+      <!-- THEME TOGGLE BUTTON -->
+      <button onclick="toggleTheme()" class="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-xs transition" title="Toggle Light / Dark Mode">
+        <span id="themeToggleIcon">☀️</span>
+      </button>
+
+      <div id="userInfoDisplay" class="hidden flex items-center gap-2 text-xs bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1 rounded-xl">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span id="userNameBadge" class="font-semibold text-slate-800 dark:text-slate-200">Guest User</span>
+        <span id="userRoleBadge" class="text-[10px] bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-400 px-2 py-0.5 rounded font-mono">Student</span>
+      </div>
+
+      <button id="authModalBtn" onclick="openLoginModal()" class="px-3.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
+        <span>Portal Account</span>
+      </button>
+
+      <button id="logoutBtn" onclick="handleLogout()" class="hidden px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-rose-100 hover:text-rose-700 dark:hover:bg-rose-950/50 dark:hover:text-rose-300 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold transition">
+        Sign Out
+      </button>
+    </div>
+  </header>
+
+  <!-- SLIDE CONTROL BAR -->
+  <div class="bg-slate-200 dark:bg-[#0b1329] border-b border-slate-300 dark:border-edu-border px-4 py-2 flex flex-wrap items-center justify-between text-xs gap-2">
+    <div class="flex items-center gap-3 overflow-x-auto py-0.5">
+      <span id="slideCounterLabel" class="text-sky-700 dark:text-sky-400 font-mono text-xs font-bold whitespace-nowrap">Slide 1 / 28</span>
+      <div class="w-28 sm:w-48 bg-slate-300 dark:bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-300 dark:border-slate-800">
+        <div id="slideProgressBar" class="bg-gradient-to-r from-sky-500 to-emerald-400 h-full w-[3.5%] transition-all duration-300"></div>
+      </div>
+      <span id="slideTitleHeader" class="text-slate-800 dark:text-slate-200 font-medium truncate max-w-[180px] sm:max-w-xs">Title & Exam Specs</span>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <!-- LIVE SYNC STATUS INDICATOR FOR STUDENTS -->
+      <div id="studentSyncIndicator" class="px-2.5 py-1 bg-sky-100 dark:bg-sky-950/80 text-sky-700 dark:text-sky-400 border border-sky-300 dark:border-sky-800 rounded-lg text-[11px] font-mono flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
+        <span>Teacher-Led Presentation</span>
+      </div>
+
+      <!-- TEACHER BROADCAST SYNC TOGGLE & NAV CONTROLS (ONLY FOR ADMIN) -->
+      <div id="teacherNavControls" class="hidden flex items-center gap-2">
+        <button id="teacherSyncToggle" onclick="toggleTeacherSync()" class="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 rounded-lg text-[11px] font-mono flex items-center gap-1.5 transition hover:bg-emerald-200 dark:hover:bg-emerald-900/50" title="Toggle Real-Time Presentation Broadcast">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="syncStatusText">Broadcasting Live</span>
+        </button>
+
+        <div class="flex items-center gap-1.5">
+          <button onclick="prevSlide()" class="p-1.5 rounded-lg bg-slate-300 dark:bg-slate-800 hover:bg-slate-400 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 transition" title="Previous Slide">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+          </button>
+          <select id="slideSelectDropdown" onchange="goToSlide(parseInt(this.value))" class="bg-slate-300 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs px-2.5 py-1.5 rounded-lg border border-slate-400 dark:border-slate-700 outline-none cursor-pointer max-w-[180px] truncate">
+          </select>
+          <button onclick="nextSlide()" class="p-1.5 rounded-lg bg-slate-300 dark:bg-slate-800 hover:bg-slate-400 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 transition" title="Next Slide">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN LAYOUT VIEWPORT -->
+  <main class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+    
+    <!-- LEFT: SLIDE CONTENT STAGE -->
+    <section id="slideStageContainer" class="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col items-center justify-start transition-all duration-300">
+      <div id="slideCard" class="w-full max-w-4xl bg-white dark:bg-edu-card border border-slate-200 dark:border-edu-border rounded-2xl p-5 sm:p-8 shadow-xl dark:shadow-2xl relative flex flex-col min-h-[580px] transition-colors duration-200">
+        
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-edu-border pb-3 mb-6">
+          <div class="flex items-center gap-2">
+            <span id="slideTagBadge" class="px-2.5 py-0.5 text-[11px] font-bold uppercase rounded-md bg-sky-100 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-sky-500/30">Module 1</span>
+            <span id="slideTypeBadge" class="px-2.5 py-0.5 text-[11px] font-bold uppercase rounded-md bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">Interactive Task</span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <!-- FULLSCREEN TOGGLE BUTTON -->
+            <button onclick="toggleCardFullscreen()" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-medium transition flex items-center gap-1.5" title="Toggle Fullscreen Mode">
+              <span id="fullscreenIcon">⛶</span>
+              <span class="hidden sm:inline">Fullscreen</span>
+            </button>
+
+            <button id="adminPanelToggle" onclick="toggleAdminDrawer()" class="hidden px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-300 rounded-lg text-xs font-semibold hover:bg-amber-500/20 transition flex items-center gap-1.5">
+              ⚡ Admin Panel
+            </button>
+          </div>
+        </div>
+
+        <!-- BROADCASTED STUDENT ANSWER BANNER / MODAL OVERLAY -->
+        <div id="sharedAnswerBanner" class="hidden mb-6 p-4 bg-gradient-to-r from-amber-500/15 via-sky-500/15 to-emerald-500/15 border-2 border-amber-500/40 rounded-xl relative shadow-lg animate-pulse">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+              <span>📢</span> Teacher Shared Response
+            </span>
+            <button id="closeSharedAnswerBtn" onclick="clearSharedAnswer()" class="hidden text-xs text-slate-400 hover:text-slate-200 font-bold px-2 py-0.5 rounded bg-slate-800/50">Dismiss Broadcast</button>
+          </div>
+          <div class="text-xs text-slate-600 dark:text-slate-300 mb-1 font-semibold">
+            Student: <strong id="sharedStudentName" class="text-sky-600 dark:text-sky-400 font-bold">Name</strong>
+          </div>
+          <p id="sharedStudentText" class="text-sm font-serif italic text-slate-800 dark:text-slate-100 bg-white/60 dark:bg-slate-900/80 p-3 rounded-lg border border-amber-500/20">
+            "Answer content..."
+          </p>
+        </div>
+
+        <!-- Dynamic Content Injected Here -->
+        <div id="slideDynamicBody" class="flex-1 flex flex-col justify-center">
+        </div>
+
+        <!-- FOOTER BAR -->
+        <div class="mt-6 pt-4 border-t border-slate-200 dark:border-edu-border/50 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
+          <span class="text-slate-500 dark:text-slate-400 font-medium">SmartStudyGrid.com — Cambridge IGCSE English</span>
+
+          <!-- BOTTOM NAV BUTTONS (ONLY VISIBLE TO TEACHER/ADMIN) -->
+          <div id="teacherBottomNav" class="hidden flex gap-2">
+            <button onclick="prevSlide()" class="px-3.5 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg transition font-medium">Previous</button>
+            <button onclick="nextSlide()" class="px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg transition font-semibold shadow-md shadow-sky-600/20">Next Slide &rarr;</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- RIGHT: ADMIN CONTROL & ROSTER MANAGEMENT (WITH MINIMIZE SUPPORT) -->
+    <aside id="adminControlDrawer" class="w-full lg:w-96 bg-white dark:bg-edu-card border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-edu-border p-4 overflow-y-auto flex flex-col gap-4 shadow-2xl transition-all duration-300 hidden">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-edu-border">
+        <div class="flex items-center gap-2">
+          <span class="p-1.5 bg-amber-500/20 text-amber-500 dark:text-amber-400 rounded-lg text-xs">🛡️</span>
+          <h2 class="font-bold text-xs tracking-wider text-slate-900 dark:text-white uppercase">Admin Console</h2>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button onclick="toggleAdminMinimize()" class="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded text-slate-500 dark:text-slate-400 text-xs font-bold" title="Minimize / Expand Panel">
+            <span id="adminMinimizeIcon">➖</span>
+          </button>
+          <span class="text-[10px] bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 px-2 py-0.5 rounded font-mono">Authenticated</span>
+        </div>
+      </div>
+
+      <div id="adminPanelContent" class="space-y-4">
+        <!-- CREATE NEW STUDENT FORM -->
+        <div class="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 space-y-2.5">
+          <h3 class="font-bold text-xs text-sky-600 dark:text-sky-400 uppercase tracking-wide">Register New Student</h3>
+          <div class="space-y-2 text-xs">
+            <div>
+              <label class="block text-slate-600 dark:text-slate-400 mb-1">Student Full Name</label>
+              <input id="newStudentName" type="text" placeholder="e.g. Sarah Khan" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-100 outline-none focus:border-sky-500" />
+            </div>
+            <div>
+              <label class="block text-slate-600 dark:text-slate-400 mb-1">Grade / Class Section</label>
+              <input id="newStudentGrade" type="text" placeholder="e.g. Grade 10-A" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-100 outline-none focus:border-sky-500" />
+            </div>
+            <div>
+              <label class="block text-slate-600 dark:text-slate-400 mb-1">Assign Password</label>
+              <input id="newStudentPassword" type="password" placeholder="Passcode" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-100 outline-none focus:border-sky-500" />
+            </div>
+            <button onclick="handleAdminCreateUser()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg shadow-md transition text-xs flex items-center justify-center gap-1.5">
+              <span>Add Student</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- LIVE INCOMING STUDENT SUBMISSIONS FEED -->
+        <div class="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-xs text-amber-600 dark:text-amber-400 uppercase tracking-wide flex items-center gap-1">
+              <span>💬</span> Live Student Submissions
+            </h3>
+            <button onclick="clearSharedAnswer()" class="text-[10px] text-rose-500 hover:underline">Clear Broadcast</button>
+          </div>
+          <div id="adminLiveFeed" class="space-y-2 max-h-48 overflow-y-auto text-xs pr-1">
+            <div class="text-slate-400 italic text-center py-2">No live responses received yet.</div>
+          </div>
+        </div>
+
+        <!-- STUDENT ROSTER LIST -->
+        <div class="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 space-y-2.5 flex-1 flex flex-col">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-xs text-sky-600 dark:text-sky-400 uppercase tracking-wide">Student Progress Roster</h3>
+            <button onclick="fetchStudentRoster()" class="text-[10px] text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-300 underline">Sync</button>
+          </div>
+
+          <div id="adminRosterList" class="space-y-2 max-h-48 overflow-y-auto text-xs flex-1 pr-1">
+            <div class="text-slate-400 italic text-center py-2">Syncing roster...</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- AUTHENTICATION MODAL -->
+  <div id="loginModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-edu-card border border-edu-border rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-edu-border pb-3">
+        <h3 class="font-bold text-sm text-white flex items-center gap-2">
+          <span>🔑</span> Portal Sign-In
+        </h3>
+        <button onclick="closeLoginModal()" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-300 mb-1 font-medium">Select Role</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="roleSelectStudentBtn" onclick="selectLoginRole('student')" class="py-2 rounded-xl bg-sky-600 text-white font-bold border border-sky-400 transition">Student</button>
+            <button id="roleSelectAdminBtn" onclick="selectLoginRole('admin')" class="py-2 rounded-xl bg-slate-900 text-slate-400 border border-slate-800 hover:text-white transition">Admin</button>
+          </div>
+        </div>
+
+        <div id="studentLoginFields" class="space-y-2">
+          <div>
+            <label class="block text-slate-400 mb-1">Student Name</label>
+            <input id="loginStudentName" type="text" placeholder="Enter your registered name" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 outline-none focus:ring-1 focus:ring-sky-500" />
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Password</label>
+            <input id="loginStudentPassword" type="password" placeholder="Password" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 outline-none focus:ring-1 focus:ring-sky-500" />
+          </div>
+        </div>
+
+        <div id="adminLoginFields" class="space-y-2 hidden">
+          <div>
+            <label class="block text-slate-400 mb-1">Master Password</label>
+            <input id="loginAdminPassword" type="password" placeholder="Enter admin password" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 outline-none focus:ring-1 focus:ring-amber-500" />
+          </div>
+        </div>
+
+        <button onclick="handleLoginSubmit()" class="w-full py-2.5 bg-gradient-to-r from-sky-500 to-emerald-500 hover:from-sky-400 hover:to-emerald-400 text-slate-950 font-extrabold rounded-xl shadow-lg transition mt-2">
+          Sign In
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDF REPORT GENERATION TEMPLATE (HIDDEN DOM CANVAS) -->
+  <div class="fixed top-[-9999px] left-[-9999px]">
+    <div id="pdfReportTemplate" class="w-[800px] bg-white text-slate-900 p-8 font-sans space-y-6">
+      <div class="flex justify-between items-center border-b-2 border-sky-600 pb-4">
+        <div>
+          <h1 class="text-2xl font-bold text-slate-900">STUDENT PROGRESS REPORT</h1>
+          <p class="text-xs text-sky-700 font-semibold uppercase tracking-wider">SmartStudyGrid.com — Cambridge IGCSE English (0510 / 0511)</p>
+        </div>
+        <div class="text-right">
+          <div class="text-xs font-bold text-slate-500">SmartStudyGrid Pro</div>
+          <div id="pdfReportDate" class="text-xs text-slate-400">Date: 2026-09-15</div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
+        <div><span class="text-slate-500 block">Student Name:</span><strong id="pdfStudentName" class="text-sm text-slate-800">Name</strong></div>
+        <div><span class="text-slate-500 block">Grade / Class:</span><strong id="pdfStudentGrade" class="text-sm text-slate-800">Grade 10</strong></div>
+        <div><span class="text-slate-500 block">Total Exercises Completed:</span><strong id="pdfTotalSubmissions" class="text-sm text-sky-600">0</strong></div>
+      </div>
+
+      <div class="space-y-3">
+        <h3 class="font-bold text-sm text-slate-800 border-b border-slate-200 pb-1">Detailed Interactive Task Logs</h3>
+        <div id="pdfSubmissionsList" class="space-y-2 text-xs">
+        </div>
+      </div>
+
+      <div class="pt-6 border-t border-slate-200 flex justify-between items-center text-[10px] text-slate-400">
+        <span>Verified by EduTrack Educator Portal</span>
+        <span>Page 1 of 1</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION UI -->
+  <div id="toastNotification" class="fixed bottom-5 right-5 bg-slate-900 border border-slate-700 text-white px-4 py-2.5 rounded-xl shadow-2xl text-xs font-medium translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
+    <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+    <span id="toastMessage">Notification</span>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, getDocs, updateDoc, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Application ID and Config setup according to platform environment
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'edutrack-igcse-app';
+    
+    // Default fallback config if environment config is not injected
+    const defaultFirebaseConfig = {
+      apiKey: "AIzaSyDLbqoHebiXa6hf9wVxelU4eJx7eDWvBCA",
+      authDomain: "exam-48e13.firebaseapp.com",
+      projectId: "exam-48e13",
+      storageBucket: "exam-48e13.firebasestorage.app",
+      messagingSenderId: "501058275146",
+      appId: "1:501058275146:web:9dad39e721594d344ce3b3"
+    };
+
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : defaultFirebaseConfig;
+
+    // Initialize Services
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Global App References
+    window.appId = appId;
+    window.auth = auth;
+    window.db = db;
+    window.dbMethods = { doc, setDoc, getDoc, collection, getDocs, updateDoc, arrayUnion, onSnapshot };
+    window.currentUser = JSON.parse(sessionStorage.getItem('edutrack_user')) || null;
+    window.selectedAuthRole = 'student';
+    window.currentSlideIndex = 0;
+
+    // Authenticate with Firebase first before performing Firestore calls
+    async function initFirebaseAuth() {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      } catch (err) {
+        console.warn("Auth initial error, falling back to anonymous auth:", err);
+        try {
+          await signInAnonymously(auth);
+        } catch(e) {
+          console.error("Anonymous auth failed:", e);
+        }
+      }
+    }
+
+    // Monitor Auth State
+    onAuthStateChanged(auth, (user) => {
+      const dot = document.getElementById('firebaseStatusDot');
+      const text = document.getElementById('firebaseStatusText');
+      if (user) {
+        if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-400";
+        if (text) text.textContent = `Firebase Connected (${user.uid.slice(0, 6)}...)`;
+        if (window.currentUser && window.currentUser.role === 'admin') {
+          fetchStudentRoster();
+        }
+      } else {
+        if (dot) dot.className = "w-2 h-2 rounded-full bg-amber-400";
+        if (text) text.textContent = "Connecting Auth...";
+      }
+    });
+
+    // Initialize Auth, Live Presentation Listener & App
+    initFirebaseAuth().then(() => {
+      initSlidesDropdown();
+      renderSlide(0, false);
+      listenToLivePresentation();
+      if (typeof window.updateUserUI === 'function') {
+        window.updateUserUI();
+      }
+    });
+
+    // LISTEN FOR LIVE TEACHER SLIDE CHANGES & SHARED STUDENT ANSWERS
+    function listenToLivePresentation() {
+      try {
+        const liveDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'presentation', 'liveSession');
+        onSnapshot(liveDocRef, (snap) => {
+          if (snap.exists()) {
+            const data = snap.data();
+
+            // 1. Live Slide Change
+            if (typeof data.currentSlide === 'number') {
+              if (window.followTeacherSync && (!window.currentUser || window.currentUser.role !== 'admin')) {
+                if (window.currentSlideIndex !== data.currentSlide) {
+                  renderSlide(data.currentSlide, false);
+                  showToast(`Teacher moved to Slide ${data.currentSlide + 1}`);
+                }
+              }
+            }
+
+            // 2. Broadcasted Student Answer Display
+            if (data.sharedAnswer) {
+              displaySharedAnswerOnScreen(data.sharedAnswer);
+            } else {
+              hideSharedAnswerOnScreen();
+            }
+          }
+        }, (err) => {
+          console.warn("Live presentation listener warning:", err);
+        });
+      } catch (e) {
+        console.error("Failed to set up live presentation listener:", e);
+      }
+    }
+  </script>
+
+  <script>
+    const ADMIN_PASSWORD = "Pakistan@1947";
+    window.followTeacherSync = true;
+    window.liveSubmissionsFeed = [];
+
+    // Theme Management (Default Light Mode)
+    function initTheme() {
+      const savedTheme = localStorage.getItem('smartstudy_theme') || 'light';
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.getElementById('themeToggleIcon').textContent = '🌙';
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('themeToggleIcon').textContent = '☀️';
+      }
+    }
+
+    window.toggleTheme = function() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('smartstudy_theme', isDark ? 'dark' : 'light');
+      document.getElementById('themeToggleIcon').textContent = isDark ? '🌙' : '☀️';
+      showToast(isDark ? "Switched to Dark Mode 🌙" : "Switched to Light Mode ☀️");
+    };
+
+    // Fullscreen Card Controller
+    window.toggleCardFullscreen = function() {
+      const card = document.getElementById('slideStageContainer');
+      const icon = document.getElementById('fullscreenIcon');
+      
+      if (!document.fullscreenElement) {
+        if (card.requestFullscreen) {
+          card.requestFullscreen();
+        } else if (card.webkitRequestFullscreen) {
+          card.webkitRequestFullscreen();
+        }
+        if (icon) icon.textContent = "↙";
+        showToast("Fullscreen mode activated");
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+        if (icon) icon.textContent = "⛶";
+        showToast("Exited fullscreen mode");
+      }
+    };
+
+    // Admin Panel Minimization
+    window.toggleAdminMinimize = function() {
+      const content = document.getElementById('adminPanelContent');
+      const icon = document.getElementById('adminMinimizeIcon');
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.textContent = "➖";
+      } else {
+        content.classList.add('hidden');
+        icon.textContent = "➕";
+      }
+    };
+
+    // Toggle Follow Teacher Mode
+    window.toggleTeacherSync = function() {
+      window.followTeacherSync = !window.followTeacherSync;
+      const statusText = document.getElementById('syncStatusText');
+      const toggleBtn = document.getElementById('teacherSyncToggle');
+
+      if (window.followTeacherSync) {
+        statusText.textContent = "Broadcasting Live";
+        toggleBtn.className = "px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 rounded-lg text-[11px] font-mono flex items-center gap-1.5 transition hover:bg-emerald-200 dark:hover:bg-emerald-900/50";
+        showToast("Live presentation broadcasting enabled");
+      } else {
+        statusText.textContent = "Broadcast Paused";
+        toggleBtn.className = "px-2.5 py-1 bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-800 rounded-lg text-[11px] font-mono flex items-center gap-1.5 transition hover:bg-slate-300";
+        showToast("Live presentation broadcast paused");
+      }
+    };
+
+    // User Interface State Updater (Hides Nav from Students, Shows to Admin)
+    window.updateUserUI = function() {
+      const infoDisplay = document.getElementById('userInfoDisplay');
+      const nameBadge = document.getElementById('userNameBadge');
+      const roleBadge = document.getElementById('userRoleBadge');
+      const authBtn = document.getElementById('authModalBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const adminToggle = document.getElementById('adminPanelToggle');
+      const adminDrawer = document.getElementById('adminControlDrawer');
+      const teacherNavControls = document.getElementById('teacherNavControls');
+      const teacherBottomNav = document.getElementById('teacherBottomNav');
+      const studentSyncIndicator = document.getElementById('studentSyncIndicator');
+      const closeSharedBtn = document.getElementById('closeSharedAnswerBtn');
+
+      const isAdmin = window.currentUser && window.currentUser.role === 'admin';
+
+      if (window.currentUser) {
+        if (infoDisplay) infoDisplay.classList.remove('hidden');
+        if (nameBadge) nameBadge.textContent = window.currentUser.name || 'User';
+        if (roleBadge) {
+          roleBadge.textContent = (window.currentUser.role || 'student').toUpperCase();
+          roleBadge.className = isAdmin 
+            ? "text-[10px] bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-800 px-2 py-0.5 rounded font-mono"
+            : "text-[10px] bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-400 px-2 py-0.5 rounded font-mono";
+        }
+        if (authBtn) authBtn.classList.add('hidden');
+        if (logoutBtn) logoutBtn.classList.remove('hidden');
+      } else {
+        if (infoDisplay) infoDisplay.classList.add('hidden');
+        if (authBtn) authBtn.classList.remove('hidden');
+        if (logoutBtn) logoutBtn.classList.add('hidden');
+      }
+
+      if (isAdmin) {
+        if (adminToggle) adminToggle.classList.remove('hidden');
+        if (teacherNavControls) teacherNavControls.classList.remove('hidden');
+        if (teacherBottomNav) teacherBottomNav.classList.remove('hidden');
+        if (studentSyncIndicator) studentSyncIndicator.classList.add('hidden');
+        if (closeSharedBtn) closeSharedBtn.classList.remove('hidden');
+      } else {
+        if (adminToggle) adminToggle.classList.add('hidden');
+        if (adminDrawer) adminDrawer.classList.add('hidden');
+        if (teacherNavControls) teacherNavControls.classList.add('hidden');
+        if (teacherBottomNav) teacherBottomNav.classList.add('hidden');
+        if (studentSyncIndicator) studentSyncIndicator.classList.remove('hidden');
+        if (closeSharedBtn) closeSharedBtn.classList.add('hidden');
+      }
+    };
+
+    // User Logout Handler
+    window.handleLogout = function() {
+      sessionStorage.removeItem('edutrack_user');
+      window.currentUser = null;
+      window.updateUserUI();
+      showToast("Signed out successfully.");
+    };
+
+    // Helper to get local fallback students
+    function getLocalStudents() {
+      try {
+        return JSON.parse(localStorage.getItem('smartstudy_students') || '{}');
+      } catch(e) {
+        return {};
+      }
+    }
+
+    // Helper to save local student
+    function saveLocalStudent(studentDocId, studentData) {
+      const current = getLocalStudents();
+      current[studentDocId] = studentData;
+      localStorage.setItem('smartstudy_students', JSON.stringify(current));
+    }
+
+    // Audio Feedback Function
+    let synth = null;
+    function playAudioCue(type = 'click') {
+      try {
+        if (!synth && window.Tone) {
+          synth = new Tone.Synth({
+            oscillator: { type: "triangle" },
+            envelope: { attack: 0.005, decay: 0.1, sustain: 0.05, release: 0.1 }
+          }).toDestination();
+        }
+        if (synth && Tone.context.state === 'running') {
+          if (type === 'success') synth.triggerAttackRelease("E5", "16n");
+          else synth.triggerAttackRelease("C5", "32n");
+        }
+      } catch(e) {}
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastNotification');
+      const text = document.getElementById('toastMessage');
+      if (text) text.textContent = msg;
+      if (toast) {
+        toast.classList.remove('translate-y-20', 'opacity-0');
+        setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+      }
+    }
+
+    // ROLE SELECTION & MODAL
+    function selectLoginRole(role) {
+      window.selectedAuthRole = role;
+      const sBtn = document.getElementById('roleSelectStudentBtn');
+      const aBtn = document.getElementById('roleSelectAdminBtn');
+      const sFields = document.getElementById('studentLoginFields');
+      const aFields = document.getElementById('adminLoginFields');
+
+      if (role === 'student') {
+        sBtn.className = "py-2 rounded-xl bg-sky-600 text-white font-bold border border-sky-400 transition";
+        aBtn.className = "py-2 rounded-xl bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-800 transition";
+        sFields.classList.remove('hidden');
+        aFields.classList.add('hidden');
+      } else {
+        aBtn.className = "py-2 rounded-xl bg-amber-600 text-white font-bold border border-amber-400 transition";
+        sBtn.className = "py-2 rounded-xl bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-800 transition";
+        aFields.classList.remove('hidden');
+        sFields.classList.add('hidden');
+      }
+    }
+
+    function openLoginModal() {
+      document.getElementById('loginModal').classList.remove('hidden');
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').classList.add('hidden');
+    }
+
+    async function handleLoginSubmit() {
+      if (window.selectedAuthRole === 'admin') {
+        const pass = document.getElementById('loginAdminPassword').value;
+        if (pass === ADMIN_PASSWORD) {
+          window.currentUser = { name: "System Admin", role: "admin" };
+          sessionStorage.setItem('edutrack_user', JSON.stringify(window.currentUser));
+          updateUserUI();
+          closeLoginModal();
+          showToast("Authenticated as System Administrator");
+          fetchStudentRoster();
+        } else {
+          showToast("Incorrect Master Admin Password!");
+        }
+      } else {
+        const name = document.getElementById('loginStudentName').value.trim();
+        const pass = document.getElementById('loginStudentPassword').value.trim();
+
+        if (!name || !pass) {
+          showToast("Please enter Name and Password");
+          return;
+        }
+
+        const studentDocId = name.toLowerCase().replace(/\s+/g, "_");
+
+        // 1. Check local storage first
+        const localStudents = getLocalStudents();
+        if (localStudents[studentDocId] && localStudents[studentDocId].password === pass) {
+          const s = localStudents[studentDocId];
+          window.currentUser = { name: s.name, grade: s.grade, role: "student", id: studentDocId };
+          sessionStorage.setItem('edutrack_user', JSON.stringify(window.currentUser));
+          updateUserUI();
+          closeLoginModal();
+          showToast(`Welcome back, ${s.name}!`);
+          return;
+        }
+
+        // 2. Try Firestore lookup
+        try {
+          const { doc, getDoc } = window.dbMethods;
+          const userRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'students', studentDocId);
+          const snap = await getDoc(userRef);
+
+          if (snap.exists() && snap.data().password === pass) {
+            window.currentUser = { name: snap.data().name, grade: snap.data().grade, role: "student", id: snap.id };
+            sessionStorage.setItem('edutrack_user', JSON.stringify(window.currentUser));
+            updateUserUI();
+            closeLoginModal();
+            showToast(`Welcome back, ${snap.data().name}!`);
+            return;
+          }
+        } catch(e) {
+          console.warn("Firestore auth lookup failed, fallback local checked.", e);
+        }
+
+        showToast("Invalid Student Credentials!");
+      }
+    }
+
+    // ADMIN: REGISTER NEW STUDENT IN FIREBASE & LOCAL FALLBACK
+    async function handleAdminCreateUser() {
+      if (!window.currentUser || window.currentUser.role !== 'admin') {
+        showToast("Admin privileges required!");
+        return;
+      }
+
+      const nameInput = document.getElementById('newStudentName');
+      const gradeInput = document.getElementById('newStudentGrade');
+      const passInput = document.getElementById('newStudentPassword');
+
+      const name = nameInput.value.trim();
+      const grade = gradeInput.value.trim();
+      const password = passInput.value.trim();
+
+      if (!name || !grade || !password) {
+        showToast("Please fill all required student fields!");
+        return;
+      }
+
+      const studentDocId = name.toLowerCase().replace(/\s+/g, "_");
+      const newStudentObj = {
+        name: name,
+        grade: grade,
+        password: password,
+        progress: [],
+        createdAt: new Date().toISOString()
+      };
+
+      saveLocalStudent(studentDocId, newStudentObj);
+
+      let firebaseSynced = false;
+      try {
+        const { doc, setDoc } = window.dbMethods;
+        const studentRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'students', studentDocId);
+        await setDoc(studentRef, newStudentObj);
+        firebaseSynced = true;
+      } catch(e) {
+        console.warn("Firestore save fallback triggered.", e);
+      }
+
+      if (firebaseSynced) {
+        showToast(`Registered student '${name}' (Synced)!`);
+      } else {
+        showToast(`Registered student '${name}' (Saved Locally)!`);
+      }
+
+      nameInput.value = "";
+      gradeInput.value = "";
+      passInput.value = "";
+      fetchStudentRoster();
+    }
+
+    // FETCH STUDENT ROSTER
+    async function fetchStudentRoster() {
+      const rosterList = document.getElementById('adminRosterList');
+      if (!rosterList) return;
+      rosterList.innerHTML = '<div class="text-slate-400 italic text-center py-2">Syncing roster...</div>';
+
+      const combinedMap = new Map();
+
+      // 1. Load Local Storage Students
+      const localStudents = getLocalStudents();
+      Object.keys(localStudents).forEach(id => {
+        combinedMap.set(id, { ...localStudents[id], id, source: 'local' });
+      });
+
+      // 2. Load Firestore Students
+      try {
+        const { collection, getDocs } = window.dbMethods;
+        const studentsCol = collection(window.db, 'artifacts', window.appId, 'public', 'data', 'students');
+        const querySnapshot = await getDocs(studentsCol);
+        
+        querySnapshot.forEach((docSnap) => {
+          combinedMap.set(docSnap.id, { ...docSnap.data(), id: docSnap.id, source: 'cloud' });
+        });
+      } catch(e) {
+        console.warn("Firestore collection query notice:", e);
+      }
+
+      rosterList.innerHTML = "";
+      if (combinedMap.size === 0) {
+        rosterList.innerHTML = '<div class="text-slate-400 text-center py-2">No students registered yet.</div>';
+        return;
+      }
+
+      combinedMap.forEach((s) => {
+        const progressCount = s.progress ? s.progress.length : 0;
+        const badgeColor = s.source === 'cloud' ? 'text-emerald-700 border-emerald-300 bg-emerald-100 dark:text-emerald-400 dark:border-emerald-800 dark:bg-emerald-950' : 'text-amber-700 border-amber-300 bg-amber-100 dark:text-amber-400 dark:border-amber-800 dark:bg-amber-950';
+        const badgeText = s.source === 'cloud' ? 'Cloud' : 'Local';
+
+        const card = document.createElement('div');
+        card.className = "p-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg flex items-center justify-between gap-2 shadow-sm";
+        card.innerHTML = `
+          <div class="truncate">
+            <div class="font-semibold text-slate-800 dark:text-slate-200 truncate flex items-center gap-1.5">
+              <span>${s.name}</span>
+              <span class="text-[9px] px-1.5 py-0.2 rounded border font-mono ${badgeColor}">${badgeText}</span>
+            </div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400">${s.grade} • ${progressCount} Tasks Done</div>
+          </div>
+          <button onclick="downloadPDFReport('${s.id}')" class="px-2 py-1 bg-sky-600/20 hover:bg-sky-600 text-sky-700 dark:text-sky-300 hover:text-white border border-sky-500/30 rounded text-[10px] font-semibold transition shrink-0">
+            📄 PDF
+          </button>
+        `;
+        rosterList.appendChild(card);
+      });
+    }
+
+    // BROADCAST / SHARE STUDENT ANSWER TO ALL SCREENS
+    async function shareAnswerToAll(studentName, answerText, slideTitle) {
+      showToast(`Broadcasting ${studentName}'s answer to class...`);
+      const sharedData = {
+        studentName: studentName,
+        answer: answerText,
+        slideTitle: slideTitle || slidesData[window.currentSlideIndex].title,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      // Always update local broadcast state
+      displaySharedAnswerOnScreen(sharedData);
+
+      // Push to Firebase live presentation session
+      if (window.db) {
+        try {
+          const { doc, setDoc } = window.dbMethods;
+          const liveDocRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'presentation', 'liveSession');
+          await setDoc(liveDocRef, {
+            sharedAnswer: sharedData,
+            updatedBy: window.currentUser ? window.currentUser.name : 'Teacher',
+            updatedAt: new Date().toISOString()
+          }, { merge: true });
+        } catch(e) {
+          console.warn("Firestore live broadcast answer failed:", e);
+        }
+      }
+    }
+
+    async function clearSharedAnswer() {
+      hideSharedAnswerOnScreen();
+      showToast("Cleared broadcast from screens");
+      if (window.db) {
+        try {
+          const { doc, setDoc } = window.dbMethods;
+          const liveDocRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'presentation', 'liveSession');
+          await setDoc(liveDocRef, {
+            sharedAnswer: null,
+            updatedAt: new Date().toISOString()
+          }, { merge: true });
+        } catch(e) {}
+      }
+    }
+
+    function displaySharedAnswerOnScreen(shared) {
+      const banner = document.getElementById('sharedAnswerBanner');
+      const nameEl = document.getElementById('sharedStudentName');
+      const textEl = document.getElementById('sharedStudentText');
+      if (banner && nameEl && textEl && shared) {
+        nameEl.textContent = shared.studentName;
+        textEl.textContent = `"${shared.answer}"`;
+        banner.classList.remove('hidden');
+      }
+    }
+
+    function hideSharedAnswerOnScreen() {
+      const banner = document.getElementById('sharedAnswerBanner');
+      if (banner) banner.classList.add('hidden');
+    }
+
+    // SUBMIT ANSWER AND UPDATE LIVE ADMIN FEED
+    async function submitSlideAnswer(answerText, typeLabel) {
+      playAudioCue('success');
+
+      const studentName = window.currentUser ? window.currentUser.name : "Guest Student";
+      const progressEntry = {
+        studentName: studentName,
+        slideIndex: window.currentSlideIndex,
+        slideTitle: slidesData[window.currentSlideIndex].title,
+        answer: answerText,
+        type: typeLabel,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      // Add to live feeds
+      addSubmissionToLiveFeed(progressEntry);
+
+      if (!window.currentUser || window.currentUser.role !== 'student') {
+        showToast("Answer submitted to teacher! 🎓");
+        return;
+      }
+
+      // 1. Update local storage record
+      const localStudents = getLocalStudents();
+      const sId = window.currentUser.id;
+      if (localStudents[sId]) {
+        if (!localStudents[sId].progress) localStudents[sId].progress = [];
+        localStudents[sId].progress.push(progressEntry);
+        saveLocalStudent(sId, localStudents[sId]);
+      }
+
+      // 2. Attempt Firestore sync
+      try {
+        const { doc, updateDoc, arrayUnion } = window.dbMethods;
+        const studentRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'students', sId);
+        await updateDoc(studentRef, {
+          progress: arrayUnion(progressEntry)
+        });
+        showToast("Answer saved & sent to teacher! 🎓");
+      } catch(e) {
+        showToast("Answer saved locally 🎓");
+      }
+    }
+
+    function addSubmissionToLiveFeed(sub) {
+      window.liveSubmissionsFeed.unshift(sub);
+      const feed = document.getElementById('adminLiveFeed');
+      if (!feed) return;
+
+      feed.innerHTML = "";
+      window.liveSubmissionsFeed.slice(0, 10).forEach((item) => {
+        const card = document.createElement('div');
+        card.className = "p-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg space-y-1 shadow-sm";
+        card.innerHTML = `
+          <div class="flex items-center justify-between text-[11px] font-bold text-slate-800 dark:text-slate-200">
+            <span>${item.studentName}</span>
+            <span class="text-[9px] text-slate-400 font-mono">${item.timestamp}</span>
+          </div>
+          <p class="text-[11px] text-slate-600 dark:text-slate-300 font-serif italic truncate">"${item.answer}"</p>
+          <button onclick="shareAnswerToAll('${item.studentName.replace(/'/g, "\\'")}', '${item.answer.replace(/'/g, "\\'")}', '${item.slideTitle.replace(/'/g, "\\'")}')" class="mt-1 w-full py-1 bg-amber-500/20 hover:bg-amber-500 hover:text-white border border-amber-500/40 text-amber-700 dark:text-amber-300 rounded font-semibold text-[10px] transition flex items-center justify-center gap-1">
+            <span>📢 Share to All Screens</span>
+          </button>
+        `;
+        feed.appendChild(card);
+      });
+    }
+
+    async function downloadPDFReport(studentDocId) {
+      showToast("Generating PDF Report...");
+      try {
+        let data = null;
+
+        const localStudents = getLocalStudents();
+        if (localStudents[studentDocId]) {
+          data = localStudents[studentDocId];
+        } else {
+          const { doc, getDoc } = window.dbMethods;
+          const studentRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'students', studentDocId);
+          const snap = await getDoc(studentRef);
+          if (snap.exists()) data = snap.data();
+        }
+
+        if (!data) {
+          showToast("Student data not found.");
+          return;
+        }
+
+        document.getElementById('pdfStudentName').textContent = data.name;
+        document.getElementById('pdfStudentGrade').textContent = data.grade;
+        document.getElementById('pdfTotalSubmissions').textContent = data.progress ? data.progress.length : 0;
+        document.getElementById('pdfReportDate').textContent = "Date: " + new Date().toISOString().split('T')[0];
+
+        const list = document.getElementById('pdfSubmissionsList');
+        list.innerHTML = "";
+
+        if (data.progress && data.progress.length > 0) {
+          data.progress.forEach((p) => {
+            const item = document.createElement('div');
+            item.className = "p-3 bg-slate-50 rounded border border-slate-200 space-y-1";
+            item.innerHTML = `
+              <div class="flex justify-between font-bold text-slate-700">
+                <span>Slide ${p.slideIndex + 1}: ${p.slideTitle}</span>
+                <span class="text-slate-400 text-[10px]">${p.timestamp || ''}</span>
+              </div>
+              <div class="text-slate-600 font-serif italic">"${p.answer}"</div>
+            `;
+            list.appendChild(item);
+          });
+        } else {
+          list.innerHTML = '<div class="text-slate-400 italic">No exercise progress recorded yet.</div>';
+        }
+
+        const element = document.getElementById('pdfReportTemplate');
+        const canvas = await html2canvas(element, { scale: 2 });
+        const imgData = canvas.toDataURL('image/png');
+        
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`${data.name.replace(/\s+/g, '_')}_Progress_Report.pdf`);
+        showToast("PDF report saved!");
+
+      } catch(e) {
+        console.error(e);
+        showToast("Failed to generate PDF report.");
+      }
+    }
+
+    function toggleAdminDrawer() {
+      document.getElementById('adminControlDrawer').classList.toggle('hidden');
+    }
+
+    // NAVIGATION CONTROLLER WITH TEACHER BROADCASTING
+    function initSlidesDropdown() {
+      const drop = document.getElementById('slideSelectDropdown');
+      if (!drop) return;
+      drop.innerHTML = "";
+      slidesData.forEach((s, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = `${idx + 1}. ${s.title}`;
+        drop.appendChild(opt);
+      });
+    }
+
+    async function broadcastTeacherSlide(idx) {
+      if (window.currentUser && window.currentUser.role === 'admin' && window.db) {
+        try {
+          const { doc, setDoc } = window.dbMethods;
+          const liveDocRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'presentation', 'liveSession');
+          await setDoc(liveDocRef, {
+            currentSlide: idx,
+            updatedBy: window.currentUser.name || 'Admin',
+            updatedAt: new Date().toISOString()
+          }, { merge: true });
+        } catch(e) {
+          console.warn("Broadcasting live slide position failed:", e);
+        }
+      }
+    }
+
+    function renderSlide(idx, shouldBroadcast = true) {
+      if (idx < 0 || idx >= slidesData.length) return;
+      window.currentSlideIndex = idx;
+
+      document.getElementById('slideCounterLabel').textContent = `Slide ${idx + 1} / ${slidesData.length}`;
+      document.getElementById('slideTitleHeader').textContent = slidesData[idx].title;
+      document.getElementById('slideTagBadge').textContent = slidesData[idx].module;
+      document.getElementById('slideTypeBadge').textContent = slidesData[idx].type;
+      const drop = document.getElementById('slideSelectDropdown');
+      if (drop) drop.value = idx;
+
+      const pct = ((idx + 1) / slidesData.length) * 100;
+      document.getElementById('slideProgressBar').style.width = `${pct}%`;
+
+      const body = document.getElementById('slideDynamicBody');
+      body.innerHTML = slidesData[idx].render();
+
+      if (shouldBroadcast) {
+        broadcastTeacherSlide(idx);
+      }
+    }
+
+    function nextSlide() {
+      if (window.currentSlideIndex < slidesData.length - 1) {
+        renderSlide(window.currentSlideIndex + 1, true);
+        playAudioCue('click');
+      }
+    }
+
+    function prevSlide() {
+      if (window.currentSlideIndex > 0) {
+        renderSlide(window.currentSlideIndex - 1, true);
+        playAudioCue('click');
+      }
+    }
+
+    function goToSlide(idx) {
+      renderSlide(idx, true);
+    }
+
+    // SPECIFIC TASK INPUT SUBMITTERS
+    function submitSlide5Sentence() {
+      const val = document.getElementById('slide5Input').value;
+      if (val.trim()) submitSlideAnswer(val, "Sentence Upgrade");
+    }
+
+    function submitSlide9Sentence() {
+      const val = document.getElementById('slide9Input').value;
+      if (val.trim()) submitSlideAnswer(val, "Sentence Combining");
+    }
+
+    function submitSlide12Support() {
+      const val = document.getElementById('slide12Input').value;
+      if (val.trim()) submitSlideAnswer(val, "Adding Support");
+    }
+
+    function submitSlide15Generalization() {
+      const val = document.getElementById('slide15Input').value;
+      if (val.trim()) submitSlideAnswer(val, "Generalization");
+    }
+
+    // Initialize Theme on load
+    window.addEventListener('DOMContentLoaded', initTheme);
+
+    const slidesData = [
+      {
+        title: "Title & Exam Specs",
+        module: "Module 1: Foundations",
+        type: "Class Poll",
+        render: () => `
+          <div class="text-center py-2 space-y-4">
+            <span class="px-3 py-1 bg-sky-100 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 text-xs font-bold rounded-full border border-sky-300 dark:border-sky-500/30">IGCSE English 0510 / 0511</span>
+            <h2 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">Exercise 6: Formal Article Writing</h2>
+            <p class="text-slate-600 dark:text-slate-300 max-w-lg mx-auto text-xs sm:text-sm leading-relaxed">
+              Target word count: <span class="text-amber-600 dark:text-amber-400 font-bold font-mono">120 – 160 words</span>. Target Audience: School Magazine & Community.
+            </p>
+
+            <div class="mt-4 p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 max-w-xl mx-auto text-left space-y-3">
+              <span class="text-xs font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider block">Interactive Starter Question:</span>
+              <p class="text-xs text-slate-700 dark:text-slate-200 font-medium">"What happens if a candidate writes 250 words instead of the requested 120–160 words?"</p>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                <button onclick="submitSlideAnswer('Increased risk of structural & language errors', 'MCQ')" class="p-3 bg-white dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-xl text-left text-slate-800 dark:text-slate-200 transition font-medium shadow-sm">
+                  A. Increased risk of language errors & poor structure
+                </button>
+                <button onclick="submitSlideAnswer('Extra bonus marks are awarded', 'MCQ')" class="p-3 bg-white dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-xl text-left text-slate-800 dark:text-slate-200 transition font-medium shadow-sm">
+                  B. Extra bonus marks are awarded for length
+                </button>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Language Type & Factors",
+        module: "Module 1: Foundations",
+        type: "Concept Map",
+        render: () => `
+          <div class="space-y-4">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Determining Your Writing Register</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div class="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-1">
+                <div class="text-sky-600 dark:text-sky-400 font-bold">1. Audience Tone</div>
+                <p class="text-slate-600 dark:text-slate-300">Classmates, teachers, and school governors. Demands a respectful, balanced approach.</p>
+              </div>
+              <div class="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-1">
+                <div class="text-sky-600 dark:text-sky-400 font-bold">2. Exam Purpose</div>
+                <p class="text-slate-600 dark:text-slate-300">To present information, evaluate viewpoints, and provide reasoned recommendations.</p>
+              </div>
+            </div>
+            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 text-xs text-center space-y-2">
+              <span class="text-slate-700 dark:text-slate-300 font-semibold block">Select required register:</span>
+              <div class="flex justify-center gap-2">
+                <button onclick="submitSlideAnswer('Casual Dialogue', 'Register')" class="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-lg text-slate-800 dark:text-slate-200 font-medium">Casual Dialogue</button>
+                <button onclick="submitSlideAnswer('Formal Article Register', 'Register')" class="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-lg text-slate-800 dark:text-slate-200 font-medium">Formal Article Register</button>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "What Formal Language Means",
+        module: "Module 1: Foundations",
+        type: "Rule Classifier",
+        render: () => `
+          <div class="space-y-4">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">4 Pillars of Formal Style</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs font-semibold">
+              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200">🚫 No Contractions</div>
+              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200">🚫 No Colloquial Idioms</div>
+              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200">🚫 No Casual Slang</div>
+              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200">✅ Formal Connectors</div>
+            </div>
+            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
+              <span class="font-bold text-sky-600 dark:text-sky-400 block">Which phrase fits a formal IGCSE article?</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button onclick="submitSlideAnswer('They can\'t do it like that', 'Classifier')" class="p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-xl text-slate-800 dark:text-slate-200 font-medium shadow-sm">"They can't do it like that"</button>
+                <button onclick="submitSlideAnswer('It is high time authorities implemented measures', 'Classifier')" class="p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-xl text-slate-800 dark:text-slate-200 font-medium shadow-sm">"It is high time authorities implemented measures"</button>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Basic Tools for Formal Writing",
+        module: "Module 1: Foundations",
+        type: "Overview",
+        render: () => `
+          <div class="space-y-4 text-xs">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">The 6 Writing Tools</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300"><strong class="text-sky-600 dark:text-sky-400 block">1. Time Fixer</strong>Anchors intro timelines</div>
+              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300"><strong class="text-sky-600 dark:text-sky-400 block">2. Point Introducers</strong>Prevents robotic listing</div>
+              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300"><strong class="text-sky-600 dark:text-sky-400 block">3. Connectors</strong>Addition & contrast</div>
+              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300"><strong class="text-sky-600 dark:text-sky-400 block">4. Adding Support</strong>Cause & effect rationale</div>
+              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300"><strong class="text-sky-600 dark:text-sky-400 block">5. Generalization</strong>Softens sweeping claims</div>
+              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300"><strong class="text-sky-600 dark:text-sky-400 block">6. Suggestions</strong>Subjunctive grammar</div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Tool 1: Phrases for Time Fixer",
+        module: "Module 2: In-Depth",
+        type: "Sentence Transformer",
+        render: () => `
+          <div class="space-y-4 text-xs">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Tool 1: Time Fixer</h3>
+            <p class="text-slate-600 dark:text-slate-300">Anchor your argument across time: <em>Nowadays, In recent years, Historically speaking...</em></p>
+            <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
+              <span class="font-bold text-amber-600 dark:text-amber-400 block">Upgrade Statement: "Most schools are digital now."</span>
+              <div class="flex gap-2">
+                <input id="slide5Input" type="text" placeholder="e.g. In recent years, an increasing number of schools have adopted digital platforms..." class="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-100 outline-none" />
+                <button onclick="submitSlide5Sentence()" class="px-4 py-1.5 bg-sky-600 text-white font-semibold rounded-lg shadow-sm">Submit</button>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Tool 2: Introducing Points",
+        module: "Module 2: In-Depth",
+        type: "Class Poll",
+        render: () => `
+          <div class="space-y-4 text-xs">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Tool 2: Introducing Points</h3>
+            <p class="text-slate-600 dark:text-slate-300">Develop a maximum of 2 to 3 main body ideas thoroughly with clear signposting.</p>
+            <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
+              <span class="text-slate-800 dark:text-slate-200 font-semibold block">Ideal number of core points for high marks?</span>
+              <div class="flex gap-2">
+                <button onclick="submitSlideAnswer('1 point', 'Poll')" class="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 font-medium">1 Point</button>
+                <button onclick="submitSlideAnswer('2 to 3 points', 'Poll')" class="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 font-medium">2 to 3 Points</button>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Film Review Gap-Fill",
+        module: "Module 2: Practice",
+        type: "Multiple Choice",
+        render: () => `
+          <div class="space-y-4 text-xs">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Concluding Gap-Fill Exercise</h3>
+            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 font-serif text-slate-800 dark:text-slate-200">
+              "...[ Blank ], a truly compelling film is a perfect synthesis of evocative storytelling, well-developed characters, and technical mastery."
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="submitSlideAnswer('First of all', 'MCQ')" class="p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 font-medium">A. First of all</button>
+              <button onclick="submitSlideAnswer('In conclusion', 'MCQ')" class="p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 font-medium">B. In conclusion</button>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Tool 3: Joining Points",
+        module: "Module 2: In-Depth",
+        type: "Classifier",
+        render: () => `
+          <div class="space-y-4 text-xs">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Addition vs Contrast Connectors</h3>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300"><strong class="text-sky-600 dark:text-sky-400">Addition:</strong> Furthermore, Moreover, In addition</div>
+              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300"><strong class="text-sky-600 dark:text-sky-400">Contrast:</strong> However, On the other hand, Nevertheless</div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Exercise: Combining Ideas",
+        module: "Module 2: Practice",
+        type: "Open Task",
+        render: () => `
+          <div class="space-y-4 text-xs">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Combine Opposing Statements</h3>
+            <p class="text-slate-600 dark:text-slate-300">Combine: "Technology accelerates learning access" AND "Technology can increase classroom distraction".</p>
+            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
+              <input id="slide9Input" type="text" placeholder="Type combined sentence with formal connector..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-100 outline-none" />
+              <button onclick="submitSlide9Sentence()" class="px-4 py-1.5 bg-sky-600 text-white rounded-lg font-semibold">Submit</button>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Model Answers: Joining Ideas",
+        module: "Module 2: Review",
+        type: "Showcase",
+        render: () => `
+          <div class="space-y-3 text-xs font-serif">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white font-sans">Model Solution</h3>
+            <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200">"Technology significantly accelerates access to learning resources. <strong class="text-sky-600 dark:text-sky-300">However,</strong> unmonitored usage may lead to cognitive distraction."</div>
+          </div>
+        `
+      },
+      {
+        title: "Tool 4: Adding Support",
+        module: "Module 2: In-Depth",
+        type: "Flowchart",
+        render: () => `
+          <div class="space-y-4 text-xs">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Causal Support Flowchart</h3>
+            <p class="text-slate-600 dark:text-slate-300">Main Point ➔ "This implies that..." ➔ "Consequently..."</p>
+          </div>
+        `
+      },
+      {
+        title: "Exercise: Adding Support",
+        module: "Module 2: Practice",
+        type: "Open Task",
+        render: () => `
+          <div class="space-y-4 text-xs">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Support Plastic Pollution Statement</h3>
+            <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
+              <input id="slide12Input" type="text" placeholder="e.g. This means marine life ingests harmful particles..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-100 outline-none" />
+              <button onclick="submitSlide12Support()" class="px-4 py-1.5 bg-sky-600 text-white rounded-lg font-semibold">Submit</button>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Model Answers: Support",
+        module: "Module 2: Review",
+        type: "Showcase",
+        render: () => `
+          <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-serif text-slate-800 dark:text-slate-200">
+            "Plastic waste accumulates in ecosystems. <strong class="text-sky-600 dark:text-sky-300">This implies that</strong> toxic elements enter the food chain. <strong class="text-sky-600 dark:text-sky-300">Consequently,</strong> public health faces long-term risks."
+          </div>
+        `
+      },
+      {
+        title: "Tool 5: Generalization",
+        module: "Module 2: In-Depth",
+        type: "Tone Softener",
+        render: () => `
+          <div class="space-y-4 text-xs">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Softening Sweeping Claims</h3>
+            <p class="text-slate-600 dark:text-slate-300">Use expressions like: <em>The vast majority of, In most cases, It is widely acknowledged that...</em></p>
+          </div>
+        `
+      },
+      {
+        title: "Exercise: Generalization",
+        module: "Module 2: Practice",
+        type: "Open Task",
+        render: () => `
+          <div class="space-y-4 text-xs">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Upgrade: "All teenagers waste time online."</h3>
+            <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
+              <input id="slide15Input" type="text" placeholder="e.g. A considerable number of young people spend substantial time online..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-100 outline-none" />
+              <button onclick="submitSlide15Generalization()" class="px-4 py-1.5 bg-sky-600 text-white rounded-lg font-semibold">Submit</button>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Tool 6: Formal Suggestions",
+        module: "Module 2: Grammar",
+        type: "Grammar Unit",
+        render: () => `
+          <div class="space-y-3 text-xs">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Subjunctive & Unreal Past Grammar</h3>
+            <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200">"It is high time school administration <strong class="text-sky-600 dark:text-sky-300">introduced</strong> comprehensive recycling programs."</div>
+          </div>
+        `
+      },
+      ...Array.from({ length: 12 }, (_, i) => ({
+        title: `Advanced Module Unit ${i + 1}`,
+        module: "Module 3: Exam Mastery",
+        type: "Exam Drill",
+        render: () => `
+          <div class="space-y-4 text-xs">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white font-sans">Exam Drill ${i + 1}</h3>
+            <p class="text-slate-600 dark:text-slate-300">Practice writing formal expressions adhering strictly to Cambridge mark scheme criteria.</p>
+            <div class="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
+              <span class="text-sky-600 dark:text-sky-400 font-bold block">Quick Response Task:</span>
+              <p class="text-slate-800 dark:text-slate-200">Express an opinion on school uniforms using formal vocabulary.</p>
+              <button onclick="submitSlideAnswer('Completed Drill Unit ' + (${i + 1}), 'Drill')" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white font-semibold rounded-lg shadow-md transition">Complete Unit ${i + 1}</button>
+            </div>
+          </div>
+        `
+      }))
+    ];
+  </script>
+</body>
+</html>
