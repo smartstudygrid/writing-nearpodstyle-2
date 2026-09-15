@@ -71,11 +71,10 @@
 
     <!-- User Bar, Theme Toggle & Firebase Status -->
     <div class="flex items-center gap-2.5">
-      <!-- FIREBASE STATUS INDICATOR WITH RETRY -->
+      <!-- FIREBASE STATUS INDICATOR -->
       <div class="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-[11px]">
         <span id="firebaseStatusDot" class="w-2 h-2 rounded-full bg-amber-400"></span>
         <span id="firebaseStatusText" class="text-slate-600 dark:text-slate-300 font-mono hidden md:inline">Connecting...</span>
-        <button id="retryFirebaseBtn" onclick="retryFirebaseConnection()" class="hidden ml-1 px-1.5 py-0.5 bg-sky-500/20 hover:bg-sky-500 hover:text-white text-sky-600 dark:text-sky-300 rounded text-[10px] font-mono transition" title="Retry Cloud Connection">↻ Retry</button>
       </div>
 
       <!-- THEME TOGGLE BUTTON -->
@@ -117,7 +116,7 @@
         <span>Teacher-Led Presentation</span>
       </div>
 
-      <!-- TEACHER BROADCAST SYNC TOGGLE & NAV CONTROLS (ONLY FOR ADMIN) -->
+      <!-- TEACHER BROADCAST SYNC TOGGLE & NAV CONTROLS -->
       <div id="teacherNavControls" class="hidden flex items-center gap-2">
         <button id="teacherSyncToggle" onclick="toggleTeacherSync()" class="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 rounded-lg text-[11px] font-mono flex items-center gap-1.5 transition hover:bg-emerald-200 dark:hover:bg-emerald-900/50" title="Toggle Real-Time Presentation Broadcast">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -152,7 +151,6 @@
           </div>
 
           <div class="flex items-center gap-2">
-            <!-- FULLSCREEN TOGGLE BUTTON -->
             <button onclick="toggleCardFullscreen()" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-medium transition flex items-center gap-1.5" title="Toggle Fullscreen Mode">
               <span id="fullscreenIcon">⛶</span>
               <span class="hidden sm:inline">Fullscreen</span>
@@ -164,18 +162,18 @@
           </div>
         </div>
 
-        <!-- BROADCASTED STUDENT ANSWER BANNER / MODAL OVERLAY -->
-        <div id="sharedAnswerBanner" class="hidden mb-6 p-4 bg-gradient-to-r from-amber-500/15 via-sky-500/15 to-emerald-500/15 border-2 border-amber-500/40 rounded-xl relative shadow-lg animate-pulse">
+        <!-- BROADCASTED STUDENT ANSWER BANNER (FADE ANIMATION REMOVED) -->
+        <div id="sharedAnswerBanner" class="hidden mb-6 p-4 bg-gradient-to-r from-amber-500/15 via-sky-500/15 to-emerald-500/15 border-2 border-amber-500/40 rounded-xl relative shadow-lg cursor-pointer hover:border-amber-500/80 transition" onclick="openAnswerModalFromShared()">
           <div class="flex items-center justify-between mb-2">
             <span class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-              <span>📢</span> Teacher Shared Response
+              <span>📢</span> Teacher Shared Response <span class="text-[10px] lowercase font-normal text-slate-400">(Click to view full answer)</span>
             </span>
-            <button id="closeSharedAnswerBtn" onclick="clearSharedAnswer()" class="hidden text-xs text-slate-400 hover:text-slate-200 font-bold px-2 py-0.5 rounded bg-slate-800/50">Dismiss Broadcast</button>
+            <button id="closeSharedAnswerBtn" onclick="event.stopPropagation(); clearSharedAnswer();" class="hidden text-xs text-slate-400 hover:text-slate-200 font-bold px-2 py-0.5 rounded bg-slate-800/50">Dismiss Broadcast</button>
           </div>
           <div class="text-xs text-slate-600 dark:text-slate-300 mb-1 font-semibold">
             Student: <strong id="sharedStudentName" class="text-sky-600 dark:text-sky-400 font-bold">Name</strong>
           </div>
-          <p id="sharedStudentText" class="text-sm font-serif italic text-slate-800 dark:text-slate-100 bg-white/60 dark:bg-slate-900/80 p-3 rounded-lg border border-amber-500/20">
+          <p id="sharedStudentText" class="text-sm font-serif italic text-slate-800 dark:text-slate-100 bg-white/60 dark:bg-slate-900/80 p-3 rounded-lg border border-amber-500/20 line-clamp-2">
             "Answer content..."
           </p>
         </div>
@@ -188,7 +186,6 @@
         <div class="mt-6 pt-4 border-t border-slate-200 dark:border-edu-border/50 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
           <span class="text-slate-500 dark:text-slate-400 font-medium">SmartStudyGrid.com — Cambridge IGCSE English</span>
 
-          <!-- BOTTOM NAV BUTTONS (ONLY VISIBLE TO TEACHER/ADMIN) -->
           <div id="teacherBottomNav" class="hidden flex gap-2">
             <button onclick="prevSlide()" class="px-3.5 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg transition font-medium">Previous</button>
             <button onclick="nextSlide()" class="px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg transition font-semibold shadow-md shadow-sky-600/20">Next Slide &rarr;</button>
@@ -198,7 +195,7 @@
       </div>
     </section>
 
-    <!-- RIGHT: ADMIN CONTROL & ROSTER MANAGEMENT (WITH MINIMIZE SUPPORT) -->
+    <!-- RIGHT: ADMIN CONTROL & ROSTER MANAGEMENT -->
     <aside id="adminControlDrawer" class="w-full lg:w-96 bg-white dark:bg-edu-card border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-edu-border p-4 overflow-y-auto flex flex-col gap-4 shadow-2xl transition-all duration-300 hidden">
       <div class="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-edu-border">
         <div class="flex items-center gap-2">
@@ -213,50 +210,33 @@
         </div>
       </div>
 
-      <div id="adminPanelContent" class="space-y-4">
-        <!-- CREATE NEW STUDENT FORM -->
-        <div class="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 space-y-2.5">
-          <h3 class="font-bold text-xs text-sky-600 dark:text-sky-400 uppercase tracking-wide">Register New Student</h3>
-          <div class="space-y-2 text-xs">
-            <div>
-              <label class="block text-slate-600 dark:text-slate-400 mb-1">Student Full Name</label>
-              <input id="newStudentName" type="text" placeholder="e.g. Sarah Khan" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-100 outline-none focus:border-sky-500" />
-            </div>
-            <div>
-              <label class="block text-slate-600 dark:text-slate-400 mb-1">Grade / Class Section</label>
-              <input id="newStudentGrade" type="text" placeholder="e.g. Grade 10-A" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-100 outline-none focus:border-sky-500" />
-            </div>
-            <div>
-              <label class="block text-slate-600 dark:text-slate-400 mb-1">Assign Password</label>
-              <input id="newStudentPassword" type="password" placeholder="Passcode" class="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-100 outline-none focus:border-sky-500" />
-            </div>
-            <button onclick="handleAdminCreateUser()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg shadow-md transition text-xs flex items-center justify-center gap-1.5">
-              <span>Add Student</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- LIVE INCOMING STUDENT SUBMISSIONS FEED -->
-        <div class="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 space-y-2.5">
+      <div id="adminPanelContent" class="space-y-4 flex-1 flex flex-col">
+        <!-- LIVE INCOMING STUDENT SUBMISSIONS FEED (EXTRA ROOM) -->
+        <div class="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 space-y-2.5 flex-1 flex flex-col min-h-[220px]">
           <div class="flex items-center justify-between">
             <h3 class="font-bold text-xs text-amber-600 dark:text-amber-400 uppercase tracking-wide flex items-center gap-1">
               <span>💬</span> Live Student Submissions
             </h3>
             <button onclick="clearSharedAnswer()" class="text-[10px] text-rose-500 hover:underline">Clear Broadcast</button>
           </div>
-          <div id="adminLiveFeed" class="space-y-2 max-h-48 overflow-y-auto text-xs pr-1">
-            <div class="text-slate-400 italic text-center py-2">No live responses received yet.</div>
+          <div id="adminLiveFeed" class="space-y-2 flex-1 overflow-y-auto text-xs pr-1 max-h-[300px]">
+            <div class="text-slate-400 italic text-center py-4">No live responses received yet.</div>
           </div>
         </div>
 
-        <!-- STUDENT ROSTER LIST -->
-        <div class="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 space-y-2.5 flex-1 flex flex-col">
+        <!-- STUDENT ROSTER LIST WITH ADD STUDENT BUTTON -->
+        <div class="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 space-y-2.5 flex-1 flex flex-col min-h-[200px]">
           <div class="flex items-center justify-between">
             <h3 class="font-bold text-xs text-sky-600 dark:text-sky-400 uppercase tracking-wide">Student Progress Roster</h3>
-            <button onclick="fetchStudentRoster()" class="text-[10px] text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-300 underline">Sync</button>
+            <div class="flex items-center gap-2">
+              <button onclick="openAddStudentModal()" class="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[10px] font-bold transition shadow-sm">
+                + Add Student
+              </button>
+              <button onclick="fetchStudentRoster(true)" class="text-[10px] text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-300 underline font-mono">Sync</button>
+            </div>
           </div>
 
-          <div id="adminRosterList" class="space-y-2 max-h-48 overflow-y-auto text-xs flex-1 pr-1">
+          <div id="adminRosterList" class="space-y-2 flex-1 overflow-y-auto text-xs pr-1 max-h-[220px]">
             <div class="text-slate-400 italic text-center py-2">Syncing roster...</div>
           </div>
         </div>
@@ -264,6 +244,78 @@
     </aside>
 
   </main>
+
+  <!-- ADD STUDENT POP-UP MODAL -->
+  <div id="addStudentModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-edu-card border border-slate-200 dark:border-edu-border rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-edu-border pb-3">
+        <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+          <span>➕</span> Add New Student
+        </h3>
+        <button onclick="closeAddStudentModal()" class="text-slate-400 hover:text-slate-200">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-600 dark:text-slate-400 mb-1 font-medium">Student Full Name</label>
+          <input id="newStudentName" type="text" placeholder="e.g. Sarah Khan" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 outline-none focus:ring-1 focus:ring-sky-500" />
+        </div>
+        <div>
+          <label class="block text-slate-600 dark:text-slate-400 mb-1 font-medium">Grade / Class Section</label>
+          <input id="newStudentGrade" type="text" placeholder="e.g. Grade 10-A" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 outline-none focus:ring-1 focus:ring-sky-500" />
+        </div>
+        <div>
+          <label class="block text-slate-600 dark:text-slate-400 mb-1 font-medium">Assign Password</label>
+          <input id="newStudentPassword" type="password" placeholder="Passcode" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 outline-none focus:ring-1 focus:ring-sky-500" />
+        </div>
+        <div class="flex items-center gap-2 pt-2">
+          <button onclick="closeAddStudentModal()" class="w-1/2 py-2.5 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition">
+            Cancel
+          </button>
+          <button onclick="handleAdminCreateUser()" class="w-1/2 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg transition">
+            Save Student
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANSWER POP-UP VIEW MODAL -->
+  <div id="answerViewModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-edu-card border border-slate-200 dark:border-edu-border rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-edu-border pb-3">
+        <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+          <span>🔍</span> Student Response Detail
+        </h3>
+        <button onclick="closeAnswerModal()" class="text-slate-400 hover:text-slate-200">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 space-y-1">
+          <div class="text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-wider font-semibold">Student Name</div>
+          <div id="modalAnswerStudent" class="font-bold text-sm text-sky-600 dark:text-sky-400">Name</div>
+        </div>
+
+        <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 space-y-1">
+          <div class="text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-wider font-semibold">Slide Task</div>
+          <div id="modalAnswerSlide" class="font-semibold text-slate-800 dark:text-slate-200">Slide Title</div>
+        </div>
+
+        <div class="space-y-1">
+          <div class="text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-wider font-semibold">Submitted Response</div>
+          <div id="modalAnswerText" class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-serif italic text-slate-800 dark:text-slate-100 leading-relaxed max-h-60 overflow-y-auto">
+            "Answer content..."
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button id="modalBroadcastBtn" onclick="broadcastModalAnswer()" class="w-full py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+            <span>📢 Broadcast Response to Class</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- AUTHENTICATION MODAL -->
   <div id="loginModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
@@ -286,18 +338,18 @@
 
         <div id="studentLoginFields" class="space-y-2">
           <div>
-            <label class="block text-slate-400 mb-1">Student Name</label>
+            <label class="block text-slate-400 mb-1 font-medium">Student Name</label>
             <input id="loginStudentName" type="text" placeholder="Enter your registered name" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 outline-none focus:ring-1 focus:ring-sky-500" />
           </div>
           <div>
-            <label class="block text-slate-400 mb-1">Password</label>
+            <label class="block text-slate-400 mb-1 font-medium">Password</label>
             <input id="loginStudentPassword" type="password" placeholder="Password" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 outline-none focus:ring-1 focus:ring-sky-500" />
           </div>
         </div>
 
         <div id="adminLoginFields" class="space-y-2 hidden">
           <div>
-            <label class="block text-slate-400 mb-1">Master Password</label>
+            <label class="block text-slate-400 mb-1 font-medium">Master Password</label>
             <input id="loginAdminPassword" type="password" placeholder="Enter admin password" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 outline-none focus:ring-1 focus:ring-amber-500" />
           </div>
         </div>
@@ -309,7 +361,7 @@
     </div>
   </div>
 
-  <!-- PDF REPORT GENERATION TEMPLATE (HIDDEN DOM CANVAS) -->
+  <!-- PDF REPORT GENERATION TEMPLATE -->
   <div class="fixed top-[-9999px] left-[-9999px]">
     <div id="pdfReportTemplate" class="w-[800px] bg-white text-slate-900 p-8 font-sans space-y-6">
       <div class="flex justify-between items-center border-b-2 border-sky-600 pb-4">
@@ -353,6 +405,7 @@
     window.followTeacherSync = true;
     window.liveSubmissionsFeed = [];
     window.currentSlideIndex = 0;
+    window.currentSelectedModalAnswer = null;
 
     // Slide Content Definitions
     window.slidesData = [
@@ -634,6 +687,57 @@
       }))
     ];
 
+    // Pop-up Answer View Handlers
+    window.openAnswerModal = function(studentName, answerText, slideTitle) {
+      window.currentSelectedModalAnswer = { studentName, answerText, slideTitle };
+      const m = document.getElementById('answerViewModal');
+      document.getElementById('modalAnswerStudent').textContent = studentName;
+      document.getElementById('modalAnswerSlide').textContent = slideTitle || window.slidesData[window.currentSlideIndex].title;
+      document.getElementById('modalAnswerText').textContent = `"${answerText}"`;
+      
+      const broadcastBtn = document.getElementById('modalBroadcastBtn');
+      if (window.currentUser && window.currentUser.role === 'admin') {
+        broadcastBtn.classList.remove('hidden');
+      } else {
+        broadcastBtn.classList.add('hidden');
+      }
+
+      if (m) m.classList.remove('hidden');
+    };
+
+    window.closeAnswerModal = function() {
+      const m = document.getElementById('answerViewModal');
+      if (m) m.classList.add('hidden');
+    };
+
+    window.openAnswerModalFromShared = function() {
+      const name = document.getElementById('sharedStudentName').textContent;
+      const text = document.getElementById('sharedStudentText').textContent.replace(/^"|"$/g, '');
+      window.openAnswerModal(name, text, window.slidesData[window.currentSlideIndex].title);
+    };
+
+    window.broadcastModalAnswer = function() {
+      if (window.currentSelectedModalAnswer) {
+        window.shareAnswerToAll(
+          window.currentSelectedModalAnswer.studentName,
+          window.currentSelectedModalAnswer.answerText,
+          window.currentSelectedModalAnswer.slideTitle
+        );
+        window.closeAnswerModal();
+      }
+    };
+
+    // Add Student Modal Controls
+    window.openAddStudentModal = function() {
+      const modal = document.getElementById('addStudentModal');
+      if (modal) modal.classList.remove('hidden');
+    };
+
+    window.closeAddStudentModal = function() {
+      const modal = document.getElementById('addStudentModal');
+      if (modal) modal.classList.add('hidden');
+    };
+
     // Theme Management
     window.initTheme = function() {
       const savedTheme = localStorage.getItem('smartstudy_theme') || 'light';
@@ -757,7 +861,6 @@
       }
     };
 
-    // User Logout Handler
     window.handleLogout = function() {
       sessionStorage.removeItem('edutrack_user');
       window.currentUser = null;
@@ -801,7 +904,7 @@
       if (text) text.textContent = msg;
       if (toast) {
         toast.classList.remove('translate-y-20', 'opacity-0');
-        setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3500);
       }
     };
 
@@ -844,7 +947,7 @@
           window.updateUserUI();
           window.closeLoginModal();
           window.showToast("Authenticated as System Administrator");
-          window.fetchStudentRoster();
+          window.fetchStudentRoster(true);
         } else {
           window.showToast("Incorrect Master Admin Password!");
         }
@@ -872,7 +975,7 @@
         if (window.dbMethods && window.db) {
           try {
             const { doc, getDoc } = window.dbMethods;
-            const userRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'students', studentDocId);
+            const userRef = doc(window.db, 'students', studentDocId);
             const snap = await getDoc(userRef);
 
             if (snap.exists() && snap.data().password === pass) {
@@ -922,42 +1025,46 @@
         createdAt: new Date().toISOString()
       };
 
-      // Save locally immediately
+      // Save locally first
       window.saveLocalStudent(studentDocId, newStudentObj);
 
       let firebaseSynced = false;
-      // Only attempt Firestore write if authenticated
-      if (window.db && window.auth && window.auth.currentUser) {
+      // Write to simplified Firestore collection 'students'
+      if (window.dbMethods && window.db) {
         try {
           const { doc, setDoc } = window.dbMethods;
-          const studentRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'students', studentDocId);
+          const studentRef = doc(window.db, 'students', studentDocId);
           await setDoc(studentRef, newStudentObj);
           firebaseSynced = true;
         } catch(e) {
-          console.warn("Firestore save fallback triggered.", e);
+          console.error("Firestore save error:", e);
+          window.showToast("Firebase write blocked! Please check Firestore rules in Console.");
         }
       }
 
       if (firebaseSynced) {
-        window.showToast(`Registered student '${name}' (Synced to Cloud)!`);
+        window.showToast(`Student '${name}' registered and synced to Cloud!`);
       } else {
-        window.showToast(`Registered student '${name}' (Saved Locally)!`);
+        window.showToast(`Student '${name}' saved locally (offline mode).`);
       }
 
       if (nameInput) nameInput.value = "";
       if (gradeInput) gradeInput.value = "";
       if (passInput) passInput.value = "";
-      window.fetchStudentRoster();
+      
+      window.closeAddStudentModal();
+      window.fetchStudentRoster(true);
     };
 
-    window.fetchStudentRoster = async function() {
+    // FIXED STUDENT ROSTER SYNC FUNCTION
+    window.fetchStudentRoster = async function(showToastNotice = false) {
       const rosterList = document.getElementById('adminRosterList');
       if (!rosterList) return;
 
       const renderRosterMap = (map) => {
         rosterList.innerHTML = "";
         if (map.size === 0) {
-          rosterList.innerHTML = '<div class="text-slate-400 text-center py-2">No students registered yet.</div>';
+          rosterList.innerHTML = '<div class="text-slate-400 text-center py-4 text-xs">No students registered yet. Click "+ Add Student" to start.</div>';
           return;
         }
 
@@ -992,23 +1099,23 @@
         combinedMap.set(id, { ...localStudents[id], id, source: 'local' });
       });
 
-      // Render local roster immediately
-      renderRosterMap(combinedMap);
-
-      if (window.dbMethods && window.db && window.auth && window.auth.currentUser) {
+      if (window.dbMethods && window.db) {
         try {
           const { collection, getDocs } = window.dbMethods;
-          const studentsCol = collection(window.db, 'artifacts', window.appId, 'public', 'data', 'students');
+          const studentsCol = collection(window.db, 'students');
           const querySnapshot = await getDocs(studentsCol);
           
           querySnapshot.forEach((docSnap) => {
             combinedMap.set(docSnap.id, { ...docSnap.data(), id: docSnap.id, source: 'cloud' });
           });
-          renderRosterMap(combinedMap);
+          if (showToastNotice) window.showToast("Roster synced successfully!");
         } catch(e) {
           console.warn("Firestore collection query notice:", e);
+          if (showToastNotice) window.showToast("Cloud sync failed. Check Firestore Rules!");
         }
       }
+
+      renderRosterMap(combinedMap);
     };
 
     window.shareAnswerToAll = async function(studentName, answerText, slideTitle) {
@@ -1026,10 +1133,10 @@
         window.liveChannel.postMessage({ type: 'SHARED_ANSWER', sharedAnswer: sharedData });
       }
 
-      if (window.db) {
+      if (window.db && window.dbMethods) {
         try {
           const { doc, setDoc } = window.dbMethods;
-          const liveDocRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'presentation', 'liveSession');
+          const liveDocRef = doc(window.db, 'session', 'liveSession');
           await setDoc(liveDocRef, {
             sharedAnswer: sharedData,
             updatedBy: window.currentUser ? window.currentUser.name : 'Teacher',
@@ -1049,10 +1156,10 @@
         window.liveChannel.postMessage({ type: 'SHARED_ANSWER', sharedAnswer: null });
       }
 
-      if (window.db) {
+      if (window.db && window.dbMethods) {
         try {
           const { doc, setDoc } = window.dbMethods;
-          const liveDocRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'presentation', 'liveSession');
+          const liveDocRef = doc(window.db, 'session', 'liveSession');
           await setDoc(liveDocRef, {
             sharedAnswer: null,
             updatedAt: new Date().toISOString()
@@ -1096,6 +1203,19 @@
         window.liveChannel.postMessage({ type: 'STUDENT_SUBMISSION', submission: progressEntry });
       }
 
+      // Sync submission to Firestore live feed collection
+      if (window.db && window.dbMethods) {
+        try {
+          const { collection, addDoc } = window.dbMethods;
+          await addDoc(collection(window.db, 'submissions'), {
+            ...progressEntry,
+            createdAt: new Date().toISOString()
+          });
+        } catch(e) {
+          console.warn("Could not push live submission to cloud:", e);
+        }
+      }
+
       if (!window.currentUser || window.currentUser.role !== 'student') {
         window.showToast("Answer submitted to teacher! 🎓");
         return;
@@ -1111,7 +1231,7 @@
 
       try {
         const { doc, updateDoc, arrayUnion } = window.dbMethods;
-        const studentRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'students', sId);
+        const studentRef = doc(window.db, 'students', sId);
         await updateDoc(studentRef, {
           progress: arrayUnion(progressEntry)
         });
@@ -1122,23 +1242,32 @@
     };
 
     window.addSubmissionToLiveFeed = function(sub) {
-      window.liveSubmissionsFeed.unshift(sub);
+      // Check if already in feed by timestamp & student
+      const exists = window.liveSubmissionsFeed.some(
+        s => s.studentName === sub.studentName && s.answer === sub.answer && s.slideIndex === sub.slideIndex
+      );
+      if (!exists) {
+        window.liveSubmissionsFeed.unshift(sub);
+      }
+
       const feed = document.getElementById('adminLiveFeed');
       if (!feed) return;
 
       feed.innerHTML = "";
-      window.liveSubmissionsFeed.slice(0, 10).forEach((item) => {
+      window.liveSubmissionsFeed.slice(0, 15).forEach((item) => {
         const card = document.createElement('div');
-        card.className = "p-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg space-y-1 shadow-sm";
+        card.className = "p-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg space-y-1 shadow-sm hover:border-sky-500 cursor-pointer transition";
+        card.onclick = () => window.openAnswerModal(item.studentName, item.answer, item.slideTitle);
         card.innerHTML = `
           <div class="flex items-center justify-between text-[11px] font-bold text-slate-800 dark:text-slate-200">
             <span>${item.studentName}</span>
             <span class="text-[9px] text-slate-400 font-mono">${item.timestamp}</span>
           </div>
           <p class="text-[11px] text-slate-600 dark:text-slate-300 font-serif italic truncate">"${item.answer}"</p>
-          <button onclick="shareAnswerToAll('${item.studentName.replace(/'/g, "\\'")}', '${item.answer.replace(/'/g, "\\'")}', '${item.slideTitle.replace(/'/g, "\\'")}')" class="mt-1 w-full py-1 bg-amber-500/20 hover:bg-amber-500 hover:text-white border border-amber-500/40 text-amber-700 dark:text-amber-300 rounded font-semibold text-[10px] transition flex items-center justify-center gap-1">
-            <span>📢 Share to All Screens</span>
-          </button>
+          <div class="flex items-center justify-between text-[9px] text-slate-400 pt-0.5">
+            <span>${item.slideTitle}</span>
+            <span class="text-sky-500 font-semibold">View Detail 🔍</span>
+          </div>
         `;
         feed.appendChild(card);
       });
@@ -1153,7 +1282,7 @@
           data = localStudents[studentDocId];
         } else {
           const { doc, getDoc } = window.dbMethods;
-          const studentRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'students', studentDocId);
+          const studentRef = doc(window.db, 'students', studentDocId);
           const snap = await getDoc(studentRef);
           if (snap.exists()) data = snap.data();
         }
@@ -1230,10 +1359,10 @@
         window.liveChannel.postMessage({ type: 'SLIDE_CHANGE', slideIndex: idx });
       }
 
-      if (window.currentUser && window.currentUser.role === 'admin' && window.db) {
+      if (window.currentUser && window.currentUser.role === 'admin' && window.db && window.dbMethods) {
         try {
           const { doc, setDoc } = window.dbMethods;
-          const liveDocRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'presentation', 'liveSession');
+          const liveDocRef = doc(window.db, 'session', 'liveSession');
           await setDoc(liveDocRef, {
             currentSlide: idx,
             updatedBy: window.currentUser.name || 'Admin',
@@ -1317,10 +1446,9 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, getDocs, updateDoc, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, getDocs, updateDoc, arrayUnion, onSnapshot, addDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'edutrack-igcse-app';
     const defaultFirebaseConfig = {
       apiKey: "AIzaSyCidnvJ4NN7Xih4LPA0NIRBzB-iZzgNAVU",
       authDomain: "nearpod-2.firebaseapp.com",
@@ -1336,10 +1464,9 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    window.appId = appId;
     window.auth = auth;
     window.db = db;
-    window.dbMethods = { doc, setDoc, getDoc, collection, getDocs, updateDoc, arrayUnion, onSnapshot };
+    window.dbMethods = { doc, setDoc, getDoc, collection, getDocs, updateDoc, arrayUnion, onSnapshot, addDoc };
     window.currentUser = JSON.parse(sessionStorage.getItem('edutrack_user')) || null;
     window.selectedAuthRole = 'student';
 
@@ -1355,7 +1482,6 @@
           if (window.followTeacherSync && (!window.currentUser || window.currentUser.role !== 'admin')) {
             if (window.currentSlideIndex !== data.slideIndex) {
               if (typeof window.renderSlide === 'function') window.renderSlide(data.slideIndex, false);
-              if (typeof window.showToast === 'function') window.showToast(`Teacher moved to Slide ${data.slideIndex + 1}`);
             }
           }
         }
@@ -1373,61 +1499,38 @@
     }
 
     async function initFirebaseAuth() {
-      const dot = document.getElementById('firebaseStatusDot');
-      const text = document.getElementById('firebaseStatusText');
-      const retryBtn = document.getElementById('retryFirebaseBtn');
-
-      if (dot) dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-pulse";
-      if (text) text.textContent = "Connecting Firebase...";
-      if (retryBtn) retryBtn.classList.add('hidden');
-
       try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
-          await signInAnonymously(auth);
-        }
-        if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-400";
-        if (text) text.textContent = `Firebase Connected (${auth.currentUser.uid.slice(0, 5)}...)`;
+        await signInAnonymously(auth);
       } catch (err) {
-        console.warn("Firebase Authentication Notice:", err);
-        let errorMsg = "Local Mode (Auth Fallback)";
-        if (err.code === 'auth/operation-not-allowed') {
-          errorMsg = "Local Mode (Enable Anon Auth in Console)";
-        } else if (err.code === 'auth/network-request-failed') {
-          errorMsg = "Local Mode (Network/CORS Restricted)";
-        } else if (err.code) {
-          errorMsg = `Local Mode (${err.code})`;
-        }
-        
-        if (dot) dot.className = "w-2 h-2 rounded-full bg-amber-400";
-        if (text) text.textContent = errorMsg;
-        if (retryBtn) retryBtn.classList.remove('hidden');
+        console.warn("Anonymous sign-in error:", err);
+        const dot = document.getElementById('firebaseStatusDot');
+        const text = document.getElementById('firebaseStatusText');
+        if (dot) dot.className = "w-2 h-2 rounded-full bg-rose-500";
+        if (text) text.textContent = "Auth Blocked (Enable in Console)";
+        window.showToast("⚠️ Anonymous Auth disabled in Firebase Console!");
       }
     }
-
-    window.retryFirebaseConnection = function() {
-      if (typeof window.showToast === 'function') window.showToast("Re-attempting Firebase cloud connection...");
-      initFirebaseAuth();
-    };
 
     onAuthStateChanged(auth, (user) => {
       const dot = document.getElementById('firebaseStatusDot');
       const text = document.getElementById('firebaseStatusText');
-      const retryBtn = document.getElementById('retryFirebaseBtn');
       if (user) {
         if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-400";
-        if (text) text.textContent = `Firebase Connected (${user.uid.slice(0, 5)}...)`;
-        if (retryBtn) retryBtn.classList.add('hidden');
-        if (window.currentUser && window.currentUser.role === 'admin' && typeof window.fetchStudentRoster === 'function') {
-          window.fetchStudentRoster();
-        }
+        if (text) text.textContent = `Online (${user.uid.slice(0, 5)}...)`;
+        
+        // Start real-time listeners for presentation and roster
+        listenToLivePresentation();
+        listenToLiveSubmissions();
+        listenToStudentsCollection();
+      } else {
+        if (dot) dot.className = "w-2 h-2 rounded-full bg-amber-400";
+        if (text) text.textContent = "Offline / Local Mode";
       }
     });
 
     function listenToLivePresentation() {
       try {
-        const liveDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'presentation', 'liveSession');
+        const liveDocRef = doc(db, 'session', 'liveSession');
         onSnapshot(liveDocRef, (snap) => {
           if (snap.exists()) {
             const data = snap.data();
@@ -1448,20 +1551,46 @@
             }
           }
         }, (err) => {
-          console.warn("Live presentation listener info:", err.message);
+          console.warn("Live presentation listener notice:", err.message);
         });
       } catch (e) {
-        console.error("Failed to set up live presentation listener:", e);
+        console.error("Failed to setup presentation listener:", e);
       }
+    }
+
+    function listenToLiveSubmissions() {
+      try {
+        const subCol = collection(db, 'submissions');
+        // Simple collection snapshot avoiding composite index requirements
+        onSnapshot(subCol, (snapshot) => {
+          snapshot.docChanges().forEach((change) => {
+            if (change.type === 'added') {
+              window.addSubmissionToLiveFeed(change.doc.data());
+            }
+          });
+        }, (err) => {
+          console.warn("Submissions listener notice:", err.message);
+        });
+      } catch (e) {}
+    }
+
+    function listenToStudentsCollection() {
+      try {
+        const studentsCol = collection(db, 'students');
+        onSnapshot(studentsCol, (snapshot) => {
+          if (typeof window.fetchStudentRoster === 'function') {
+            window.fetchStudentRoster(false);
+          }
+        }, (err) => {
+          console.warn("Students live snapshot notice:", err.message);
+        });
+      } catch (e) {}
     }
 
     initFirebaseAuth().then(() => {
       if (typeof window.initSlidesDropdown === 'function') window.initSlidesDropdown();
       if (typeof window.renderSlide === 'function') window.renderSlide(0, false);
-      listenToLivePresentation();
-      if (typeof window.updateUserUI === 'function') {
-        window.updateUserUI();
-      }
+      if (typeof window.updateUserUI === 'function') window.updateUserUI();
     });
   </script>
 </body>
