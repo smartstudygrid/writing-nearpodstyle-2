@@ -2,7 +2,7 @@
 <html lang="en" class="h-full">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SmartStudyGrid.com — IGCSE Learning Platform</title>
 
   <!-- Tailwind CSS CDN -->
@@ -55,6 +55,97 @@
       50% { transform: translateY(-6px); }
     }
     .floating-podium { animation: float 3s ease-in-out infinite; }
+    
+    /* Dedicated slide card backgrounds for Light and Dark modes */
+    #slideCard {
+      background-color: #ffffff;
+      background-image: radial-gradient(at 0% 0%, rgba(224, 242, 254, 0.7) 0px, transparent 55%),
+                        radial-gradient(at 100% 100%, rgba(236, 253, 245, 0.6) 0px, transparent 55%),
+                        linear-gradient(135deg, #ffffff 0%, #f8fafc 55%, #f1f5f9 100%);
+      box-shadow: 0 25px 50px -12px rgba(14, 165, 233, 0.16), 0 0 0 1px rgba(203, 213, 225, 0.85), 0 8px 24px -4px rgba(15, 23, 42, 0.04);
+      border-color: rgba(203, 213, 225, 0.9);
+    }
+    
+    .dark #slideCard {
+      background-color: #080f1e !important;
+      background-image: radial-gradient(circle at 10% 15%, rgba(6, 182, 212, 0.22) 0%, transparent 50%),
+                        radial-gradient(circle at 90% 85%, rgba(16, 185, 129, 0.20) 0%, transparent 50%),
+                        linear-gradient(145deg, #050b17 0%, #0a1427 45%, #060e1c 100%) !important;
+      box-shadow: 0 0 45px -5px rgba(6, 182, 212, 0.35), 0 0 20px -2px rgba(16, 185, 129, 0.25), inset 0 0 35px rgba(6, 182, 212, 0.08), 0 0 0 1px rgba(34, 211, 238, 0.45) !important;
+      border-color: rgba(34, 211, 238, 0.45) !important;
+      color: #f1f5f9 !important;
+    }
+
+    /* Vibrant Neon typography and glowing effects for Dark Mode */
+    .dark .neon-cyan {
+      color: #38bdf8 !important;
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.75), 0 0 24px rgba(6, 182, 212, 0.5);
+    }
+    .dark .neon-emerald {
+      color: #34d399 !important;
+      text-shadow: 0 0 10px rgba(52, 211, 153, 0.75), 0 0 24px rgba(16, 185, 129, 0.5);
+    }
+    .dark .neon-amber {
+      color: #fbbf24 !important;
+      text-shadow: 0 0 10px rgba(251, 191, 36, 0.75), 0 0 22px rgba(245, 158, 11, 0.45);
+    }
+    .dark .neon-rose {
+      color: #fb7185 !important;
+      text-shadow: 0 0 10px rgba(251, 113, 133, 0.75);
+    }
+    .dark .neon-box-cyan {
+      border-color: rgba(56, 189, 248, 0.5) !important;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.22), inset 0 0 15px rgba(56, 189, 248, 0.07) !important;
+    }
+    .dark .neon-box-emerald {
+      border-color: rgba(52, 211, 153, 0.5) !important;
+      box-shadow: 0 0 20px rgba(52, 211, 153, 0.22), inset 0 0 15px rgba(52, 211, 153, 0.07) !important;
+    }
+
+    /* True full-screen focus view behavior */
+    #slideCard:fullscreen,
+    #slideCard:-webkit-full-screen,
+    .card-fullscreen-active {
+      width: 100vw !important;
+      max-width: 100vw !important;
+      height: 100vh !important;
+      max-height: 100vh !important;
+      min-height: 100vh !important;
+      border-radius: 0px !important;
+      border: none !important;
+      padding: 2.5rem 3.5rem !important;
+      overflow-y: auto !important;
+      z-index: 99999 !important;
+      position: fixed !important;
+      inset: 0 !important;
+      box-sizing: border-box !important;
+    }
+
+    .stage-mesh {
+      background-image: radial-gradient(rgba(56, 189, 248, 0.16) 1.2px, transparent 0);
+      background-size: 26px 26px;
+    }
+    .dark .stage-mesh {
+      background-image: radial-gradient(rgba(34, 211, 238, 0.22) 1.4px, transparent 0);
+      background-size: 26px 26px;
+    }
+    
+    /* PDF discrete page container styling for authentic multi-page flow */
+    .pdf-a4-page {
+      width: 794px;
+      height: 1123px;
+      min-height: 1123px;
+      max-height: 1123px;
+      padding: 44px 48px;
+      box-sizing: border-box;
+      background: #ffffff;
+      color: #0f172a;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
   </style>
 </head>
 
@@ -81,7 +172,7 @@
       <!-- FIREBASE STATUS INDICATOR -->
       <div class="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-[11px]">
         <span id="firebaseStatusDot" class="w-2 h-2 rounded-full bg-amber-400"></span>
-        <span id="firebaseStatusText" class="text-slate-600 dark:text-slate-300 font-mono hidden md:inline">Connecting...</span>
+        <span id="firebaseStatusText" class="text-slate-600 dark:text-slate-300 font-mono hidden md:inline font-semibold">Connecting...</span>
       </div>
 
       <!-- CONNECTED / ONLINE STUDENTS BUTTON -->
@@ -139,18 +230,18 @@
   <!-- SLIDE CONTROL BAR -->
   <div class="bg-slate-200 dark:bg-[#0b1329] border-b border-slate-300 dark:border-edu-border px-4 py-2 flex flex-wrap items-center justify-between text-xs gap-2">
     <div class="flex items-center gap-3 overflow-x-auto py-0.5">
-      <span id="slideCounterLabel" class="text-sky-700 dark:text-sky-400 font-mono text-xs font-bold whitespace-nowrap">Slide 1 / 20</span>
-      <div class="w-28 sm:w-48 bg-slate-300 dark:bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-300 dark:border-slate-800">
-        <div id="slideProgressBar" class="bg-gradient-to-r from-sky-500 to-emerald-400 h-full w-[5%] transition-all duration-300"></div>
+      <span id="slideCounterLabel" class="text-sky-700 dark:text-cyan-400 font-mono text-xs sm:text-sm font-bold whitespace-nowrap">Slide 1 / 20</span>
+      <div class="w-28 sm:w-48 bg-slate-300 dark:bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-300 dark:border-slate-800">
+        <div id="slideProgressBar" class="bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-400 dark:from-cyan-400 dark:to-emerald-400 h-full w-[5%] transition-all duration-300 shadow-[0_0_10px_rgba(6,182,212,0.5)]"></div>
       </div>
-      <span id="slideTitleHeader" class="text-slate-800 dark:text-slate-200 font-medium truncate max-w-[180px] sm:max-w-xs">Title & Exam Specs</span>
-      <span id="sessionActiveBadge" class="hidden sm:inline-flex text-[10px] bg-slate-300 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded font-mono">Session: Live</span>
+      <span id="slideTitleHeader" class="text-slate-800 dark:text-cyan-200 font-semibold text-xs sm:text-sm truncate max-w-[180px] sm:max-w-xs">Title & Exam Specs</span>
+      <span id="sessionActiveBadge" class="hidden sm:inline-flex text-[10px] bg-slate-300 dark:bg-slate-800/90 text-slate-700 dark:text-cyan-300 px-2 py-0.5 rounded-md font-mono border border-transparent dark:border-cyan-500/30">Session: Live</span>
     </div>
 
     <div class="flex items-center gap-2">
       <!-- LIVE SYNC STATUS INDICATOR FOR STUDENTS -->
-      <div id="studentSyncIndicator" class="px-2.5 py-1 bg-sky-100 dark:bg-sky-950/80 text-sky-700 dark:text-sky-400 border border-sky-300 dark:border-sky-800 rounded-lg text-[11px] font-mono flex items-center gap-1.5">
-        <span class="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
+      <div id="studentSyncIndicator" class="px-2.5 py-1 bg-sky-100 dark:bg-slate-900/90 text-sky-700 dark:text-cyan-300 border border-sky-300 dark:border-cyan-500/40 rounded-lg text-[11px] font-mono flex items-center gap-1.5 shadow-xs">
+        <span class="w-2 h-2 rounded-full bg-sky-500 dark:bg-cyan-400 animate-pulse shadow-[0_0_8px_#22d3ee]"></span>
         <span>Teacher-Led Presentation</span>
       </div>
 
@@ -197,51 +288,70 @@
   <!-- MAIN LAYOUT VIEWPORT -->
   <main class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
     
-    <!-- LEFT: SLIDE CONTENT STAGE -->
-    <section id="slideStageContainer" class="flex-1 overflow-y-auto p-3 sm:p-5 flex flex-col items-center justify-start transition-all duration-300 w-full min-w-0">
-      <div id="slideCard" class="w-full max-w-4xl bg-white dark:bg-edu-card border border-slate-200 dark:border-edu-border rounded-2xl p-4 sm:p-7 shadow-xl dark:shadow-2xl relative flex flex-col min-h-[540px] transition-all duration-300">
+    <!-- LEFT: SLIDE CONTENT STAGE WITH MODERN REDESIGNED CARD -->
+    <section id="slideStageContainer" class="flex-1 overflow-y-auto p-3 sm:p-6 lg:p-8 flex flex-col items-center justify-start transition-all duration-300 w-full min-w-0 stage-mesh relative">
+      
+      <!-- BACKGROUND AMBIENT GLOW ACCENTS (NEON IN DARK MODE) -->
+      <div class="absolute top-12 left-1/4 w-96 h-96 bg-sky-400/10 dark:bg-cyan-500/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+      <div class="absolute bottom-12 right-1/4 w-96 h-96 bg-emerald-400/10 dark:bg-emerald-500/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
+      <div id="slideCard" class="w-full max-w-4xl backdrop-blur-xl border rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl relative flex flex-col min-h-[580px] transition-all duration-300">
         
-        <div class="flex items-center justify-between border-b border-slate-200 dark:border-edu-border pb-3 mb-4">
-          <div class="flex items-center gap-2">
-            <span id="slideTagBadge" class="px-2.5 py-0.5 text-[11px] font-bold uppercase rounded-md bg-sky-100 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-sky-500/30">Module 1</span>
-            <span id="slideTypeBadge" class="px-2.5 py-0.5 text-[11px] font-bold uppercase rounded-md bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">Interactive Task</span>
+        <!-- CARD TOP BAR / BREADCRUMBS & METRIC PILLS -->
+        <div class="flex flex-wrap items-center justify-between border-b border-slate-200/80 dark:border-cyan-500/30 pb-4 mb-6 gap-3">
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <span class="inline-flex items-center gap-1.5 px-3.5 py-1 text-xs font-bold tracking-wide uppercase rounded-xl bg-gradient-to-r from-sky-500/15 to-sky-600/10 dark:from-cyan-500/25 dark:to-cyan-600/15 text-sky-800 dark:text-cyan-300 border border-sky-400/30 dark:border-cyan-400/40 shadow-xs">
+              <span class="w-2 h-2 rounded-full bg-sky-500 dark:bg-cyan-400 animate-pulse shadow-[0_0_8px_#38bdf8]"></span>
+              <span id="slideTagBadge">Module 1</span>
+            </span>
+
+            <span id="slideTypeBadge" class="px-3.5 py-1 text-xs font-semibold tracking-wide uppercase rounded-xl bg-slate-100 dark:bg-slate-900/95 text-slate-800 dark:text-emerald-300 border border-slate-200 dark:border-emerald-500/40 shadow-xs">
+              Interactive Task
+            </span>
+
+            <span class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 text-xs font-mono text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 dark:bg-emerald-950/60 border border-emerald-500/20 dark:border-emerald-500/40 rounded-xl">
+              <span>🎯</span> 120–160 Words
+            </span>
           </div>
 
           <div class="flex items-center gap-2">
-            <button onclick="toggleCardFullscreen()" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-medium transition flex items-center gap-1.5" title="Toggle Fullscreen Mode">
+            <button onclick="toggleCardFullscreen()" class="px-3.5 py-1.5 bg-white/90 hover:bg-white dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-300 dark:border-cyan-500/40 text-slate-700 dark:text-cyan-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm hover:dark:shadow-[0_0_12px_rgba(56,189,248,0.3)]" title="Toggle Fullscreen Focus View">
               <span id="fullscreenIcon">⛶</span>
-              <span class="hidden sm:inline">Fullscreen</span>
+              <span class="hidden sm:inline" id="fullscreenBtnLabel">Focus View</span>
             </button>
           </div>
         </div>
 
         <!-- BROADCASTED STUDENT ANSWER BANNER -->
-        <div id="sharedAnswerBanner" class="hidden mb-6 p-4 bg-gradient-to-r from-amber-500/15 via-sky-500/15 to-emerald-500/15 border-2 border-amber-500/40 rounded-xl relative shadow-lg cursor-pointer hover:border-amber-500/80 transition" onclick="openAnswerModalFromShared()">
+        <div id="sharedAnswerBanner" class="hidden mb-6 p-4 bg-gradient-to-r from-amber-500/15 via-sky-500/15 to-emerald-500/15 border-2 border-amber-500/40 dark:border-amber-400/60 rounded-2xl relative shadow-xl cursor-pointer hover:border-amber-500/80 transition" onclick="openAnswerModalFromShared()">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-              <span>📢</span> Teacher Shared Response <span class="text-[10px] lowercase font-normal text-slate-400">(Click to view full answer)</span>
+            <span class="text-xs font-bold text-amber-600 dark:text-amber-300 dark:neon-amber uppercase tracking-wider flex items-center gap-1.5">
+              <span>📢</span> Teacher Shared Response <span class="text-[10px] lowercase font-normal text-slate-400 dark:text-slate-300">(Click to view full answer)</span>
             </span>
             <button id="closeSharedAnswerBtn" onclick="event.stopPropagation(); clearSharedAnswer();" class="hidden text-xs text-slate-400 hover:text-slate-200 font-bold px-2 py-0.5 rounded bg-slate-800/50">Dismiss Broadcast</button>
           </div>
-          <div class="text-xs text-slate-600 dark:text-slate-300 mb-1 font-semibold">
-            Student: <strong id="sharedStudentName" class="text-sky-600 dark:text-sky-400 font-bold">Name</strong>
+          <div class="text-xs text-slate-600 dark:text-cyan-300 mb-1 font-semibold">
+            Student: <strong id="sharedStudentName" class="text-sky-600 dark:text-cyan-200 font-bold">Name</strong>
           </div>
-          <p id="sharedStudentText" class="text-sm font-serif italic text-slate-800 dark:text-slate-100 bg-white/60 dark:bg-slate-900/80 p-3 rounded-lg border border-amber-500/20 line-clamp-2">
+          <p id="sharedStudentText" class="text-sm sm:text-base font-serif italic text-slate-800 dark:text-slate-100 bg-white/70 dark:bg-slate-950/90 p-3 rounded-xl border border-amber-500/20 dark:border-amber-500/40 line-clamp-2 shadow-inner">
             "Answer content..."
           </p>
         </div>
 
-        <!-- Dynamic Content Injected Here -->
+        <!-- Dynamic Slide Content Injected Here -->
         <div id="slideDynamicBody" class="flex-1 flex flex-col justify-center">
         </div>
 
         <!-- FOOTER BAR -->
-        <div class="mt-6 pt-4 border-t border-slate-200 dark:border-edu-border/50 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
-          <span class="text-slate-500 dark:text-slate-400 font-medium">SmartStudyGrid.com — Cambridge IGCSE English</span>
+        <div class="mt-8 pt-4 border-t border-slate-200 dark:border-cyan-500/30 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm text-slate-500 dark:text-cyan-200">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 dark:bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+            <span class="text-slate-600 dark:text-slate-200 font-medium">Cambridge ESL Formative Assessment Engine</span>
+          </div>
 
           <div id="teacherBottomNav" class="hidden flex gap-2">
-            <button onclick="prevSlide()" class="px-3.5 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg transition font-medium">Previous</button>
-            <button onclick="nextSlide()" class="px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg transition font-semibold shadow-md shadow-sky-600/20">Next Slide &rarr;</button>
+            <button onclick="prevSlide()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl transition font-semibold">Previous</button>
+            <button onclick="nextSlide()" class="px-5 py-2 bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 dark:from-cyan-600 dark:to-emerald-600 text-white rounded-xl transition font-bold shadow-md shadow-sky-600/20">Next Slide &rarr;</button>
           </div>
         </div>
 
@@ -322,7 +432,288 @@
 
   </main>
 
-  <!-- PODIUM & LEADERBOARD MODAL (WAYGROUND STYLE) -->
+  <!-- REDESIGNED MULTI-PAGE FORMATIVE EVALUATION REPORT TEMPLATE (DISCRETE A4 PAGES) -->
+  <div id="pdfExportWrapper" style="position: fixed; left: -9999px; top: 0; width: 840px; z-index: -100; pointer-events: none;">
+    
+    <!-- ================= PAGE 1: EXECUTIVE SUMMARY & OVERVIEW ================= -->
+    <div id="pdfReportPage1" class="pdf-a4-page">
+      
+      <!-- TOP: HEADER -->
+      <header class="space-y-4 border-b-2 border-slate-900 pb-5">
+        <div class="flex justify-between items-start">
+          <div class="space-y-1">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center font-black text-xl shadow-md">
+                ⚡
+              </div>
+              <div>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight leading-none">SmartStudyGrid.com</h1>
+                <p class="text-[10px] text-sky-700 font-extrabold uppercase tracking-widest font-mono mt-0.5">Cambridge IGCSE Learning & Continuous Assessment Portal</p>
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-600 font-medium">
+              English as a Second Language (Syllabus 0510 / 0511 / 0991 / 0993) • Formative Assessment Transcript
+            </p>
+          </div>
+
+          <div class="text-right space-y-1">
+            <span class="inline-block px-3 py-1 bg-slate-900 text-amber-300 rounded-md font-mono text-[9px] font-extrabold tracking-widest uppercase shadow-sm">
+              FORMATIVE EVALUATION REPORT
+            </span>
+            <div class="text-[11px] font-bold text-slate-800">Academic Year 2025–2026</div>
+            <div id="pdfReportDateP1" class="text-[10px] text-slate-500 font-mono">Date: 2026-09-15</div>
+          </div>
+        </div>
+
+        <!-- CANDIDATE & SESSION METADATA STRIP -->
+        <div class="grid grid-cols-4 gap-3 text-xs bg-slate-50 border border-slate-300 rounded-2xl p-3.5">
+          <div class="col-span-2 space-y-0.5">
+            <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider font-mono block">Student Full Name</span>
+            <div id="pdfStudentNameP1" class="text-base font-black text-slate-900 tracking-tight">Candidate Name</div>
+          </div>
+          <div class="space-y-0.5">
+            <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider font-mono block">Grade / Section</span>
+            <strong id="pdfStudentGradeP1" class="text-xs font-bold text-slate-800 block">Grade 10</strong>
+          </div>
+          <div class="space-y-0.5">
+            <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider font-mono block">Session Identifier</span>
+            <strong id="pdfSessionIdP1" class="text-xs font-bold text-slate-700 font-mono block">SESS_LIVE</strong>
+          </div>
+        </div>
+
+        <!-- SYLLABUS FOCUS BANNER -->
+        <div class="bg-sky-50/90 border border-sky-200 rounded-xl p-3 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 bg-sky-600 text-white font-mono font-bold text-[9px] rounded">Syllabus Focus</span>
+            <strong class="text-slate-900 font-bold text-[11px]">Cambridge IGCSE ESL Exercise 6: Extended Writing</strong>
+            <span class="text-slate-600 text-[11px]">(Formal Article, Review, Report & Discussion)</span>
+          </div>
+          <span class="font-mono text-sky-800 font-bold text-[10px] bg-white px-2 py-0.5 rounded border border-sky-300">Target: 120 – 160 Words</span>
+        </div>
+      </header>
+
+      <!-- MIDDLE: EXECUTIVE SUMMARY & BENCHMARK SCORE CARDS -->
+      <section class="space-y-5 my-auto">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+          <h2 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded bg-sky-600"></span> Executive Summary & Overall Performance
+          </h2>
+          <span class="text-[10px] text-slate-500 font-mono">Standard: Cambridge B2/C1 CEFR</span>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3.5 text-xs">
+          <!-- Total Score vs Pass Mark -->
+          <div id="pdfScoreBoxP1" class="bg-emerald-50 border border-emerald-300 rounded-2xl p-4 text-center space-y-1 shadow-sm">
+            <span class="text-[9px] uppercase font-bold text-slate-600 block font-mono">Assessed Mark / Percentage</span>
+            <strong id="pdfTotalMarksScoreP1" class="text-2xl font-black text-emerald-700 font-mono block">0 / 0 (0%)</strong>
+            <span class="text-[10px] text-slate-500 block">Target Pass Mark: <strong class="text-slate-800">50% Minimum</strong></span>
+          </div>
+
+          <!-- Official Status -->
+          <div class="bg-slate-50 border border-slate-300 rounded-2xl p-4 text-center space-y-1 flex flex-col justify-center">
+            <span class="text-[9px] uppercase font-bold text-slate-600 block font-mono">Performance Status</span>
+            <div id="pdfStatusBadgeP1" class="text-sm font-black text-emerald-700 font-mono py-1">
+              ● Satisfactory Pass
+            </div>
+            <span class="text-[9px] text-slate-500">Continuous Formative Band</span>
+          </div>
+
+          <!-- Tasks Completed -->
+          <div class="bg-slate-50 border border-slate-300 rounded-2xl p-4 text-center space-y-1 flex flex-col justify-center">
+            <span class="text-[9px] uppercase font-bold text-slate-600 block font-mono">Logged Submissions</span>
+            <strong id="pdfTasksCountBadgeP1" class="text-2xl font-black text-sky-700 font-mono">0 Tasks</strong>
+            <span class="text-[9px] text-slate-500">Curriculum Drills Evaluated</span>
+          </div>
+        </div>
+
+        <!-- Formative Assessment Narrative -->
+        <div class="bg-slate-50 border border-slate-300 rounded-2xl p-4 space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-800 uppercase tracking-wider font-mono">Assessor's Performance Synthesis:</span>
+            <span class="text-[9px] bg-slate-200 text-slate-700 px-2 py-0.2 rounded font-mono">Continuous Review</span>
+          </div>
+          <p id="pdfExecutiveSummaryNarrativeP1" class="text-[11px] text-slate-700 leading-relaxed font-sans">
+            The candidate participated in interactive Cambridge IGCSE Exercise 6 writing exercises covering audience register, cohesive devices, and argumentative support. Overall performance reflects steady progression in foundational sentence craft, with key opportunities to refine formal discourse markers and eliminate informal speech patterns.
+          </p>
+        </div>
+
+        <!-- Cambridge Assessment Criteria Overview Strip -->
+        <div class="grid grid-cols-2 gap-3 text-xs">
+          <div class="bg-sky-50/70 border border-sky-200 rounded-xl p-3.5 space-y-1">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-sky-600"></span>
+              <strong class="text-sky-950 font-bold text-[11px]">Criterion 1: Content & Relevance</strong>
+            </div>
+            <p class="text-[10px] text-slate-600 leading-relaxed">Fulfilment of prompt requirements, adherence to word limits (120–160 words), development of balanced perspectives, and formal register appropriateness.</p>
+          </div>
+          <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3.5 space-y-1">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+              <strong class="text-emerald-950 font-bold text-[11px]">Criterion 2: Language & Cohesion</strong>
+            </div>
+            <p class="text-[10px] text-slate-600 leading-relaxed">Range and accuracy of sentence structures, accurate use of transitional time-fixers, contrast connectors (e.g. <em>However, Nevertheless</em>), and formal subjunctive phrases.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- BOTTOM: OFFICIAL FOOTER -->
+      <footer class="pt-4 border-t-2 border-slate-900 flex justify-between items-center text-[10px] text-slate-500">
+        <div>SmartStudyGrid Academic Assessment Directorate • Cambridge IGCSE Formative Transcript</div>
+        <div class="font-mono font-bold text-slate-700">Page 1 of 2</div>
+      </footer>
+    </div>
+
+    <!-- ================= PAGE 2: ITEMIZED TASK BREAKDOWN & RECOMMENDATIONS ================= -->
+    <div id="pdfReportPage2" class="pdf-a4-page">
+      
+      <!-- TOP: CONTINUATION HEADER -->
+      <header class="border-b-2 border-slate-900 pb-3 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-lg bg-slate-900 text-amber-400 flex items-center justify-center font-black text-xs">⚡</div>
+          <span class="font-black text-slate-900 text-sm tracking-tight">SmartStudyGrid.com</span>
+          <span class="text-slate-400 text-xs">|</span>
+          <span class="text-xs text-slate-600 font-medium">Candidate: <strong id="pdfStudentNameP2" class="text-slate-900">Candidate Name</strong></span>
+        </div>
+        <div class="text-[10px] font-mono text-slate-500" id="pdfSessionIdP2">SESSION: SESS_LIVE</div>
+      </header>
+
+      <!-- MIDDLE: DETAILED BREAKDOWN TABLE (LOGICAL PAGE FIT) -->
+      <section class="space-y-4 my-auto">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-1.5">
+          <h2 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded bg-sky-600"></span> Detailed Breakdown of Evaluated Exercises & Tasks
+          </h2>
+          <span class="text-[10px] text-slate-500 font-mono">Itemized Formative Evidence</span>
+        </div>
+
+        <!-- Structured Markdown-style Formative Table -->
+        <div class="border border-slate-300 rounded-xl overflow-hidden shadow-xs">
+          <table class="w-full text-left border-collapse text-[10px]">
+            <thead>
+              <tr class="bg-slate-900 text-white font-mono text-[9px] uppercase tracking-wider">
+                <th class="p-2.5 border-r border-slate-700 w-14 text-center">Slide</th>
+                <th class="p-2.5 border-r border-slate-700 w-44">Focus Area / Concept</th>
+                <th class="p-2.5 border-r border-slate-700">Student Submission / Quote</th>
+                <th class="p-2.5 border-r border-slate-700 w-24 text-center">Score</th>
+                <th class="p-2.5 w-52">Feedback & Directives</th>
+              </tr>
+            </thead>
+            <tbody id="pdfSubmissionsTableBodyP2" class="divide-y divide-slate-200">
+              <!-- Itemized dynamic rows rendered cleanly here without cutting midway -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ACTIONABLE RECOMMENDATIONS FOR IMPROVEMENT -->
+        <div class="space-y-2 pt-2 border-t border-slate-200">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-600"></span> Actionable Recommendations for Upcoming Extended Writing
+            </h3>
+            <span class="text-[9px] text-slate-500 font-mono">Exercise 6 Directives</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-[10px] text-slate-700">
+            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl space-y-0.5">
+              <strong class="text-slate-900 block font-bold">1. Varied Contrast Connectors:</strong>
+              <p class="text-slate-600 leading-snug">Deploy multi-tiered transitions (<em>"Conversely," "Nevertheless"</em>) rather than repeating simple conjunctions like <em>"And"</em> or <em>"But"</em>.</p>
+            </div>
+
+            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl space-y-0.5">
+              <strong class="text-slate-900 block font-bold">2. Formal Register Discipline:</strong>
+              <p class="text-slate-600 leading-snug">Eliminate contractions (use <em>"cannot"</em> instead of <em>"can't"</em>) and conversational idioms to preserve academic decorum.</p>
+            </div>
+
+            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl space-y-0.5">
+              <strong class="text-slate-900 block font-bold">3. Subjunctive Mood Usage:</strong>
+              <p class="text-slate-600 leading-snug">Implement advanced structures (e.g. <em>"It is imperative that school administrators allocate..."</em>) in final recommendations.</p>
+            </div>
+
+            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl space-y-0.5">
+              <strong class="text-slate-900 block font-bold">4. Strict Word Target Pacing:</strong>
+              <p class="text-slate-600 leading-snug">Structure responses into 4 balanced paragraphs to stay reliably within the Cambridge 120–160 word requirement.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BOTTOM: OFFICIAL SIGN-OFF BLOCK & AUTHENTICATION STAMP -->
+      <footer class="pt-3 border-t-2 border-slate-900 flex justify-between items-end text-[10px] text-slate-600">
+        <div class="space-y-0.5 max-w-[260px]">
+          <div class="font-black text-slate-900 text-xs">Amanullah Khan</div>
+          <div class="text-[10px] text-slate-700 font-semibold">Lead ESL Educator & Assessment Specialist</div>
+          <div class="text-[9px] text-slate-500 font-mono">amankhan@smartstudygrid.com • +966568959394</div>
+        </div>
+
+        <div class="text-center px-4 py-2 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 space-y-0.5">
+          <div class="font-serif italic text-slate-900 font-bold text-xs">Officially Verified Formative Evaluation</div>
+          <div class="text-[9px] text-slate-500 font-mono">Cambridge IGCSE Continuous Assessment Record</div>
+          <div id="pdfPassGuaranteeStampP2" class="text-[8px] text-emerald-700 font-mono font-bold tracking-widest uppercase">
+            ● Authenticated Performance Record
+          </div>
+        </div>
+
+        <div class="text-right space-y-0.5">
+          <div class="font-serif italic text-slate-500 text-xs pb-0.5 border-b border-slate-200">
+            Amanullah Khan (Lead Assessor)
+          </div>
+          <div class="text-[9px] font-mono text-slate-400" id="pdfVerificationHashP2">REF: SSG-2026-IGCSE</div>
+          <div class="font-mono text-[9px] text-slate-700 font-bold">Page 2 of 2 • End of Transcript</div>
+        </div>
+      </footer>
+    </div>
+
+  </div>
+
+  <!-- CONNECTED / ONLINE STUDENTS MODAL -->
+  <div id="onlineStudentsModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-edu-card border border-slate-200 dark:border-edu-border rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-edu-border pb-3 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <div class="relative flex h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+          </div>
+          <div>
+            <h3 class="font-black text-base text-slate-900 dark:text-white flex items-center gap-2">
+              Connected Students & Participants
+            </h3>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">Live real-time active users in current interactive session</p>
+          </div>
+        </div>
+        <button onclick="closeOnlineStudentsModal()" class="text-slate-400 hover:text-slate-200 p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm">✕</button>
+      </div>
+
+      <!-- STATS STRIP -->
+      <div class="grid grid-cols-3 gap-2.5 text-center shrink-0">
+        <div class="bg-slate-50 dark:bg-slate-900 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <span class="text-[10px] uppercase font-bold text-slate-500 block">Online Now</span>
+          <strong id="modalOnlineCountVal" class="text-lg font-black text-emerald-600 font-mono">1</strong>
+        </div>
+        <div class="bg-slate-50 dark:bg-slate-900 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <span class="text-[10px] uppercase font-bold text-slate-500 block">Class Session</span>
+          <strong id="modalOnlineSessionVal" class="text-[11px] font-bold text-sky-600 font-mono truncate block mt-1">SESS_LIVE</strong>
+        </div>
+        <div class="bg-slate-50 dark:bg-slate-900 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <span class="text-[10px] uppercase font-bold text-slate-500 block">Sync Frequency</span>
+          <strong class="text-xs font-bold text-amber-500 font-mono block mt-1">Real-Time</strong>
+        </div>
+      </div>
+
+      <!-- ONLINE USERS LIST -->
+      <div class="flex-1 overflow-y-auto space-y-2 pr-1" id="onlineStudentsContainer">
+      </div>
+
+      <div class="pt-3 border-t border-slate-200 dark:border-edu-border flex items-center justify-between text-xs text-slate-500 shrink-0">
+        <span class="text-[11px]">Heartbeats refreshed automatically</span>
+        <button onclick="triggerManualPresenceRefresh()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium rounded-xl transition flex items-center gap-1 text-[11px]">
+          <span>🔄</span> Refresh Now
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PODIUM & LEADERBOARD MODAL -->
   <div id="leaderboardModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white dark:bg-edu-card border border-slate-200 dark:border-edu-border rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-slate-200 dark:border-edu-border pb-3">
@@ -411,55 +802,6 @@
     </div>
   </div>
 
-  <!-- CONNECTED / ONLINE STUDENTS MODAL -->
-  <div id="onlineStudentsModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-edu-card border border-slate-200 dark:border-edu-border rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
-      <div class="flex items-center justify-between border-b border-slate-200 dark:border-edu-border pb-3 shrink-0">
-        <div class="flex items-center gap-2.5">
-          <div class="relative flex h-3 w-3">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-          </div>
-          <div>
-            <h3 class="font-black text-base text-slate-900 dark:text-white flex items-center gap-2">
-              Connected Students & Participants
-            </h3>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400">Live real-time active users in current interactive session</p>
-          </div>
-        </div>
-        <button onclick="closeOnlineStudentsModal()" class="text-slate-400 hover:text-slate-200 p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm">✕</button>
-      </div>
-
-      <!-- STATS STRIP -->
-      <div class="grid grid-cols-3 gap-2.5 text-center shrink-0">
-        <div class="bg-slate-50 dark:bg-slate-900 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800">
-          <span class="text-[10px] uppercase font-bold text-slate-500 block">Online Now</span>
-          <strong id="modalOnlineCountVal" class="text-lg font-black text-emerald-600 font-mono">1</strong>
-        </div>
-        <div class="bg-slate-50 dark:bg-slate-900 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800">
-          <span class="text-[10px] uppercase font-bold text-slate-500 block">Class Session</span>
-          <strong id="modalOnlineSessionVal" class="text-[11px] font-bold text-sky-600 font-mono truncate block mt-1">SESS_LIVE</strong>
-        </div>
-        <div class="bg-slate-50 dark:bg-slate-900 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800">
-          <span class="text-[10px] uppercase font-bold text-slate-500 block">Sync Frequency</span>
-          <strong class="text-xs font-bold text-amber-500 font-mono block mt-1">Real-Time</strong>
-        </div>
-      </div>
-
-      <!-- ONLINE USERS LIST -->
-      <div class="flex-1 overflow-y-auto space-y-2 pr-1" id="onlineStudentsContainer">
-        <!-- Injected via JavaScript -->
-      </div>
-
-      <div class="pt-3 border-t border-slate-200 dark:border-edu-border flex items-center justify-between text-xs text-slate-500 shrink-0">
-        <span class="text-[11px]">Heartbeats refreshed automatically</span>
-        <button onclick="triggerManualPresenceRefresh()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium rounded-xl transition flex items-center gap-1 text-[11px]">
-          <span>🔄</span> Refresh Now
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- STUDENT WORK REVIEW MODAL (AT END OF SESSION) -->
   <div id="studentWorkModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white dark:bg-edu-card border border-slate-200 dark:border-edu-border rounded-3xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[92vh] flex flex-col">
@@ -494,7 +836,7 @@
       <div class="pt-3 border-t border-slate-200 dark:border-edu-border flex items-center justify-between shrink-0">
         <span class="text-[11px] text-slate-500">Cambridge IGCSE 0510/0511 Session Log</span>
         <button id="downloadMyReportBtn" onclick="downloadCurrentStudentPDF()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center gap-1.5">
-          <span>📄</span> Download Verified 1-Page PDF
+          <span>📄</span> Download Formative Evaluation Report (PDF)
         </button>
       </div>
     </div>
@@ -508,7 +850,7 @@
         <h3 class="font-bold text-base text-slate-900 dark:text-white">End Active Class Session?</h3>
       </div>
       <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-        Ending the session will close live submissions, calculate final rankings for the podium, and display the performance review banner with PDF reports to all connected students.
+        Ending the session will close live submissions, calculate final rankings for the podium, and display the performance review banner with comprehensive PDF evaluation reports to all connected students.
       </p>
       <div class="flex gap-2 pt-2">
         <button onclick="closeEndSessionConfirmModal()" class="w-1/2 py-2.5 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs transition">
@@ -656,130 +998,13 @@
     </div>
   </div>
 
-  <!-- STRICTLY ONE-PAGE PDF REPORT GENERATION TEMPLATE -->
-  <div id="pdfExportWrapper" style="position: fixed; left: -9999px; top: 0; width: 794px; z-index: -100; pointer-events: none;">
-    <div id="pdfReportTemplate" style="width: 794px; height: 1123px; min-height: 1123px; max-height: 1123px; box-sizing: border-box;" class="bg-white text-slate-900 p-7 font-sans flex flex-col justify-between overflow-hidden relative">
-      
-      <!-- TOP SECTION: HEADER & CANDIDATE METRICS -->
-      <div class="space-y-3.5">
-        
-        <!-- INSTITUTIONAL BRAND HEADER -->
-        <div class="flex justify-between items-start border-b-2 border-slate-900 pb-3">
-          <div class="space-y-1">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-lg bg-slate-900 text-amber-400 flex items-center justify-center font-black text-base shadow-sm">
-                ⚡
-              </div>
-              <div>
-                <h1 class="text-xl font-black text-slate-900 tracking-tight leading-none">SmartStudyGrid.com</h1>
-                <span class="text-[10px] text-sky-700 font-bold uppercase tracking-widest font-mono">Cambridge IGCSE Learning & Assessment Portal</span>
-              </div>
-            </div>
-            <p class="text-[11px] text-slate-600 font-medium">
-              English as a Second Language (Syllabus 0510 / 0511) • Continuous Formative Assessment
-            </p>
-          </div>
-
-          <div class="text-right space-y-0.5">
-            <span class="inline-block px-2.5 py-1 bg-slate-900 text-amber-300 rounded font-mono text-[9px] font-bold tracking-wider uppercase">
-              OFFICIAL TRANSCRIPT
-            </span>
-            <div class="text-[11px] font-bold text-slate-800 pt-1">Academic Session 2025–2026</div>
-            <div id="pdfReportDate" class="text-[10px] text-slate-500 font-mono">Date: 2026-09-15</div>
-          </div>
-        </div>
-
-        <!-- CANDIDATE IDENTITY & PERFORMANCE BANNER -->
-        <div class="bg-gradient-to-r from-slate-50 via-sky-50/40 to-slate-50 border border-slate-300 rounded-xl p-3.5 shadow-sm space-y-3">
-          <!-- CANDIDATE FULL NAME DISPLAY -->
-          <div class="flex justify-between items-center border-b border-slate-200/80 pb-2.5">
-            <div class="space-y-0.5 min-w-0 flex-1 pr-4">
-              <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest font-mono block">CANDIDATE FULL NAME</span>
-              <div id="pdfStudentName" class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight leading-normal break-words">
-                Candidate Name
-              </div>
-            </div>
-            <div class="text-right shrink-0 bg-white border border-slate-200 rounded-lg px-3 py-1.5 shadow-xs">
-              <span class="text-[9px] font-bold text-slate-500 uppercase block font-mono">OFFICIAL STATUS</span>
-              <div id="pdfStatusBadge" class="text-xs font-bold text-emerald-700 flex items-center gap-1 font-mono">
-                <span>●</span> Verified Pass (0%)
-              </div>
-            </div>
-          </div>
-
-          <!-- METRICS GRID -->
-          <div class="grid grid-cols-4 gap-2.5 text-xs">
-            <div class="bg-white border border-slate-200 rounded-lg p-2">
-              <span class="text-[9px] uppercase font-bold text-slate-500 block font-mono">Class / Grade</span>
-              <strong id="pdfStudentGrade" class="text-xs font-bold text-slate-800 block mt-0.5">Grade 10</strong>
-            </div>
-
-            <div class="bg-white border border-slate-200 rounded-lg p-2">
-              <span class="text-[9px] uppercase font-bold text-slate-500 block font-mono">Session ID</span>
-              <strong id="pdfSessionId" class="text-xs font-bold text-slate-700 font-mono block mt-0.5">SESS_LIVE</strong>
-            </div>
-
-            <div class="bg-white border border-slate-200 rounded-lg p-2">
-              <span class="text-[9px] uppercase font-bold text-slate-500 block font-mono">Tasks Completed</span>
-              <strong id="pdfTasksCountBadge" class="text-xs font-bold text-sky-700 font-mono block mt-0.5">0 Tasks</strong>
-            </div>
-
-            <div id="pdfScoreBox" class="bg-emerald-50 border border-emerald-300 rounded-lg p-2 text-center transition-colors">
-              <span class="text-[9px] uppercase font-extrabold text-slate-600 block font-mono">Score / Result</span>
-              <strong id="pdfTotalMarksScore" class="text-sm font-black text-emerald-700 font-mono block mt-0.5">0 / 0 (0%)</strong>
-            </div>
-          </div>
-        </div>
-
-        <!-- EXAM EXERCISE LOGS SECTION -->
-        <div class="space-y-2">
-          <div class="flex justify-between items-center border-b border-slate-300 pb-1">
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-bold uppercase tracking-wider text-slate-800 font-mono">
-                Curriculum Task Logs & Formative Evaluations
-              </span>
-              <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Exercise 6 Writing</span>
-            </div>
-            <span class="text-[10px] text-slate-500 font-mono" id="pdfExerciseCountLabel">Showing verified responses</span>
-          </div>
-
-          <!-- COMPACT 2-COLUMN GRID -->
-          <div id="pdfSubmissionsList" class="grid grid-cols-2 gap-2 text-[11px] max-h-[600px] overflow-hidden">
-            <!-- Dynamic task rows injected here -->
-          </div>
-        </div>
-
-      </div>
-
-      <!-- BOTTOM SECTION: LEAD EDUCATOR CREDENTIALS & OFFICIAL STAMP -->
-      <div class="pt-3 border-t-2 border-slate-900 flex justify-between items-end text-[10px] text-slate-600">
-        <div class="space-y-0.5 max-w-[280px]">
-          <div class="font-bold text-slate-900 text-xs">Amanullah Khan — Lead Educator & Assessor</div>
-          <div class="text-slate-600 font-mono text-[9px]">amankhan@smartstudygrid.com • +966568959394</div>
-          <div class="text-slate-500 text-[9px]">SmartStudyGrid Academic Assessment Department</div>
-        </div>
-
-        <div class="text-center px-4 py-1.5 border border-dashed border-slate-300 rounded-xl bg-slate-50">
-          <div class="font-serif italic text-slate-700 font-bold text-xs tracking-wide">Official Verified Transcript</div>
-          <div class="text-[9px] text-slate-500 font-mono">Cambridge IGCSE 0510/0511 Formative Record</div>
-          <div id="pdfPassGuaranteeStamp" class="text-[8px] text-emerald-700 font-mono font-bold tracking-widest uppercase mt-0.5">● Pass Requirement: ≥ 50%</div>
-        </div>
-
-        <div class="text-right space-y-0.5">
-          <div class="text-[9px] font-mono text-slate-400" id="pdfVerificationHash">REF: SSG-2026-IGCSE</div>
-          <div class="font-mono text-[10px] text-slate-700 font-bold">Page 1 of 1 • Official Transcript</div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
   <!-- TOAST NOTIFICATION UI -->
   <div id="toastNotification" class="fixed bottom-5 right-5 bg-slate-900 border border-slate-700 text-white px-4 py-2.5 rounded-xl shadow-2xl text-xs font-medium translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
     <span class="w-2 h-2 rounded-full bg-sky-400"></span>
     <span id="toastMessage">Notification</span>
   </div>
 
+  <!-- MAIN SCRIPT INITIALIZATION & ROBUST PRESENCE SETUP -->
   <script>
     const ADMIN_PASSWORD = "Pakistan@1947";
     window.followTeacherSync = true;
@@ -787,8 +1012,26 @@
     window.currentSlideIndex = 0;
     window.currentSelectedModalAnswer = null;
     window.studentScore = 0;
-    window.currentSessionId = "sess_" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + "_1";
+
+    // Track answered slides locally to enforce single-attempt policy
+    window.studentAnsweredSlides = {};
+
+    // Standardized session naming helper e.g. Session-01-15-Sept-26
+    window.sessionCounter = 1;
+    window.formatSessionName = function(counterNum) {
+      const d = new Date();
+      const day = String(d.getDate()).padStart(2, '0');
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
+      const month = monthNames[d.getMonth()];
+      const year = String(d.getFullYear()).slice(-2);
+      const countStr = String(counterNum).padStart(2, '0');
+      return `Session-${countStr}-${day}-${month}-${year}`;
+    };
+
+    window.currentSessionId = window.formatSessionName(window.sessionCounter);
     window.isSessionEnded = false;
+    
+    // Explicit global initialization to prevent any undefined 'set' or access errors
     window.onlineUsersMap = new Map();
     window.clientPresenceId = "pres_" + Math.random().toString(36).substring(2, 9);
 
@@ -805,6 +1048,9 @@
     };
 
     window.renderOnlineStudentsList = function() {
+      if (!window.onlineUsersMap) {
+        window.onlineUsersMap = new Map();
+      }
       const container = document.getElementById('onlineStudentsContainer');
       const badge = document.getElementById('onlineStudentsCountBadge');
       const modalCount = document.getElementById('modalOnlineCountVal');
@@ -812,7 +1058,7 @@
       if (!container) return;
 
       if (modalSession) {
-        modalSession.textContent = window.currentSessionId.toUpperCase();
+        modalSession.textContent = (window.currentSessionId || "SESS_LIVE").toUpperCase();
       }
 
       const now = Date.now();
@@ -909,7 +1155,7 @@
       window.showToast("Refreshed active student status 👥");
     };
 
-    // Slide Content Definitions (Focused 20-Slide Curriculum)
+    // Slide Content Definitions
     window.slidesData = [
       {
         title: "Title & Exam Specs",
@@ -917,26 +1163,26 @@
         type: "Class Poll",
         correctAnswer: "Increased risk of structural & language errors",
         render: () => `
-          <div class="text-center py-2 space-y-4">
-            <span class="px-3 py-1 bg-sky-100 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 text-xs font-bold rounded-full border border-sky-300 dark:border-sky-500/30">IGCSE English 0510 / 0511</span>
-            <h2 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">Exercise 6: Formal Article Writing</h2>
-            <p class="text-slate-600 dark:text-slate-300 max-w-lg mx-auto text-xs sm:text-sm leading-relaxed">
-              Target word count: <span class="text-amber-600 dark:text-amber-400 font-bold font-mono">120 – 160 words</span>. Target Audience: School Magazine & Community.
+          <div class="text-center py-3 space-y-6">
+            <span class="px-4 py-1.5 bg-sky-100 dark:bg-cyan-950/80 text-sky-800 dark:text-cyan-300 dark:neon-cyan text-xs sm:text-sm font-bold rounded-full border border-sky-300 dark:border-cyan-400/50 shadow-xs inline-block">IGCSE English 0510 / 0511</span>
+            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 dark:text-cyan-300 dark:neon-cyan tracking-tight">Exercise 6: Formal Article Writing</h2>
+            <p class="text-slate-700 dark:text-cyan-100 max-w-xl mx-auto text-base sm:text-lg leading-relaxed">
+              Target word count: <span class="text-amber-700 dark:text-amber-300 dark:neon-amber font-bold font-mono text-lg sm:text-xl">120 – 160 words</span>. <span class="text-slate-600 dark:text-cyan-200">Target Audience: School Magazine & Community.</span>
             </p>
 
-            <div class="mt-4 p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 max-w-xl mx-auto text-left space-y-3">
-              <span class="text-xs font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider block">Interactive Starter Question:</span>
-              <p class="text-xs text-slate-700 dark:text-slate-200 font-medium">"What happens if a candidate writes 250 words instead of the requested 120–160 words?"</p>
+            <div class="mt-4 p-6 sm:p-7 bg-slate-50 dark:bg-[#071126] rounded-2xl border border-slate-300 dark:border-cyan-500/50 max-w-2xl mx-auto text-left space-y-4 shadow-lg neon-box-cyan">
+              <span class="text-xs sm:text-sm font-bold text-sky-700 dark:text-cyan-300 dark:neon-cyan uppercase tracking-wider block font-mono">Interactive Starter Question:</span>
+              <p class="text-base sm:text-lg lg:text-xl text-slate-800 dark:text-white font-semibold leading-relaxed">"What happens if a candidate writes 250 words instead of the requested 120–160 words?"</p>
               
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                <button onclick="submitSlideAnswer('Increased risk of structural & language errors', 'MCQ', 'Increased risk of structural & language errors', false)" class="p-3 bg-white dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-xl text-left text-slate-800 dark:text-slate-200 transition font-medium shadow-sm flex items-center justify-between">
-                  <span>A. Increased risk of language errors & poor structure</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm sm:text-base pt-1">
+                <button onclick="submitSlideAnswer('Increased risk of structural & language errors', 'MCQ', 'Increased risk of structural & language errors', false)" class="p-4 sm:p-5 bg-white dark:bg-[#0b1b36] hover:bg-sky-50 dark:hover:bg-[#12274e] border border-slate-300 dark:border-cyan-500/40 hover:border-sky-500 dark:hover:border-cyan-300 rounded-2xl text-left text-slate-800 dark:text-cyan-100 transition font-medium shadow-sm flex items-center justify-between group">
+                  <span class="group-hover:text-sky-700 dark:group-hover:text-cyan-300 text-slate-800 dark:text-cyan-100">A. Increased risk of language errors & poor structure</span>
                 </button>
-                <button onclick="submitSlideAnswer('Extra bonus marks are awarded', 'MCQ', 'Increased risk of structural & language errors', false)" class="p-3 bg-white dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-xl text-left text-slate-800 dark:text-slate-200 transition font-medium shadow-sm flex items-center justify-between">
-                  <span>B. Extra bonus marks are awarded for length</span>
+                <button onclick="submitSlideAnswer('Extra bonus marks are awarded', 'MCQ', 'Increased risk of structural & language errors', false)" class="p-4 sm:p-5 bg-white dark:bg-[#0b1b36] hover:bg-sky-50 dark:hover:bg-[#12274e] border border-slate-300 dark:border-cyan-500/40 hover:border-sky-500 dark:hover:border-cyan-300 rounded-2xl text-left text-slate-800 dark:text-cyan-100 transition font-medium shadow-sm flex items-center justify-between group">
+                  <span class="group-hover:text-sky-700 dark:group-hover:text-cyan-300 text-slate-800 dark:text-cyan-100">B. Extra bonus marks are awarded for length</span>
                 </button>
               </div>
-              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
+              <div id="slideAnswerFeedback" class="hidden p-3.5 rounded-xl text-xs sm:text-sm font-semibold"></div>
             </div>
           </div>
         `
@@ -947,25 +1193,30 @@
         type: "Concept Map",
         correctAnswer: "Formal Article Register",
         render: () => `
-          <div class="space-y-4">
-            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Determining Your Writing Register</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              <div class="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-1">
-                <div class="text-sky-600 dark:text-sky-400 font-bold">1. Audience Tone</div>
-                <p class="text-slate-600 dark:text-slate-300">Classmates, teachers, and school governors. Demands a respectful, balanced approach.</p>
+          <div class="space-y-6">
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-cyan-300 dark:neon-cyan tracking-tight">Determining Your Writing Register</h3>
+            <p class="text-base sm:text-lg text-slate-700 dark:text-cyan-100">Exam expectations depend on audience tone and communicative purpose.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-base">
+              <div class="p-5 sm:p-6 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl space-y-2.5 shadow-md">
+                <div class="text-sky-700 dark:text-cyan-300 dark:neon-cyan font-bold text-lg sm:text-xl flex items-center gap-2">
+                  <span>👥</span> 1. Audience Tone
+                </div>
+                <p class="text-slate-700 dark:text-cyan-100 leading-relaxed text-sm sm:text-base">Classmates, teachers, and school governors. Demands a respectful, objective, and balanced approach.</p>
               </div>
-              <div class="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-1">
-                <div class="text-sky-600 dark:text-sky-400 font-bold">2. Exam Purpose</div>
-                <p class="text-slate-600 dark:text-slate-300">To present information, evaluate viewpoints, and provide reasoned recommendations.</p>
+              <div class="p-5 sm:p-6 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl space-y-2.5 shadow-md">
+                <div class="text-sky-700 dark:text-cyan-300 dark:neon-cyan font-bold text-lg sm:text-xl flex items-center gap-2">
+                  <span>🎯</span> 2. Exam Purpose
+                </div>
+                <p class="text-slate-700 dark:text-cyan-100 leading-relaxed text-sm sm:text-base">To evaluate multiple viewpoints, present sustained arguments, and provide reasoned recommendations.</p>
               </div>
             </div>
-            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 text-xs text-center space-y-2">
-              <span class="text-slate-700 dark:text-slate-300 font-semibold block">Select required register:</span>
-              <div class="flex justify-center gap-2">
-                <button onclick="submitSlideAnswer('Casual Dialogue', 'Register', 'Formal Article Register', false)" class="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-lg text-slate-800 dark:text-slate-200 font-medium transition">Casual Dialogue</button>
-                <button onclick="submitSlideAnswer('Formal Article Register', 'Register', 'Formal Article Register', false)" class="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-lg text-slate-800 dark:text-slate-200 font-medium transition">Formal Article Register</button>
+            <div class="p-6 bg-slate-50 dark:bg-[#071126] rounded-2xl border border-slate-300 dark:border-cyan-500/40 text-sm sm:text-base text-center space-y-4 shadow-md neon-box-cyan">
+              <span class="text-slate-800 dark:text-white font-bold block text-base sm:text-lg">Select required register for Exercise 6:</span>
+              <div class="flex flex-wrap justify-center gap-3.5">
+                <button onclick="submitSlideAnswer('Casual Dialogue', 'Register', 'Formal Article Register', false)" class="px-6 py-3.5 bg-white dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 hover:border-sky-500 dark:hover:border-cyan-300 rounded-xl text-slate-800 dark:text-cyan-100 font-semibold transition hover:scale-105 shadow-sm text-sm sm:text-base">Casual Dialogue</button>
+                <button onclick="submitSlideAnswer('Formal Article Register', 'Register', 'Formal Article Register', false)" class="px-6 py-3.5 bg-white dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 hover:border-sky-500 dark:hover:border-cyan-300 rounded-xl text-slate-800 dark:text-cyan-100 font-semibold transition hover:scale-105 shadow-sm text-sm sm:text-base">Formal Article Register</button>
               </div>
-              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
+              <div id="slideAnswerFeedback" class="hidden p-3.5 rounded-xl text-xs sm:text-sm font-semibold"></div>
             </div>
           </div>
         `
@@ -976,21 +1227,21 @@
         type: "Rule Classifier",
         correctAnswer: "It is high time authorities implemented measures",
         render: () => `
-          <div class="space-y-4">
-            <h3 class="text-xl font-bold text-slate-900 dark:text-white">4 Pillars of Formal Style</h3>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs font-semibold">
-              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200">🚫 No Contractions</div>
-              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200">🚫 No Colloquial Idioms</div>
-              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200">🚫 No Casual Slang</div>
-              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200">✅ Formal Connectors</div>
+          <div class="space-y-6">
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-cyan-300 dark:neon-cyan tracking-tight">4 Pillars of Formal Style</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-sm sm:text-base font-bold">
+              <div class="p-4 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl text-slate-800 dark:text-cyan-300 dark:neon-cyan shadow-sm">🚫 No Contractions</div>
+              <div class="p-4 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl text-slate-800 dark:text-cyan-300 dark:neon-cyan shadow-sm">🚫 No Slang / Idioms</div>
+              <div class="p-4 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl text-slate-800 dark:text-cyan-300 dark:neon-cyan shadow-sm">🚫 No Exclamations</div>
+              <div class="p-4 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-emerald-500/40 rounded-2xl text-slate-800 dark:text-emerald-300 dark:neon-emerald shadow-sm">✅ Formal Connectors</div>
             </div>
-            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
-              <span class="font-bold text-sky-600 dark:text-sky-400 block">Which phrase fits a formal IGCSE article?</span>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <button onclick="submitSlideAnswer('They can\\'t do it like that', 'Classifier', 'It is high time authorities implemented measures', false)" class="p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-xl text-slate-800 dark:text-slate-200 font-medium shadow-sm transition">"They can't do it like that"</button>
-                <button onclick="submitSlideAnswer('It is high time authorities implemented measures', 'Classifier', 'It is high time authorities implemented measures', false)" class="p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-xl text-slate-800 dark:text-slate-200 font-medium shadow-sm transition">"It is high time authorities implemented measures"</button>
+            <div class="p-6 bg-slate-50 dark:bg-[#071126] rounded-2xl border border-slate-300 dark:border-cyan-500/40 space-y-4 text-sm sm:text-base shadow-md neon-box-cyan">
+              <span class="font-bold text-sky-700 dark:text-cyan-300 dark:neon-cyan block text-base sm:text-lg">Which sentence demonstrates appropriate formal register for IGCSE?</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <button onclick="submitSlideAnswer('They can\\'t do it like that', 'Classifier', 'It is high time authorities implemented measures', false)" class="p-4 sm:p-5 bg-white dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 hover:border-sky-500 dark:hover:border-cyan-300 rounded-xl text-slate-800 dark:text-cyan-100 font-medium shadow-sm transition">"They can't do it like that"</button>
+                <button onclick="submitSlideAnswer('It is high time authorities implemented measures', 'Classifier', 'It is high time authorities implemented measures', false)" class="p-4 sm:p-5 bg-white dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 hover:border-sky-500 dark:hover:border-cyan-300 rounded-xl text-slate-800 dark:text-cyan-100 font-medium shadow-sm transition">"It is high time authorities implemented measures"</button>
               </div>
-              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
+              <div id="slideAnswerFeedback" class="hidden p-3.5 rounded-xl text-xs sm:text-sm font-semibold"></div>
             </div>
           </div>
         `
@@ -1000,15 +1251,16 @@
         module: "Module 1: Foundations",
         type: "Overview",
         render: () => `
-          <div class="space-y-4 text-xs">
-            <h3 class="text-xl font-bold text-slate-900 dark:text-white">The 6 Writing Tools</h3>
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300"><strong class="text-sky-600 dark:text-sky-400 block">1. Time Fixer</strong>Anchors intro timelines</div>
-              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300"><strong class="text-sky-600 dark:text-sky-400 block">2. Point Introducers</strong>Prevents robotic listing</div>
-              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300"><strong class="text-sky-600 dark:text-sky-400 block">3. Connectors</strong>Addition & contrast</div>
-              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300"><strong class="text-sky-600 dark:text-sky-400 block">4. Adding Support</strong>Cause & effect rationale</div>
-              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300"><strong class="text-sky-600 dark:text-sky-400 block">5. Generalization</strong>Softens sweeping claims</div>
-              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300"><strong class="text-sky-600 dark:text-sky-400 block">6. Suggestions</strong>Subjunctive grammar</div>
+          <div class="space-y-6">
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-cyan-300 dark:neon-cyan tracking-tight">The 6 Writing Tools</h3>
+            <p class="text-base sm:text-lg text-slate-700 dark:text-cyan-100">Master these 6 essential structural tools to secure top-tier marks in Exercise 6 extended writing:</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm sm:text-base">
+              <div class="p-5 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl text-slate-800 dark:text-cyan-100 shadow-sm"><strong class="text-sky-700 dark:text-cyan-300 dark:neon-cyan block text-base sm:text-lg font-bold mb-1">1. Time Fixer</strong>Anchors timelines in introductions.</div>
+              <div class="p-5 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl text-slate-800 dark:text-cyan-100 shadow-sm"><strong class="text-sky-700 dark:text-cyan-300 dark:neon-cyan block text-base sm:text-lg font-bold mb-1">2. Point Introducers</strong>Prevents robotic listing of arguments.</div>
+              <div class="p-5 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl text-slate-800 dark:text-cyan-100 shadow-sm"><strong class="text-sky-700 dark:text-cyan-300 dark:neon-cyan block text-base sm:text-lg font-bold mb-1">3. Connectors</strong>Seamless addition and contrast devices.</div>
+              <div class="p-5 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl text-slate-800 dark:text-cyan-100 shadow-sm"><strong class="text-sky-700 dark:text-cyan-300 dark:neon-cyan block text-base sm:text-lg font-bold mb-1">4. Adding Support</strong>Cause & effect rationale and evidence.</div>
+              <div class="p-5 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl text-slate-800 dark:text-cyan-100 shadow-sm"><strong class="text-sky-700 dark:text-cyan-300 dark:neon-cyan block text-base sm:text-lg font-bold mb-1">5. Generalization</strong>Softens sweeping, unverified claims.</div>
+              <div class="p-5 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl text-slate-800 dark:text-cyan-100 shadow-sm"><strong class="text-sky-700 dark:text-cyan-300 dark:neon-cyan block text-base sm:text-lg font-bold mb-1">6. Formal Suggestions</strong>Advanced subjunctive grammar.</div>
             </div>
           </div>
         `
@@ -1018,17 +1270,17 @@
         module: "Module 2: In-Depth",
         type: "Sentence Transformer",
         render: () => `
-          <div class="space-y-4 text-xs">
-            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Tool 1: Time Fixer</h3>
-            <p class="text-slate-600 dark:text-slate-300">Anchor your argument across time: <em>Nowadays, In recent years, Historically speaking...</em></p>
-            <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
-              <span class="font-bold text-amber-600 dark:text-amber-400 block">Upgrade Statement: "Most schools are digital now."</span>
-              <p class="text-[11px] text-slate-500">Short answer task: Requires teacher grading.</p>
-              <div class="flex gap-2">
-                <input id="slide5Input" type="text" onkeydown="if(event.key==='Enter') submitSlide5Sentence();" placeholder="e.g. In recent years, an increasing number of schools have adopted digital platforms..." class="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-100 outline-none" />
-                <button onclick="submitSlide5Sentence()" class="px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-white font-semibold rounded-lg shadow-sm transition cursor-pointer">Submit</button>
+          <div class="space-y-6">
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-cyan-300 dark:neon-cyan tracking-tight">Tool 1: Time Fixer</h3>
+            <p class="text-base sm:text-lg text-slate-700 dark:text-cyan-100">Anchor your argument across time using academic markers: <em class="dark:text-cyan-300 font-semibold">Nowadays, In recent years, In contemporary society...</em></p>
+            <div class="p-6 sm:p-7 bg-slate-50 dark:bg-[#071126] rounded-2xl border border-slate-300 dark:border-cyan-500/50 space-y-4 shadow-lg neon-box-cyan">
+              <span class="font-bold text-amber-700 dark:text-amber-300 dark:neon-amber block text-base sm:text-lg">Upgrade Statement: "Most schools are digital now."</span>
+              <p class="text-sm text-slate-600 dark:text-cyan-200">Upgrade this informal phrase with a formal time-fixer and advanced vocabulary:</p>
+              <div class="flex flex-col sm:flex-row gap-3">
+                <input id="slide5Input" type="text" onkeydown="if(event.key==='Enter') submitSlide5Sentence();" placeholder="Type your answer here..." class="flex-1 bg-white dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/50 rounded-xl px-4 py-3.5 text-base text-slate-800 dark:text-cyan-100 dark:placeholder:text-cyan-300/40 outline-none focus:ring-2 focus:ring-sky-500 dark:focus:ring-cyan-400" />
+                <button onclick="submitSlide5Sentence()" class="px-7 py-3.5 bg-sky-600 hover:bg-sky-500 dark:bg-cyan-600 dark:hover:bg-cyan-500 text-white font-bold text-base rounded-xl shadow-md transition cursor-pointer">Submit</button>
               </div>
-              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
+              <div id="slideAnswerFeedback" class="hidden p-3.5 rounded-xl text-xs sm:text-sm font-semibold"></div>
             </div>
           </div>
         `
@@ -1039,16 +1291,16 @@
         type: "Class Poll",
         correctAnswer: "2 to 3 points",
         render: () => `
-          <div class="space-y-4 text-xs">
-            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Tool 2: Introducing Points</h3>
-            <p class="text-slate-600 dark:text-slate-300">Develop a maximum of 2 to 3 main body ideas thoroughly with clear signposting.</p>
-            <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
-              <span class="text-slate-800 dark:text-slate-200 font-semibold block">Ideal number of core points for high marks?</span>
-              <div class="flex gap-2">
-                <button onclick="submitSlideAnswer('1 point', 'Poll', '2 to 3 points', false)" class="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 font-medium transition">1 Point</button>
-                <button onclick="submitSlideAnswer('2 to 3 points', 'Poll', '2 to 3 points', false)" class="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 font-medium transition">2 to 3 Points</button>
+          <div class="space-y-6">
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-cyan-300 dark:neon-cyan tracking-tight">Tool 2: Introducing Points</h3>
+            <p class="text-base sm:text-lg text-slate-700 dark:text-cyan-100">Avoid listing 5 or 6 shallow ideas. Quality and depth of development are valued over quantity.</p>
+            <div class="p-6 sm:p-7 bg-slate-50 dark:bg-[#071126] rounded-2xl border border-slate-300 dark:border-cyan-500/50 space-y-4 shadow-lg neon-box-cyan">
+              <span class="text-slate-800 dark:text-white font-bold block text-base sm:text-lg">What is the optimal number of core body arguments for high marks?</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-sm sm:text-base">
+                <button onclick="submitSlideAnswer('1 point', 'Poll', '2 to 3 points', false)" class="p-4 sm:p-5 bg-white dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 hover:border-sky-500 dark:hover:border-cyan-300 rounded-xl text-slate-800 dark:text-cyan-100 font-semibold transition">A. 1 Point (Overly brief)</button>
+                <button onclick="submitSlideAnswer('2 to 3 points', 'Poll', '2 to 3 points', false)" class="p-4 sm:p-5 bg-white dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 hover:border-sky-500 dark:hover:border-cyan-300 rounded-xl text-slate-800 dark:text-cyan-100 font-semibold transition">B. 2 to 3 Points (Deeply developed)</button>
               </div>
-              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
+              <div id="slideAnswerFeedback" class="hidden p-3.5 rounded-xl text-xs sm:text-sm font-semibold"></div>
             </div>
           </div>
         `
@@ -1059,16 +1311,16 @@
         type: "Multiple Choice",
         correctAnswer: "In conclusion",
         render: () => `
-          <div class="space-y-4 text-xs">
-            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Concluding Gap-Fill Exercise</h3>
-            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 font-serif text-slate-800 dark:text-slate-200">
-              "...[ Blank ], a truly compelling film is a perfect synthesis of evocative storytelling, well-developed characters, and technical mastery."
+          <div class="space-y-6">
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-cyan-300 dark:neon-cyan tracking-tight">Concluding Gap-Fill Exercise</h3>
+            <div class="p-6 sm:p-7 bg-slate-50 dark:bg-[#0b1b36] rounded-2xl border border-slate-300 dark:border-cyan-500/40 font-serif text-slate-800 dark:text-cyan-100 text-lg sm:text-xl leading-relaxed shadow-lg">
+              "...[ <strong class="text-amber-600 dark:text-amber-300 dark:neon-amber font-sans">Blank</strong> ], a truly compelling film is a perfect synthesis of evocative storytelling, well-developed characters, and technical mastery."
             </div>
-            <div class="grid grid-cols-2 gap-2">
-              <button onclick="submitSlideAnswer('First of all', 'MCQ', 'In conclusion', false)" class="p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 font-medium transition">A. First of all</button>
-              <button onclick="submitSlideAnswer('In conclusion', 'MCQ', 'In conclusion', false)" class="p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 font-medium transition">B. In conclusion</button>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-sm sm:text-base">
+              <button onclick="submitSlideAnswer('First of all', 'MCQ', 'In conclusion', false)" class="p-4 sm:p-5 bg-white dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 hover:border-sky-500 dark:hover:border-cyan-300 rounded-xl text-slate-800 dark:text-cyan-100 font-semibold transition">A. First of all</button>
+              <button onclick="submitSlideAnswer('In conclusion', 'MCQ', 'In conclusion', false)" class="p-4 sm:p-5 bg-white dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 hover:border-sky-500 dark:hover:border-cyan-300 rounded-xl text-slate-800 dark:text-cyan-100 font-semibold transition">B. In conclusion</button>
             </div>
-            <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
+            <div id="slideAnswerFeedback" class="hidden p-3.5 rounded-xl text-xs sm:text-sm font-semibold"></div>
           </div>
         `
       },
@@ -1077,11 +1329,18 @@
         module: "Module 2: In-Depth",
         type: "Classifier",
         render: () => `
-          <div class="space-y-4 text-xs">
-            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Addition vs Contrast Connectors</h3>
-            <div class="grid grid-cols-2 gap-3">
-              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300"><strong class="text-sky-600 dark:text-sky-400">Addition:</strong> Furthermore, Moreover, In addition</div>
-              <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300"><strong class="text-sky-600 dark:text-sky-400">Contrast:</strong> However, On the other hand, Nevertheless</div>
+          <div class="space-y-6">
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-cyan-300 dark:neon-cyan tracking-tight">Addition vs Contrast Connectors</h3>
+            <p class="text-base sm:text-lg text-slate-700 dark:text-cyan-100">IGCSE examiners award high marks for cohesive, multi-tiered transitions between paragraphs:</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-base">
+              <div class="p-5 sm:p-6 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl space-y-2 shadow-md">
+                <strong class="text-sky-700 dark:text-cyan-300 dark:neon-cyan text-lg sm:text-xl block font-bold">➕ Addition Connectors:</strong>
+                <p class="text-slate-700 dark:text-cyan-100 text-sm sm:text-base">Furthermore, Moreover, In addition, Not only that, but...</p>
+              </div>
+              <div class="p-5 sm:p-6 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl space-y-2 shadow-md">
+                <strong class="text-amber-700 dark:text-amber-300 dark:neon-amber text-lg sm:text-xl block font-bold">⚖️ Contrast Connectors:</strong>
+                <p class="text-slate-700 dark:text-cyan-100 text-sm sm:text-base">However, On the contrary, Nevertheless, Conversely...</p>
+              </div>
             </div>
           </div>
         `
@@ -1091,13 +1350,13 @@
         module: "Module 2: Practice",
         type: "Open Task",
         render: () => `
-          <div class="space-y-4 text-xs">
-            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Combine Opposing Statements</h3>
-            <p class="text-slate-600 dark:text-slate-300">Combine: "Technology accelerates learning access" AND "Technology can increase classroom distraction".</p>
-            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
-              <input id="slide9Input" type="text" onkeydown="if(event.key==='Enter') submitSlide9Sentence();" placeholder="Type combined sentence with formal connector..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-100 outline-none" />
-              <button onclick="submitSlide9Sentence()" class="px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg font-semibold transition cursor-pointer">Submit</button>
-              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
+          <div class="space-y-6">
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-cyan-300 dark:neon-cyan tracking-tight">Combine Opposing Statements</h3>
+            <p class="text-base sm:text-lg text-slate-700 dark:text-cyan-100">Synthesize these two ideas: <span class="font-bold text-slate-900 dark:text-cyan-300 dark:neon-cyan">"Technology accelerates learning access"</span> AND <span class="font-bold text-slate-900 dark:text-amber-300 dark:neon-amber">"Technology can increase classroom distraction"</span>.</p>
+            <div class="p-6 sm:p-7 bg-slate-50 dark:bg-[#071126] rounded-2xl border border-slate-300 dark:border-cyan-500/50 space-y-4 shadow-lg neon-box-cyan">
+              <input id="slide9Input" type="text" onkeydown="if(event.key==='Enter') submitSlide9Sentence();" placeholder="Type your answer here..." class="w-full bg-white dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/50 rounded-xl px-4 py-3.5 text-base text-slate-800 dark:text-cyan-100 dark:placeholder:text-cyan-300/40 outline-none focus:ring-2 focus:ring-sky-500 dark:focus:ring-cyan-400" />
+              <button onclick="submitSlide9Sentence()" class="px-7 py-3.5 bg-sky-600 hover:bg-sky-500 dark:bg-cyan-600 dark:hover:bg-cyan-500 text-white font-bold text-base rounded-xl transition cursor-pointer shadow-md">Submit</button>
+              <div id="slideAnswerFeedback" class="hidden p-3.5 rounded-xl text-xs sm:text-sm font-semibold"></div>
             </div>
           </div>
         `
@@ -1107,9 +1366,11 @@
         module: "Module 2: Review",
         type: "Showcase",
         render: () => `
-          <div class="space-y-3 text-xs font-serif">
-            <h3 class="text-xl font-bold text-slate-900 dark:text-white font-sans">Model Solution</h3>
-            <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200">"Technology significantly accelerates access to learning resources. <strong class="text-sky-600 dark:text-sky-300">However,</strong> unmonitored usage may lead to cognitive distraction."</div>
+          <div class="space-y-6">
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-cyan-300 dark:neon-cyan tracking-tight">Model Solution</h3>
+            <div class="p-6 sm:p-8 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl text-slate-800 dark:text-cyan-100 font-serif text-lg sm:text-xl leading-relaxed shadow-lg">
+              "Technology significantly accelerates access to pedagogical materials and research resources. <strong class="text-sky-700 dark:text-cyan-300 dark:neon-cyan font-sans font-bold">However,</strong> unmoderated digital usage in classroom environments frequently fosters cognitive distraction and reduces deep task engagement."
+            </div>
           </div>
         `
       },
@@ -1118,9 +1379,14 @@
         module: "Module 2: In-Depth",
         type: "Flowchart",
         render: () => `
-          <div class="space-y-4 text-xs">
-            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Causal Support Flowchart</h3>
-            <p class="text-slate-600 dark:text-slate-300">Main Point ➔ "This implies that..." ➔ "Consequently..."</p>
+          <div class="space-y-6">
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-cyan-300 dark:neon-cyan tracking-tight">Causal Support Flowchart</h3>
+            <p class="text-base sm:text-lg text-slate-700 dark:text-cyan-100">Avoid bare assertions. Strengthen claims through explicit consequence chains:</p>
+            <div class="p-6 sm:p-7 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl font-mono text-base sm:text-lg space-y-3 text-slate-800 dark:text-cyan-200 shadow-md">
+              <div class="font-bold text-slate-900 dark:text-white text-lg sm:text-xl">Core Point: "Plastic waste accumulates in waterways."</div>
+              <div class="text-sky-600 dark:text-cyan-300 dark:neon-cyan">➔ "This implies that marine life ingests microparticles..."</div>
+              <div class="text-emerald-600 dark:text-emerald-300 dark:neon-emerald">➔ "Consequently, toxins permeate the food web..."</div>
+            </div>
           </div>
         `
       },
@@ -1129,12 +1395,13 @@
         module: "Module 2: Practice",
         type: "Open Task",
         render: () => `
-          <div class="space-y-4 text-xs">
-            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Support Plastic Pollution Statement</h3>
-            <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
-              <input id="slide12Input" type="text" onkeydown="if(event.key==='Enter') submitSlide12Support();" placeholder="e.g. This means marine life ingests harmful particles..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-100 outline-none" />
-              <button onclick="submitSlide12Support()" class="px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg font-semibold transition cursor-pointer">Submit</button>
-              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
+          <div class="space-y-6">
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-cyan-300 dark:neon-cyan tracking-tight">Support Plastic Pollution Statement</h3>
+            <p class="text-base sm:text-lg text-slate-700 dark:text-cyan-100">Provide an effective causal explanation for: <span class="font-bold text-slate-900 dark:text-cyan-300 dark:neon-cyan">"Single-use plastics pose severe ecological risks."</span></p>
+            <div class="p-6 sm:p-7 bg-slate-50 dark:bg-[#071126] rounded-2xl border border-slate-300 dark:border-cyan-500/50 space-y-4 shadow-lg neon-box-cyan">
+              <input id="slide12Input" type="text" onkeydown="if(event.key==='Enter') submitSlide12Support();" placeholder="Type your answer here..." class="w-full bg-white dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/50 rounded-xl px-4 py-3.5 text-base text-slate-800 dark:text-cyan-100 dark:placeholder:text-cyan-300/40 outline-none focus:ring-2 focus:ring-sky-500 dark:focus:ring-cyan-400" />
+              <button onclick="submitSlide12Support()" class="px-7 py-3.5 bg-sky-600 hover:bg-sky-500 dark:bg-cyan-600 dark:hover:bg-cyan-500 text-white font-bold text-base rounded-xl transition cursor-pointer shadow-md">Submit</button>
+              <div id="slideAnswerFeedback" class="hidden p-3.5 rounded-xl text-xs sm:text-sm font-semibold"></div>
             </div>
           </div>
         `
@@ -1144,8 +1411,11 @@
         module: "Module 2: Review",
         type: "Showcase",
         render: () => `
-          <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-serif text-slate-800 dark:text-slate-200">
-            "Plastic waste accumulates in ecosystems. <strong class="text-sky-600 dark:text-sky-300">This implies that</strong> toxic elements enter the food chain. <strong class="text-sky-600 dark:text-sky-300">Consequently,</strong> public health faces long-term risks."
+          <div class="space-y-6">
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-cyan-300 dark:neon-cyan tracking-tight">Model Solution</h3>
+            <div class="p-6 sm:p-8 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl text-lg sm:text-xl font-serif text-slate-800 dark:text-cyan-100 leading-relaxed shadow-lg">
+              "Single-use plastic refuse accumulates at alarming rates within ocean ecosystems. <strong class="text-sky-700 dark:text-cyan-300 dark:neon-cyan font-sans font-bold">This implies that</strong> aquatic species inevitably ingest indigestible microplastics. <strong class="text-emerald-700 dark:text-emerald-300 dark:neon-emerald font-sans font-bold">Consequently,</strong> broader biodiversity and public health face systemic, long-term contamination risks."
+            </div>
           </div>
         `
       },
@@ -1154,9 +1424,13 @@
         module: "Module 2: In-Depth",
         type: "Tone Softener",
         render: () => `
-          <div class="space-y-4 text-xs">
-            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Softening Sweeping Claims</h3>
-            <p class="text-slate-600 dark:text-slate-300">Use expressions like: <em>The vast majority of, In most cases, It is widely acknowledged that...</em></p>
+          <div class="space-y-6">
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-cyan-300 dark:neon-cyan tracking-tight">Softening Sweeping Claims</h3>
+            <p class="text-base sm:text-lg text-slate-700 dark:text-cyan-100">Avoid absolute claims (e.g. <em>"All youth do..."</em>). Cambridge examiners reward academic nuance:</p>
+            <div class="p-6 sm:p-7 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl text-base sm:text-lg space-y-3 text-slate-800 dark:text-cyan-100 shadow-md">
+              <div><strong class="text-rose-600 dark:text-rose-400 dark:neon-rose">❌ Sweeping:</strong> <span class="dark:text-cyan-100">"Nobody reads physical books anymore."</span></div>
+              <div><strong class="text-emerald-600 dark:text-emerald-400 dark:neon-emerald">✅ Nuanced:</strong> <span class="dark:text-cyan-100">"It is widely observed that a growing majority of adolescents favor digital formats over print."</span></div>
+            </div>
           </div>
         `
       },
@@ -1165,12 +1439,13 @@
         module: "Module 2: Practice",
         type: "Open Task",
         render: () => `
-          <div class="space-y-4 text-xs">
-            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Upgrade: "All teenagers waste time online."</h3>
-            <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
-              <input id="slide15Input" type="text" onkeydown="if(event.key==='Enter') submitSlide15Generalization();" placeholder="e.g. A considerable number of young people spend substantial time online..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-100 outline-none" />
-              <button onclick="submitSlide15Generalization()" class="px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg font-semibold transition cursor-pointer">Submit</button>
-              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
+          <div class="space-y-6">
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-cyan-300 dark:neon-cyan tracking-tight">Upgrade: "All teenagers waste time online."</h3>
+            <p class="text-base sm:text-lg text-slate-700 dark:text-cyan-100">Rewrite using an academic hedging marker (e.g. <em class="dark:text-cyan-300 font-semibold">"A considerable proportion", "It is often argued that"</em>):</p>
+            <div class="p-6 sm:p-7 bg-slate-50 dark:bg-[#071126] rounded-2xl border border-slate-300 dark:border-cyan-500/50 space-y-4 shadow-lg neon-box-cyan">
+              <input id="slide15Input" type="text" onkeydown="if(event.key==='Enter') submitSlide15Generalization();" placeholder="Type your answer here..." class="w-full bg-white dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/50 rounded-xl px-4 py-3.5 text-base text-slate-800 dark:text-cyan-100 dark:placeholder:text-cyan-300/40 outline-none focus:ring-2 focus:ring-sky-500 dark:focus:ring-cyan-400" />
+              <button onclick="submitSlide15Generalization()" class="px-7 py-3.5 bg-sky-600 hover:bg-sky-500 dark:bg-cyan-600 dark:hover:bg-cyan-500 text-white font-bold text-base rounded-xl transition cursor-pointer shadow-md">Submit</button>
+              <div id="slideAnswerFeedback" class="hidden p-3.5 rounded-xl text-xs sm:text-sm font-semibold"></div>
             </div>
           </div>
         `
@@ -1180,9 +1455,12 @@
         module: "Module 2: Grammar",
         type: "Grammar Unit",
         render: () => `
-          <div class="space-y-3 text-xs">
-            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Subjunctive & Unreal Past Grammar</h3>
-            <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200">"It is high time school administration <strong class="text-sky-600 dark:text-sky-300">introduced</strong> comprehensive recycling programs."</div>
+          <div class="space-y-6">
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-cyan-300 dark:neon-cyan tracking-tight">Subjunctive & Unreal Past Grammar</h3>
+            <p class="text-base sm:text-lg text-slate-700 dark:text-cyan-100">End recommendations with advanced syntactic patterns:</p>
+            <div class="p-6 sm:p-8 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl text-slate-800 dark:text-cyan-100 text-lg sm:text-xl leading-relaxed shadow-lg font-serif">
+              "It is high time school administration <strong class="text-sky-700 dark:text-cyan-300 dark:neon-cyan font-sans font-bold">introduced</strong> comprehensive environmental recycling initiatives."
+            </div>
           </div>
         `
       },
@@ -1191,22 +1469,22 @@
         module: "Module 3: Exam Mastery",
         type: "Written Drill",
         render: () => `
-          <div class="space-y-4 text-xs">
+          <div class="space-y-6">
             <div class="flex items-center justify-between">
-              <h3 class="text-xl font-bold text-slate-900 dark:text-white font-sans">Exam Drill 1: Engaging Introduction</h3>
-              <span class="px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 font-mono text-[10px] font-bold">Teacher Graded</span>
+              <h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-cyan-300 dark:neon-cyan tracking-tight">Exam Drill 1: Engaging Introduction</h3>
+              <span class="px-3.5 py-1 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 dark:neon-amber font-mono text-xs font-bold border border-amber-300 dark:border-amber-700">Teacher Graded</span>
             </div>
-            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
-              <strong class="text-sky-600 dark:text-sky-400">Prompt:</strong> Write a 30–45 word formal introduction for a school magazine article discussing whether mandatory school uniforms cultivate discipline or restrict individuality.
+            <p class="text-base sm:text-lg text-slate-700 dark:text-cyan-100 leading-relaxed">
+              <strong class="text-sky-700 dark:text-cyan-300 dark:neon-cyan font-bold">Prompt:</strong> Write a 30–45 word formal introduction for a school magazine article discussing whether mandatory school uniforms cultivate discipline or restrict individuality.
             </p>
-            <div class="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
-              <label class="block font-semibold text-slate-700 dark:text-slate-200 text-xs">Your Introduction Response:</label>
-              <textarea id="slide17DrillText" rows="4" placeholder="In recent years, the debate surrounding compulsory school attire has intensified..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-slate-800 dark:text-slate-100 outline-none focus:ring-1 focus:ring-sky-500 font-serif leading-relaxed"></textarea>
+            <div class="p-6 sm:p-7 bg-slate-50 dark:bg-[#071126] border border-slate-300 dark:border-cyan-500/50 rounded-2xl space-y-4 shadow-lg neon-box-cyan">
+              <label class="block font-bold text-slate-800 dark:text-cyan-200 text-base">Your Introduction Response:</label>
+              <textarea id="slide17DrillText" rows="4" placeholder="Type your answer here..." class="w-full bg-white dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/50 rounded-xl p-4 text-base text-slate-800 dark:text-cyan-100 dark:placeholder:text-cyan-300/40 outline-none focus:ring-2 focus:ring-sky-500 dark:focus:ring-cyan-400 font-serif leading-relaxed"></textarea>
               <div class="flex items-center justify-between pt-1">
-                <span class="text-[10px] text-slate-400">Aim for 30–45 formal words</span>
-                <button onclick="submitDrillResponse('slide17DrillText', 'Exam Drill 1: Intro Hook')" class="px-5 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl shadow-md transition">Submit for Review</button>
+                <span class="text-xs sm:text-sm text-slate-500 dark:text-cyan-300">Aim for 30–45 formal words</span>
+                <button onclick="submitDrillResponse('slide17DrillText', 'Exam Drill 1: Intro Hook')" class="px-7 py-3.5 bg-sky-600 hover:bg-sky-500 dark:bg-cyan-600 dark:hover:bg-cyan-500 text-white font-bold text-base rounded-xl shadow-md transition">Submit for Review</button>
               </div>
-              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
+              <div id="slideAnswerFeedback" class="hidden p-3.5 rounded-xl text-xs sm:text-sm font-semibold"></div>
             </div>
           </div>
         `
@@ -1216,22 +1494,22 @@
         module: "Module 3: Exam Mastery",
         type: "Written Drill",
         render: () => `
-          <div class="space-y-4 text-xs">
+          <div class="space-y-6">
             <div class="flex items-center justify-between">
-              <h3 class="text-xl font-bold text-slate-900 dark:text-white font-sans">Exam Drill 2: Counter-Arguments & Contrast</h3>
-              <span class="px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 font-mono text-[10px] font-bold">Teacher Graded</span>
+              <h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-cyan-300 dark:neon-cyan tracking-tight">Exam Drill 2: Counter-Arguments & Contrast</h3>
+              <span class="px-3.5 py-1 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 dark:neon-amber font-mono text-xs font-bold border border-amber-300 dark:border-amber-700">Teacher Graded</span>
             </div>
-            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
-              <strong class="text-sky-600 dark:text-sky-400">Prompt:</strong> Some claim electronic tablets should replace printed textbooks. Write a 40–50 word body paragraph acknowledging convenience while using contrast connectors (e.g. <em>However, On the contrary</em>) to emphasize screen fatigue.
+            <p class="text-base sm:text-lg text-slate-700 dark:text-cyan-100 leading-relaxed">
+              <strong class="text-sky-700 dark:text-cyan-300 dark:neon-cyan font-bold">Prompt:</strong> Some claim electronic tablets should replace printed textbooks. Write a 40–50 word body paragraph acknowledging convenience while using contrast connectors (e.g. <em class="dark:text-cyan-300">However, On the contrary</em>) to emphasize screen fatigue.
             </p>
-            <div class="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
-              <label class="block font-semibold text-slate-700 dark:text-slate-200 text-xs">Your Balanced Paragraph:</label>
-              <textarea id="slide18DrillText" rows="4" placeholder="Advocates argue that digital tablets provide instant access to limitless pedagogical materials. Nevertheless, unmoderated screen time..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-slate-800 dark:text-slate-100 outline-none focus:ring-1 focus:ring-sky-500 font-serif leading-relaxed"></textarea>
+            <div class="p-6 sm:p-7 bg-slate-50 dark:bg-[#071126] border border-slate-300 dark:border-cyan-500/50 rounded-2xl space-y-4 shadow-lg neon-box-cyan">
+              <label class="block font-bold text-slate-800 dark:text-cyan-200 text-base">Your Balanced Paragraph:</label>
+              <textarea id="slide18DrillText" rows="4" placeholder="Type your answer here..." class="w-full bg-white dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/50 rounded-xl p-4 text-base text-slate-800 dark:text-cyan-100 dark:placeholder:text-cyan-300/40 outline-none focus:ring-2 focus:ring-sky-500 dark:focus:ring-cyan-400 font-serif leading-relaxed"></textarea>
               <div class="flex items-center justify-between pt-1">
-                <span class="text-[10px] text-slate-400">Must include 1 contrast connector</span>
-                <button onclick="submitDrillResponse('slide18DrillText', 'Exam Drill 2: Counter-Arguments')" class="px-5 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl shadow-md transition">Submit for Review</button>
+                <span class="text-xs sm:text-sm text-slate-500 dark:text-cyan-300">Must include 1 contrast connector</span>
+                <button onclick="submitDrillResponse('slide18DrillText', 'Exam Drill 2: Counter-Arguments')" class="px-7 py-3.5 bg-sky-600 hover:bg-sky-500 dark:bg-cyan-600 dark:hover:bg-cyan-500 text-white font-bold text-base rounded-xl shadow-md transition">Submit for Review</button>
               </div>
-              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
+              <div id="slideAnswerFeedback" class="hidden p-3.5 rounded-xl text-xs sm:text-sm font-semibold"></div>
             </div>
           </div>
         `
@@ -1241,22 +1519,22 @@
         module: "Module 3: Exam Mastery",
         type: "Written Drill",
         render: () => `
-          <div class="space-y-4 text-xs">
+          <div class="space-y-6">
             <div class="flex items-center justify-between">
-              <h3 class="text-xl font-bold text-slate-900 dark:text-white font-sans">Exam Drill 3: Recommendations & Subjunctive Mood</h3>
-              <span class="px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 font-mono text-[10px] font-bold">Teacher Graded</span>
+              <h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-cyan-300 dark:neon-cyan tracking-tight">Exam Drill 3: Recommendations & Subjunctive Mood</h3>
+              <span class="px-3.5 py-1 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 dark:neon-amber font-mono text-xs font-bold border border-amber-300 dark:border-amber-700">Teacher Graded</span>
             </div>
-            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
-              <strong class="text-sky-600 dark:text-sky-400">Prompt:</strong> Write a 35–45 word formal recommendation proposing improvements for sports facilities. Employ subjunctive grammar (e.g. <em>"It is imperative that school leaders allocate..."</em>).
+            <p class="text-base sm:text-lg text-slate-700 dark:text-cyan-100 leading-relaxed">
+              <strong class="text-sky-700 dark:text-cyan-300 dark:neon-cyan font-bold">Prompt:</strong> Write a 35–45 word formal recommendation proposing improvements for sports facilities. Employ subjunctive grammar (e.g. <em class="dark:text-cyan-300">"It is imperative that school leaders allocate..."</em>).
             </p>
-            <div class="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
-              <label class="block font-semibold text-slate-700 dark:text-slate-200 text-xs">Your Formal Recommendation:</label>
-              <textarea id="slide19DrillText" rows="4" placeholder="To bolster student wellbeing, it is imperative that the school board invest in modernized fitness facilities..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-slate-800 dark:text-slate-100 outline-none focus:ring-1 focus:ring-sky-500 font-serif leading-relaxed"></textarea>
+            <div class="p-6 sm:p-7 bg-slate-50 dark:bg-[#071126] border border-slate-300 dark:border-cyan-500/50 rounded-2xl space-y-4 shadow-lg neon-box-cyan">
+              <label class="block font-bold text-slate-800 dark:text-cyan-200 text-base">Your Formal Recommendation:</label>
+              <textarea id="slide19DrillText" rows="4" placeholder="Type your answer here..." class="w-full bg-white dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/50 rounded-xl p-4 text-base text-slate-800 dark:text-cyan-100 dark:placeholder:text-cyan-300/40 outline-none focus:ring-2 focus:ring-sky-500 dark:focus:ring-cyan-400 font-serif leading-relaxed"></textarea>
               <div class="flex items-center justify-between pt-1">
-                <span class="text-[10px] text-slate-400">Use formal subjunctive structures</span>
-                <button onclick="submitDrillResponse('slide19DrillText', 'Exam Drill 3: Formal Suggestions')" class="px-5 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl shadow-md transition">Submit for Review</button>
+                <span class="text-xs sm:text-sm text-slate-500 dark:text-cyan-300">Use formal subjunctive structures</span>
+                <button onclick="submitDrillResponse('slide19DrillText', 'Exam Drill 3: Formal Suggestions')" class="px-7 py-3.5 bg-sky-600 hover:bg-sky-500 dark:bg-cyan-600 dark:hover:bg-cyan-500 text-white font-bold text-base rounded-xl shadow-md transition">Submit for Review</button>
               </div>
-              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
+              <div id="slideAnswerFeedback" class="hidden p-3.5 rounded-xl text-xs sm:text-sm font-semibold"></div>
             </div>
           </div>
         `
@@ -1266,22 +1544,22 @@
         module: "Module 3: Exam Mastery",
         type: "Written Drill",
         render: () => `
-          <div class="space-y-4 text-xs">
+          <div class="space-y-6">
             <div class="flex items-center justify-between">
-              <h3 class="text-xl font-bold text-slate-900 dark:text-white font-sans">Exam Drill 4: Concluding Call to Action</h3>
-              <span class="px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 font-mono text-[10px] font-bold">Teacher Graded</span>
+              <h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-cyan-300 dark:neon-cyan tracking-tight">Exam Drill 4: Concluding Call to Action</h3>
+              <span class="px-3.5 py-1 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 dark:neon-amber font-mono text-xs font-bold border border-amber-300 dark:border-amber-700">Teacher Graded</span>
             </div>
-            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
-              <strong class="text-sky-600 dark:text-sky-400">Prompt:</strong> Conclude a formal article about environmental preservation. Write a 30–45 word closing statement summarizing the collective urgency to reduce plastic consumption.
+            <p class="text-base sm:text-lg text-slate-700 dark:text-cyan-100 leading-relaxed">
+              <strong class="text-sky-700 dark:text-cyan-300 dark:neon-cyan font-bold">Prompt:</strong> Conclude a formal article about environmental preservation. Write a 30–45 word closing statement summarizing the collective urgency to reduce plastic consumption.
             </p>
-            <div class="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
-              <label class="block font-semibold text-slate-700 dark:text-slate-200 text-xs">Your Concluding Call to Action:</label>
-              <textarea id="slide20DrillText" rows="4" placeholder="In summary, safeguarding our natural habitat requires proactive community engagement..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-slate-800 dark:text-slate-100 outline-none focus:ring-1 focus:ring-sky-500 font-serif leading-relaxed"></textarea>
+            <div class="p-6 sm:p-7 bg-slate-50 dark:bg-[#071126] border border-slate-300 dark:border-cyan-500/50 rounded-2xl space-y-4 shadow-lg neon-box-cyan">
+              <label class="block font-bold text-slate-800 dark:text-cyan-200 text-base">Your Concluding Call to Action:</label>
+              <textarea id="slide20DrillText" rows="4" placeholder="Type your answer here..." class="w-full bg-white dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/50 rounded-xl p-4 text-base text-slate-800 dark:text-cyan-100 dark:placeholder:text-cyan-300/40 outline-none focus:ring-2 focus:ring-sky-500 dark:focus:ring-cyan-400 font-serif leading-relaxed"></textarea>
               <div class="flex items-center justify-between pt-1">
-                <span class="text-[10px] text-slate-400">Synthesize points with a strong final sentence</span>
-                <button onclick="submitDrillResponse('slide20DrillText', 'Exam Drill 4: Concluding Action')" class="px-5 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl shadow-md transition">Submit for Review</button>
+                <span class="text-xs sm:text-sm text-slate-500 dark:text-cyan-300">Synthesize points with a strong final sentence</span>
+                <button onclick="submitDrillResponse('slide20DrillText', 'Exam Drill 4: Concluding Action')" class="px-7 py-3.5 bg-sky-600 hover:bg-sky-500 dark:bg-cyan-600 dark:hover:bg-cyan-500 text-white font-bold text-base rounded-xl shadow-md transition">Submit for Review</button>
               </div>
-              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
+              <div id="slideAnswerFeedback" class="hidden p-3.5 rounded-xl text-xs sm:text-sm font-semibold"></div>
             </div>
           </div>
         `
@@ -1391,7 +1669,7 @@
         }
       }
 
-      // 1. Sync updated score to Firestore Student Doc
+      // Sync updated score to Firestore
       if (window.db && window.dbMethods) {
         try {
           const { doc, setDoc, updateDoc } = window.dbMethods;
@@ -1399,7 +1677,6 @@
             await setDoc(doc(window.db, 'students', studentDocId), localStudents[studentDocId], { merge: true });
           }
           
-          // 2. ALSO update in the submissions collection if it had an ID
           if (targetSub.firestoreId) {
             await updateDoc(doc(window.db, 'submissions', targetSub.firestoreId), {
               awardedMarks: marksAwarded,
@@ -1408,7 +1685,6 @@
             });
           }
 
-          // 3. Write directly to liveSession grade broadcast so the specific student's screen updates immediately!
           const liveDocRef = doc(window.db, 'session', 'liveSession');
           await setDoc(liveDocRef, {
             latestGradeNotification: {
@@ -1424,7 +1700,6 @@
         }
       }
 
-      // Broadcast grade update to all connected tabs/students locally
       if (window.liveChannel) {
         window.liveChannel.postMessage({
           type: 'GRADE_NOTIFICATION',
@@ -1440,7 +1715,6 @@
       setTimeout(() => window.closeAnswerModal(), 650);
     };
 
-    // Calculate current student score
     window.recalculateStudentScore = function() {
       if (!window.currentUser || window.currentUser.role !== 'student') return;
       const sId = window.currentUser.id || window.currentUser.name.toLowerCase().replace(/\s+/g, "_");
@@ -1454,26 +1728,58 @@
       }
     };
 
+    // Helper: Disable all interactive elements on current slide once answered
+    window.lockCurrentSlideInteractiveElements = function(feedbackHtml) {
+      const body = document.getElementById('slideDynamicBody');
+      if (!body) return;
+
+      const buttons = body.querySelectorAll('button:not([data-nav])');
+      buttons.forEach(b => {
+        b.disabled = true;
+        b.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+      });
+
+      const inputs = body.querySelectorAll('input, textarea');
+      inputs.forEach(inp => {
+        inp.disabled = true;
+        inp.classList.add('opacity-60', 'cursor-not-allowed', 'bg-slate-100', 'dark:bg-[#060c18]', 'dark:text-cyan-100', 'dark:border-cyan-500/30');
+      });
+
+      const feedbackEl = document.getElementById('slideAnswerFeedback');
+      if (feedbackEl && feedbackHtml) {
+        feedbackEl.classList.remove('hidden');
+        feedbackEl.innerHTML = feedbackHtml;
+      }
+    };
+
     window.submitSlideAnswer = async function(answerText, typeLabel, expectedAnswer = null, isShortAnswer = false) {
+      // 1. Guard against 2nd attempts
+      if (window.studentAnsweredSlides[window.currentSlideIndex]) {
+        window.showToast("Attempt already recorded. Multiple attempts are disabled 🔒");
+        return;
+      }
+
       const currentSlide = window.slidesData[window.currentSlideIndex];
       const targetAnswer = expectedAnswer || currentSlide.correctAnswer;
       let isCorrect = null;
       let awardedMarks = 0;
       let isGraded = false;
+      let feedbackHtml = '';
 
       if (isShortAnswer) {
         awardedMarks = 0;
         isGraded = false;
         window.playAudioCue('click');
 
+        feedbackHtml = `
+          <div class="flex items-center justify-between w-full">
+            <span>📝 Response submitted! Pending teacher review & grading.</span>
+            <span class="font-mono text-[11px] font-bold text-amber-600 dark:text-amber-400">🔒 Attempt Locked</span>
+          </div>
+        `;
         const feedbackEl = document.getElementById('slideAnswerFeedback');
         if (feedbackEl) {
-          feedbackEl.classList.remove('hidden');
           feedbackEl.className = "p-3 rounded-xl text-xs font-semibold border bg-amber-50 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800 flex items-center justify-between";
-          feedbackEl.innerHTML = `
-            <span>📝 Response submitted! Pending teacher review & grading.</span>
-            <span class="font-mono text-[11px] font-bold">⏳ Awaiting Grade</span>
-          `;
         }
       } else if (targetAnswer) {
         isCorrect = (answerText.trim().toLowerCase() === targetAnswer.trim().toLowerCase());
@@ -1483,8 +1789,20 @@
         if (isCorrect) {
           window.studentScore = (window.studentScore || 0) + 1;
           window.playAudioCue('success');
+          feedbackHtml = `
+            <div class="flex items-center justify-between w-full">
+              <span>✅ Correct! +1 Mark awarded</span>
+              <span class="font-mono text-[11px] font-bold text-emerald-700 dark:text-emerald-300">🔒 Attempt Locked • Total: ${window.studentScore} Mk(s)</span>
+            </div>
+          `;
         } else {
           window.playAudioCue('error');
+          feedbackHtml = `
+            <div class="flex items-center justify-between w-full">
+              <span>❌ Incorrect. (Target: ${targetAnswer})</span>
+              <span class="font-mono text-[11px] font-bold text-rose-700 dark:text-rose-300">🔒 Attempt Locked • 0 Marks</span>
+            </div>
+          `;
         }
 
         const scoreBadge = document.getElementById('userScoreBadge');
@@ -1494,22 +1812,25 @@
 
         const feedbackEl = document.getElementById('slideAnswerFeedback');
         if (feedbackEl) {
-          feedbackEl.classList.remove('hidden');
-          if (isCorrect) {
-            feedbackEl.className = "p-3 rounded-xl text-xs font-semibold border bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800 flex items-center justify-between";
-            feedbackEl.innerHTML = `
-              <span>✅ Correct! +1 Mark awarded</span>
-              <span class="font-mono text-[11px] font-bold">Total: ${window.studentScore} Mark(s)</span>
-            `;
-          } else {
-            feedbackEl.className = "p-3 rounded-xl text-xs font-semibold border bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-800 flex items-center justify-between";
-            feedbackEl.innerHTML = `
-              <span>❌ Incorrect. (Target: ${targetAnswer})</span>
-              <span class="font-mono text-[11px] font-bold">0 Marks</span>
-            `;
-          }
+          feedbackEl.className = isCorrect 
+            ? "p-3 rounded-xl text-xs font-semibold border bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800 flex items-center justify-between"
+            : "p-3 rounded-xl text-xs font-semibold border bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-800 flex items-center justify-between";
         }
       }
+
+      // Record answer lock for current slide
+      window.studentAnsweredSlides[window.currentSlideIndex] = {
+        answer: answerText,
+        type: typeLabel,
+        isShortAnswer: isShortAnswer,
+        isCorrect: isCorrect,
+        awardedMarks: awardedMarks,
+        feedbackHtml: feedbackHtml,
+        feedbackClass: document.getElementById('slideAnswerFeedback')?.className || ''
+      };
+
+      // Disable inputs and buttons immediately to prevent 2nd attempt
+      window.lockCurrentSlideInteractiveElements(feedbackHtml);
 
       const studentName = window.currentUser ? window.currentUser.name : "Guest Student";
       const progressEntry = {
@@ -1547,7 +1868,7 @@
       }
 
       if (!window.currentUser || window.currentUser.role !== 'student') {
-        window.showToast(isShortAnswer ? "Response logged for teacher review 📝" : (isCorrect ? "Response logged! +1 Mark 🎓" : "Response logged ⚠️"));
+        window.showToast(isShortAnswer ? "Response logged for teacher review 📝 (Locked)" : (isCorrect ? "Response logged! +1 Mark 🎓 (Locked)" : "Response logged ⚠️ (Locked)"));
         return;
       }
 
@@ -1581,7 +1902,6 @@
         filterLabel.textContent = `Showing Session [${window.currentSessionId.slice(-6)}] • Slide ${window.currentSlideIndex + 1}`;
       }
 
-      // Filter strictly by active sessionId AND current slideIndex
       const filtered = window.liveSubmissionsFeed.filter(sub => 
         sub.sessionId === window.currentSessionId && sub.slideIndex === window.currentSlideIndex
       );
@@ -1639,12 +1959,14 @@
     };
 
     window.startNewClassSession = async function() {
-      const newSessionId = "sess_" + new Date().toISOString().slice(0, 10).replace(/-/g, "") + "_" + Math.random().toString(36).substr(2, 4);
+      window.sessionCounter = (window.sessionCounter || 1) + 1;
+      const newSessionId = window.formatSessionName(window.sessionCounter);
       window.currentSessionId = newSessionId;
       window.isSessionEnded = false;
+      window.studentAnsweredSlides = {}; // Reset attempts for new session
 
       const adminLabel = document.getElementById('adminSessionLabel');
-      if (adminLabel) adminLabel.textContent = newSessionId.toUpperCase();
+      if (adminLabel) adminLabel.textContent = newSessionId;
 
       if (window.db && window.dbMethods) {
         try {
@@ -1666,7 +1988,7 @@
         window.liveChannel.postMessage({ type: 'SESSION_CHANGE', sessionId: newSessionId, isEnded: false });
       }
 
-      window.showToast("Started New Live Class Session! 🚀");
+      window.showToast(`Started ${newSessionId}! 🚀`);
       window.renderSlide(0, true);
       window.renderFilteredLiveSubmissions();
     };
@@ -1794,7 +2116,6 @@
         studentsList.push({ name: s.name, grade: s.grade, marks: marks, tasks: (s.progress || []).length });
       });
 
-      // Sort descending by marks
       studentsList.sort((a, b) => b.marks - a.marks);
 
       const totalStudents = studentsList.length;
@@ -1833,7 +2154,6 @@
         document.getElementById('podiumBronzeScore').textContent = "0 Mks";
       }
 
-      // Roster Table
       const fullList = document.getElementById('podiumFullRosterList');
       fullList.innerHTML = "";
 
@@ -1866,8 +2186,67 @@
       if (modal) modal.classList.add('hidden');
     };
 
+    // Helper to generate Cambridge-aligned formative feedback for itemized table
+    function generateCambridgeFeedback(task) {
+      const tNum = (typeof task.slideIndex === 'number') ? (task.slideIndex + 1) : 0;
+      const isAwarded = (task.awardedMarks > 0);
+
+      let feedback = {
+        focus: task.slideTitle || "Exercise 6 Task",
+        directive: "Maintain concise formal expression."
+      };
+
+      if (tNum === 1) {
+        feedback.focus = "Word Count & Scope (Specs)";
+        feedback.directive = isAwarded 
+          ? "Accurately noted that excessive length (>160w) elevates error rate without conferring bonus marks." 
+          : "Target strictly 120–160 words to preserve concise organization and minimize grammatical lapses.";
+      } else if (tNum === 2 || tNum === 3) {
+        feedback.focus = "Formal Article Register";
+        feedback.directive = isAwarded
+          ? "Demonstrated high-register awareness, avoiding conversational abbreviations and informal idioms."
+          : "Adopt formal academic diction; eliminate colloquial phrasing and subjective contractions.";
+      } else if (tNum === 5) {
+        feedback.focus = "Tool 1: Time Fixer Phrasing";
+        feedback.directive = isAwarded
+          ? "Effective temporal anchoring (e.g., 'In recent years') establishes immediate academic context."
+          : "Introduce arguments with formal time markers (e.g., 'Nowadays,' 'In contemporary society') to ground the timeline.";
+      } else if (tNum === 6) {
+        feedback.focus = "Tool 2: Argument Point Density";
+        feedback.directive = "Develop 2–3 cohesive points in depth rather than superficial, disjointed bullet-style listing.";
+      } else if (tNum === 7) {
+        feedback.focus = "Conclusion Connective Gap-Fill";
+        feedback.directive = isAwarded
+          ? "Accurately identified 'In conclusion' as the terminal discourse marker for extended reviews."
+          : "Reserve introductory signposts ('First of all') for body openings; conclude with summative markers.";
+      } else if (tNum === 9 || tNum === 10) {
+        feedback.focus = "Tool 3: Contrast & Addition";
+        feedback.directive = isAwarded
+          ? "Skilfully synthesized opposing viewpoints using contrast conjunctions (e.g., 'However', 'Nevertheless')."
+          : "Employ contrast connectors with preceding semi-colons or commas to seamlessly balance contrasting claims.";
+      } else if (tNum === 12 || tNum === 13) {
+        feedback.focus = "Tool 4: Causal Rationale";
+        feedback.directive = isAwarded
+          ? "Exemplary causal development: linked empirical claim to ecological and public health repercussions."
+          : "Deepen point support by deploying 'Consequently' or 'This indicates that' to illustrate ripple impacts.";
+      } else if (tNum === 15) {
+        feedback.focus = "Tool 5: Nuanced Generalization";
+        feedback.directive = isAwarded
+          ? "Successfully tempered sweeping absolutes by employing academic quantifiers ('a substantial proportion')."
+          : "Avoid extreme quantifiers ('All teenagers'); utilize tempered phrases ('A prevailing majority of youth').";
+      } else if (tNum >= 17) {
+        feedback.focus = `Exam Drill: ${task.type || 'Extended Task'}`;
+        feedback.directive = isAwarded
+          ? "Comprehensive response displaying robust vocabulary, sentence complexity, and tight prompt relevance."
+          : "Ensure adherence to formal paragraph scaffolding with clear thematic progression.";
+      }
+
+      return feedback;
+    }
+
+    // REDESIGNED MULTI-PAGE FORMATIVE EVALUATION REPORT GENERATOR (DISCRETE LOGICAL PAGES)
     window.downloadPDFReport = async function(studentDocId) {
-      window.showToast("Rendering ultra-sharp high-definition PDF transcript...");
+      window.showToast("Compiling spacious 2-page Formative Evaluation Report... 📄");
       try {
         let data = null;
         const localStudents = window.getLocalStudents();
@@ -1889,142 +2268,178 @@
         const progressItems = Array.isArray(data.progress) ? data.progress : [];
         const totalScore = progressItems.reduce((acc, p) => acc + (p.awardedMarks || 0), 0);
 
-        // Calculate percentage: pass threshold is strictly >= 50%
         const totalTasksAssessed = progressItems.length;
         const maxPossibleMarks = Math.max(totalTasksAssessed, 1);
         const scorePercentage = totalTasksAssessed > 0 ? Math.round((totalScore / maxPossibleMarks) * 100) : 0;
         const isPassed = totalTasksAssessed > 0 && scorePercentage >= 50;
+        const formattedDate = "Evaluation Date: " + new Date().toISOString().split('T')[0];
+        const formattedSessionId = (window.currentSessionId || "SESS_LIVE").toUpperCase();
+        const verificationHash = `VERIFIED: SSG-${Math.random().toString(36).substring(2, 9).toUpperCase()}-0510`;
 
-        // Populate Candidate Identity
-        const nameEl = document.getElementById('pdfStudentName');
-        if (nameEl) nameEl.textContent = candidateName;
+        // 1. Populate Page 1 Elements
+        const nameP1 = document.getElementById('pdfStudentNameP1');
+        if (nameP1) nameP1.textContent = candidateName;
 
-        const gradeEl = document.getElementById('pdfStudentGrade');
-        if (gradeEl) gradeEl.textContent = data.grade || "Grade 10";
+        const gradeP1 = document.getElementById('pdfStudentGradeP1');
+        if (gradeP1) gradeP1.textContent = data.grade || "Grade 10 ESL";
 
-        const scoreEl = document.getElementById('pdfTotalMarksScore');
-        const scoreBox = document.getElementById('pdfScoreBox');
-        if (scoreEl) {
-          scoreEl.textContent = `${totalScore} / ${maxPossibleMarks} (${scorePercentage}%)`;
+        const scoreP1 = document.getElementById('pdfTotalMarksScoreP1');
+        const scoreBoxP1 = document.getElementById('pdfScoreBoxP1');
+        if (scoreP1) scoreP1.textContent = `${totalScore} / ${maxPossibleMarks} (${scorePercentage}%)`;
+
+        const countBadgeP1 = document.getElementById('pdfTasksCountBadgeP1');
+        if (countBadgeP1) countBadgeP1.textContent = `${totalTasksAssessed} Tasks Logged`;
+
+        const sessionP1 = document.getElementById('pdfSessionIdP1');
+        if (sessionP1) sessionP1.textContent = formattedSessionId;
+
+        const dateP1 = document.getElementById('pdfReportDateP1');
+        if (dateP1) dateP1.textContent = formattedDate;
+
+        const statusBadgeP1 = document.getElementById('pdfStatusBadgeP1');
+        const narrativeP1 = document.getElementById('pdfExecutiveSummaryNarrativeP1');
+
+        let performanceStatus = "Satisfactory";
+        if (scorePercentage >= 80) {
+          performanceStatus = "Outstanding";
+        } else if (scorePercentage >= 50) {
+          performanceStatus = "Satisfactory";
+        } else {
+          performanceStatus = "Needs Improvement";
         }
 
-        const countBadge = document.getElementById('pdfTasksCountBadge');
-        if (countBadge) countBadge.textContent = `${totalTasksAssessed} Logged`;
-
-        const sessionEl = document.getElementById('pdfSessionId');
-        if (sessionEl) sessionEl.textContent = (window.currentSessionId || "SESS_LIVE").toUpperCase();
-
-        const dateEl = document.getElementById('pdfReportDate');
-        if (dateEl) dateEl.textContent = "Date: " + new Date().toISOString().split('T')[0];
-
-        const hashEl = document.getElementById('pdfVerificationHash');
-        if (hashEl) hashEl.textContent = `REF: SSG-${Math.random().toString(36).substring(2, 8).toUpperCase()}-0510`;
-
-        // Verified Pass status: strictly 50% or higher
-        const statusBadge = document.getElementById('pdfStatusBadge');
-        const stampEl = document.getElementById('pdfPassGuaranteeStamp');
-
-        if (statusBadge) {
-          if (isPassed) {
-            statusBadge.className = "text-xs font-black text-emerald-700 flex items-center gap-1 font-mono";
-            statusBadge.innerHTML = `<span>●</span> Verified Pass (${scorePercentage}%)`;
+        if (statusBadgeP1) {
+          if (performanceStatus === "Outstanding") {
+            statusBadgeP1.className = "text-sm font-black text-amber-600 font-mono py-1";
+            statusBadgeP1.innerHTML = `★ Outstanding (${scorePercentage}%)`;
+          } else if (performanceStatus === "Satisfactory") {
+            statusBadgeP1.className = "text-sm font-black text-emerald-700 font-mono py-1";
+            statusBadgeP1.innerHTML = `● Satisfactory (${scorePercentage}%)`;
           } else {
-            statusBadge.className = "text-xs font-black text-rose-700 flex items-center gap-1 font-mono";
-            statusBadge.innerHTML = `<span>●</span> Needs Improvement (${scorePercentage}%)`;
+            statusBadgeP1.className = "text-sm font-black text-rose-700 font-mono py-1";
+            statusBadgeP1.innerHTML = `▲ Needs Improvement (${scorePercentage}%)`;
           }
         }
 
-        if (scoreBox) {
-          if (isPassed) {
-            scoreBox.className = "bg-emerald-50 border border-emerald-300 rounded-lg p-2 text-center";
-            if (scoreEl) scoreEl.className = "text-sm font-black text-emerald-700 font-mono block mt-0.5";
+        if (scoreBoxP1) {
+          if (scorePercentage >= 50) {
+            scoreBoxP1.className = "bg-emerald-50 border border-emerald-300 rounded-2xl p-4 text-center space-y-1 shadow-sm";
+            if (scoreP1) scoreP1.className = "text-2xl font-black text-emerald-700 font-mono block";
           } else {
-            scoreBox.className = "bg-rose-50 border border-rose-300 rounded-lg p-2 text-center";
-            if (scoreEl) scoreEl.className = "text-sm font-black text-rose-700 font-mono block mt-0.5";
+            scoreBoxP1.className = "bg-rose-50 border border-rose-300 rounded-2xl p-4 text-center space-y-1 shadow-sm";
+            if (scoreP1) scoreP1.className = "text-2xl font-black text-rose-700 font-mono block";
           }
         }
 
-        if (stampEl) {
-          stampEl.className = isPassed 
-            ? "text-[8px] text-emerald-700 font-mono font-bold tracking-widest uppercase mt-0.5"
-            : "text-[8px] text-rose-600 font-mono font-bold tracking-widest uppercase mt-0.5";
-          stampEl.textContent = isPassed ? "● Authenticated Pass (≥ 50%)" : "● Below Pass Mark (< 50%)";
+        if (narrativeP1) {
+          if (performanceStatus === "Outstanding") {
+            narrativeP1.textContent = `The candidate demonstrated exemplary control of Cambridge IGCSE Exercise 6 formal article and report conventions during this formative session. Arguments were systematically anchored using high-tier temporal phrases and balanced contrast devices (e.g. 'Nevertheless', 'However'). Diction remained impeccably formal with zero intrusive colloquialisms, reflecting ready proficiency for highest-tier mark bands.`;
+          } else if (performanceStatus === "Satisfactory") {
+            narrativeP1.textContent = `The candidate achieved a sound formative pass mark, fulfilling foundational Cambridge IGCSE Exercise 6 requirements with clear argumentative intent. Linking devices and register choices were generally appropriate, though consistent deployment of subjunctive recommendations and refined subordinate clauses will help secure top-quartile marks. Continued drill practice with 120–160 word pacing is recommended.`;
+          } else {
+            narrativeP1.textContent = `The candidate engaged with core Exercise 6 tasks but is currently performing below the 50% target threshold, indicating developing mastery of formal register and cohesive sequencing. High-priority focus areas include eliminating conversational contractions, incorporating structured introductory time-fixers, and developing balanced multi-sentence paragraphs with explicit cause-and-effect transitions.`;
+          }
         }
 
-        const list = document.getElementById('pdfSubmissionsList');
-        if (list) {
-          list.innerHTML = "";
+        // 2. Populate Page 2 Elements
+        const nameP2 = document.getElementById('pdfStudentNameP2');
+        if (nameP2) nameP2.textContent = candidateName;
+
+        const sessionP2 = document.getElementById('pdfSessionIdP2');
+        if (sessionP2) sessionP2.textContent = `SESSION: ${formattedSessionId}`;
+
+        const hashP2 = document.getElementById('pdfVerificationHashP2');
+        if (hashP2) hashP2.textContent = verificationHash;
+
+        const stampP2 = document.getElementById('pdfPassGuaranteeStampP2');
+        if (stampP2) {
+          stampP2.className = isPassed 
+            ? "text-[8px] text-emerald-700 font-mono font-bold tracking-widest uppercase" 
+            : "text-[8px] text-rose-600 font-mono font-bold tracking-widest uppercase";
+          stampP2.textContent = isPassed ? "● Verified Benchmark Achieved (≥ 50%)" : "● Below Benchmark (< 50%)";
+        }
+
+        // Itemized Table Rows for Page 2
+        const tableBodyP2 = document.getElementById('pdfSubmissionsTableBodyP2');
+        if (tableBodyP2) {
+          tableBodyP2.innerHTML = "";
           if (progressItems.length > 0) {
-            // Display up to 10 items formatted cleanly for guaranteed crisp 1-page fit
-            const displayItems = progressItems.slice(0, 10);
-            displayItems.forEach((p) => {
-              const item = document.createElement('div');
-              
-              let markLabel = "";
-              let markClass = "";
+            // Display evaluated items on Page 2 for clean, spacious presentation
+            const page2Items = progressItems.slice(0, 7);
+            page2Items.forEach((p, idx) => {
+              const row = document.createElement('tr');
+              row.className = (idx % 2 === 0) ? "bg-white" : "bg-slate-50/75";
+
+              let markBadge = "";
               if (p.isShortAnswer && !p.isGraded) {
-                markLabel = "⏳ Pending";
-                markClass = "text-amber-800 bg-amber-100 border-amber-300 font-bold";
+                markBadge = '<span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 font-mono font-bold text-[9px] border border-amber-300">⏳ Pending</span>';
               } else if (p.awardedMarks > 0) {
-                markLabel = `✅ +${p.awardedMarks} Mk`;
-                markClass = "text-emerald-900 bg-emerald-100 border-emerald-400 font-black";
+                markBadge = `<span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono font-extrabold text-[9px] border border-emerald-400">✅ +${p.awardedMarks} Mk</span>`;
               } else {
-                markLabel = "0 Mks";
-                markClass = "text-rose-800 bg-rose-100 border-rose-300 font-bold";
+                markBadge = '<span class="px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 font-mono font-bold text-[9px] border border-rose-300">0 Mks</span>';
               }
 
-              const slideNum = (typeof p.slideIndex === 'number') ? (p.slideIndex + 1) : '-';
-              const safeTitle = p.slideTitle || 'Curriculum Task';
-              const rawAnswer = (p.answer || '').trim();
-              const displayAnswer = rawAnswer.length > 135 ? (rawAnswer.slice(0, 132) + '...') : rawAnswer;
+              const slideNum = (typeof p.slideIndex === 'number') ? (p.slideIndex + 1) : (idx + 1);
+              const safeTitle = p.slideTitle || `Task ${slideNum}`;
+              const answerText = (p.answer || "").trim() || "No response text logged.";
+              const feedbackObj = generateCambridgeFeedback(p);
 
-              item.className = "p-2.5 bg-slate-50/95 rounded-xl border border-slate-300 flex flex-col justify-between gap-1.5 shadow-xs";
-              item.innerHTML = `
-                <div class="flex items-center justify-between gap-2 border-b border-slate-200 pb-1.5">
-                  <div class="flex items-center gap-1.5 min-w-0 flex-1">
-                    <span class="px-1.5 py-0.5 rounded bg-slate-900 text-amber-300 font-mono font-bold text-[9px] shrink-0 whitespace-nowrap">Slide ${slideNum}</span>
-                    <span class="font-bold text-slate-900 text-[10px] leading-tight truncate">${safeTitle}</span>
+              row.innerHTML = `
+                <td class="p-2 border-r border-slate-300 text-center font-mono font-bold text-slate-800 bg-slate-100/50">
+                  #${slideNum}
+                </td>
+                <td class="p-2 border-r border-slate-300 font-semibold text-slate-900 leading-snug">
+                  <div>${safeTitle}</div>
+                  <span class="text-[8px] text-slate-500 font-mono block mt-0.5">${p.type || 'Exercise Task'}</span>
+                </td>
+                <td class="p-2 border-r border-slate-300 text-slate-800 font-serif italic leading-relaxed break-words max-w-[200px]">
+                  "${answerText}"
+                </td>
+                <td class="p-2 border-r border-slate-300 text-center whitespace-nowrap">
+                  ${markBadge}
+                </td>
+                <td class="p-2 text-slate-700 leading-snug space-y-0.5">
+                  <div class="font-mono text-[8px] font-bold text-sky-800">
+                    ◈ [${feedbackObj.focus}]
                   </div>
-                  <span class="font-mono text-[9px] px-2 py-0.5 rounded-md border font-bold shrink-0 ${markClass}">${markLabel}</span>
-                </div>
-                <div class="text-slate-800 font-serif italic text-[10px] leading-snug bg-white p-2 rounded-lg border border-slate-200/90 break-words min-h-[36px] flex items-center">
-                  "${displayAnswer}"
-                </div>
+                  <div class="text-[9px] text-slate-600">${feedbackObj.directive}</div>
+                </td>
               `;
-              list.appendChild(item);
+              tableBodyP2.appendChild(row);
             });
           } else {
-            list.innerHTML = '<div class="text-slate-400 italic text-[11px] col-span-2 py-10 text-center bg-slate-50 rounded-2xl border border-slate-200">No exercise logs registered in this session yet.</div>';
+            tableBodyP2.innerHTML = `
+              <tr>
+                <td colspan="5" class="p-6 text-center text-slate-400 italic bg-slate-50">
+                  No exercise submissions logged in this session yet. Complete interactive slides to populate formative log.
+                </td>
+              </tr>
+            `;
           }
         }
 
-        const element = document.getElementById('pdfReportTemplate');
-        if (!element) throw new Error("Template element not found");
+        // 3. Render Page 1 and Page 2 discretely via html2canvas & jsPDF
+        const page1El = document.getElementById('pdfReportPage1');
+        const page2El = document.getElementById('pdfReportPage2');
+        if (!page1El || !page2El) throw new Error("Report page containers not found");
 
-        // High-resolution 3x scale (300 DPI clarity) with proper clone placement
-        const canvas = await html2canvas(element, {
-          scale: 3,
+        const canvasOptions = {
+          scale: 2.5,
           useCORS: true,
           logging: false,
           backgroundColor: "#ffffff",
           width: 794,
           height: 1123,
           windowWidth: 794,
-          windowHeight: 1123,
-          onclone: (clonedDoc) => {
-            const clonedWrapper = clonedDoc.getElementById('pdfExportWrapper');
-            if (clonedWrapper) {
-              clonedWrapper.style.position = 'static';
-              clonedWrapper.style.left = '0px';
-              clonedWrapper.style.top = '0px';
-              clonedWrapper.style.opacity = '1';
-              clonedWrapper.style.visibility = 'visible';
-            }
-          }
-        });
-        
-        const imgData = canvas.toDataURL('image/png', 1.0);
-        
+          windowHeight: 1123
+        };
+
+        const canvas1 = await html2canvas(page1El, canvasOptions);
+        const imgData1 = canvas1.toDataURL('image/png', 1.0);
+
+        const canvas2 = await html2canvas(page2El, canvasOptions);
+        const imgData2 = canvas2.toDataURL('image/png', 1.0);
+
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF({
           orientation: 'portrait',
@@ -2033,13 +2448,19 @@
           compress: true
         });
 
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const pdfWidth = pdf.internal.pageSize.getWidth(); // 210mm
+        const pdfHeight = pdf.internal.pageSize.getHeight(); // 297mm
 
-        // Exactly single-page output with zero margins
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'SLOW');
-        pdf.save(`${candidateName.replace(/\s+/g, '_')}_Cambridge_IGCSE_Transcript.pdf`);
-        window.showToast("High-definition certified transcript downloaded! 📄");
+        // Add Page 1
+        pdf.addImage(imgData1, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+
+        // Add Page 2
+        pdf.addPage();
+        pdf.addImage(imgData2, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+
+        const fileName = `${candidateName.replace(/\s+/g, '_')}_Cambridge_Formative_Evaluation.pdf`;
+        pdf.save(fileName);
+        window.showToast("Spacious 2-Page Formative Evaluation Report downloaded! 📄");
 
       } catch(e) {
         console.error("PDF generation error:", e);
@@ -2273,20 +2694,51 @@
       }
     };
 
+    // Robust Focus View / Fullscreen toggler that makes the slide card truly fill the entire screen
     window.toggleCardFullscreen = function() {
-      const card = document.getElementById('slideStageContainer');
+      const card = document.getElementById('slideCard');
       const icon = document.getElementById('fullscreenIcon');
-      if (!document.fullscreenElement) {
-        if (card.requestFullscreen) card.requestFullscreen();
-        else if (card.webkitRequestFullscreen) card.webkitRequestFullscreen();
+      const label = document.getElementById('fullscreenBtnLabel');
+      if (!card) return;
+
+      const isFs = document.fullscreenElement || document.webkitFullscreenElement || card.classList.contains('card-fullscreen-active');
+
+      if (!isFs) {
+        // Try browser native Fullscreen API first
+        if (card.requestFullscreen) {
+          card.requestFullscreen().catch(() => card.classList.add('card-fullscreen-active'));
+        } else if (card.webkitRequestFullscreen) {
+          card.webkitRequestFullscreen();
+        } else {
+          card.classList.add('card-fullscreen-active');
+        }
         if (icon) icon.textContent = "↙";
-        window.showToast("Fullscreen mode activated");
+        if (label) label.textContent = "Exit Focus";
+        window.showToast("Slide Focus View activated ⛶");
       } else {
-        if (document.exitFullscreen) document.exitFullscreen();
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+        card.classList.remove('card-fullscreen-active');
         if (icon) icon.textContent = "⛶";
-        window.showToast("Exited fullscreen mode");
+        if (label) label.textContent = "Focus View";
+        window.showToast("Exited Focus View");
       }
     };
+
+    // Listen to native fullscreen escape key changes
+    document.addEventListener('fullscreenchange', () => {
+      const icon = document.getElementById('fullscreenIcon');
+      const label = document.getElementById('fullscreenBtnLabel');
+      const card = document.getElementById('slideCard');
+      if (!document.fullscreenElement) {
+        if (card) card.classList.remove('card-fullscreen-active');
+        if (icon) icon.textContent = "⛶";
+        if (label) label.textContent = "Focus View";
+      }
+    });
 
     window.initTheme = function() {
       const savedTheme = localStorage.getItem('smartstudy_theme') || 'light';
@@ -2545,7 +2997,19 @@
       if (progress) progress.style.width = `${pct}%`;
 
       const body = document.getElementById('slideDynamicBody');
-      if (body) body.innerHTML = window.slidesData[idx].render();
+      if (body) {
+        body.innerHTML = window.slidesData[idx].render();
+        
+        // If this slide was already answered, restore locked state and disable 2nd attempts
+        const previousAttempt = window.studentAnsweredSlides[idx];
+        if (previousAttempt) {
+          const feedbackEl = document.getElementById('slideAnswerFeedback');
+          if (feedbackEl) {
+            feedbackEl.className = previousAttempt.feedbackClass || "p-3 rounded-xl text-xs font-semibold border bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300";
+          }
+          window.lockCurrentSlideInteractiveElements(previousAttempt.feedbackHtml);
+        }
+      }
 
       window.renderFilteredLiveSubmissions();
 
@@ -2610,6 +3074,7 @@
     });
   </script>
 
+  <!-- FIREBASE INTEGRATION MODULE WITH COMPLETE PRESENCE SAFEGUARDS -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -2645,12 +3110,15 @@
         if (!data) return;
 
         if (data.type === 'PRESENCE_PING' && data.presence) {
+          if (!window.onlineUsersMap) window.onlineUsersMap = new Map();
           window.onlineUsersMap.set(data.presence.id, data.presence);
           window.renderOnlineStudentsList();
         }
         else if (data.type === 'PRESENCE_LEAVE' && data.presenceId) {
-          window.onlineUsersMap.delete(data.presenceId);
-          window.renderOnlineStudentsList();
+          if (window.onlineUsersMap) {
+            window.onlineUsersMap.delete(data.presenceId);
+            window.renderOnlineStudentsList();
+          }
         }
         else if (data.type === 'SLIDE_CHANGE' && typeof data.slideIndex === 'number') {
           if (window.followTeacherSync && (!window.currentUser || window.currentUser.role !== 'admin')) {
@@ -2691,12 +3159,10 @@
         window.playAudioCue('success');
         window.showToast(`Teacher graded Slide ${notif.slideIndex + 1}: +${notif.awardedMarks} Mark(s)! 🎓`);
         
-        // Update local score badge immediately
         if (typeof window.recalculateStudentScore === 'function') {
           window.recalculateStudentScore();
         }
 
-        // Update on-screen feedback element if viewing the active slide
         if (window.currentSlideIndex === notif.slideIndex) {
           const feedbackEl = document.getElementById('slideAnswerFeedback');
           if (feedbackEl) {
@@ -2736,7 +3202,7 @@
       const text = document.getElementById('firebaseStatusText');
       if (user) {
         if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-400";
-        if (text) text.textContent = `Online (${user.uid.slice(0, 5)}...)`;
+        if (text) text.textContent = "Firebase Connected";
         
         listenToLivePresentation();
         listenToLiveSubmissions();
@@ -2745,34 +3211,37 @@
         startPresenceHeartbeat();
       } else {
         if (dot) dot.className = "w-2 h-2 rounded-full bg-amber-400";
-        if (text) text.textContent = "Offline / Local Mode";
+        if (text) text.textContent = "Local Offline Mode";
       }
     });
 
-    // Cloud & local presence heartbeat
+    // Safe presence ping function ensuring onlineUsersMap is always defined
     window.sendPresencePing = async function() {
+      if (!window.onlineUsersMap) {
+        window.onlineUsersMap = new Map();
+      }
+
       const presencePayload = {
-        id: window.clientPresenceId,
+        id: window.clientPresenceId || ("pres_" + Math.random().toString(36).substring(2, 9)),
         name: window.currentUser ? window.currentUser.name : "Guest Student",
         role: window.currentUser ? window.currentUser.role : "student",
-        currentSlide: window.currentSlideIndex,
-        sessionId: window.currentSessionId,
+        currentSlide: typeof window.currentSlideIndex === 'number' ? window.currentSlideIndex : 0,
+        sessionId: window.currentSessionId || "sess_live",
         lastSeen: Date.now()
       };
 
-      // Store in local memory map
-      window.onlineUsersMap.set(window.clientPresenceId, presencePayload);
-      window.renderOnlineStudentsList();
+      window.onlineUsersMap.set(presencePayload.id, presencePayload);
+      if (typeof window.renderOnlineStudentsList === 'function') {
+        window.renderOnlineStudentsList();
+      }
 
-      // Broadcast across local browser tabs
       if (window.liveChannel) {
         window.liveChannel.postMessage({ type: 'PRESENCE_PING', presence: presencePayload });
       }
 
-      // Sync to Firestore
       if (window.db && window.auth && window.auth.currentUser) {
         try {
-          const presenceDocRef = doc(window.db, 'presence', window.clientPresenceId);
+          const presenceDocRef = doc(window.db, 'presence', presencePayload.id);
           await setDoc(presenceDocRef, presencePayload, { merge: true });
         } catch(e) {
           console.debug("Presence ping notice:", e);
@@ -2786,7 +3255,6 @@
         window.sendPresencePing();
       }, 15000);
 
-      // Clean up on tab close
       window.addEventListener('beforeunload', () => {
         if (window.liveChannel) {
           window.liveChannel.postMessage({ type: 'PRESENCE_LEAVE', presenceId: window.clientPresenceId });
@@ -2804,19 +3272,21 @@
       try {
         const presCol = collection(db, 'presence');
         onSnapshot(presCol, (snapshot) => {
+          if (!window.onlineUsersMap) window.onlineUsersMap = new Map();
           const now = Date.now();
           snapshot.docChanges().forEach((change) => {
             const data = change.doc.data();
             if (change.type === 'removed') {
               window.onlineUsersMap.delete(change.doc.id);
             } else {
-              // Only keep users active within last 45 seconds
               if (now - (data.lastSeen || 0) < 45000) {
                 window.onlineUsersMap.set(change.doc.id, data);
               }
             }
           });
-          window.renderOnlineStudentsList();
+          if (typeof window.renderOnlineStudentsList === 'function') {
+            window.renderOnlineStudentsList();
+          }
         }, (err) => {
           console.warn("Presence snapshot notice:", err.message);
         });
@@ -2830,13 +3300,11 @@
           if (snap.exists()) {
             const data = snap.data();
 
-            // Session ID Sync
             if (data.sessionId && data.sessionId !== window.currentSessionId) {
               window.currentSessionId = data.sessionId;
               window.renderFilteredLiveSubmissions();
             }
 
-            // Session End Status Sync
             if (data.isEnded && !window.isSessionEnded) {
               if (!window.currentUser || window.currentUser.role !== 'admin') {
                 window.handleSessionEndedForStudent();
@@ -2847,12 +3315,10 @@
               if (banner) banner.classList.add('hidden');
             }
 
-            // Real-Time Grade Broadcast Sync to specific student
             if (data.latestGradeNotification && data.latestGradeNotification.timestamp) {
               handleIncomingGradeNotification(data.latestGradeNotification);
             }
 
-            // Slide Navigation Broadcast Sync
             if (typeof data.currentSlide === 'number') {
               if (window.followTeacherSync && (!window.currentUser || window.currentUser.role !== 'admin')) {
                 if (window.currentSlideIndex !== data.currentSlide) {
@@ -2862,7 +3328,6 @@
               }
             }
 
-            // Shared Broadcast Answer Sync
             if (data.sharedAnswer) {
               if (typeof window.displaySharedAnswerOnScreen === 'function') window.displaySharedAnswerOnScreen(data.sharedAnswer);
             } else {
@@ -2888,13 +3353,11 @@
             if (change.type === 'added') {
               window.addSubmissionToLiveFeed(subData);
             } else if (change.type === 'modified') {
-              // Update submission in memory
               const idx = window.liveSubmissionsFeed.findIndex(s => s.id === subData.id || s.firestoreId === change.doc.id);
               if (idx !== -1) {
                 window.liveSubmissionsFeed[idx] = { ...window.liveSubmissionsFeed[idx], ...subData };
                 window.renderFilteredLiveSubmissions();
               }
-              // If this is the student's submission, trigger feedback update
               handleIncomingGradeNotification({
                 studentName: subData.studentName,
                 slideIndex: subData.slideIndex,
