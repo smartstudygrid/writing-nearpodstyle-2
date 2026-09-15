@@ -71,10 +71,11 @@
 
     <!-- User Bar, Theme Toggle & Firebase Status -->
     <div class="flex items-center gap-2.5">
-      <!-- FIREBASE STATUS INDICATOR (MOVED TO HEADER) -->
+      <!-- FIREBASE STATUS INDICATOR WITH RETRY -->
       <div class="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-[11px]">
         <span id="firebaseStatusDot" class="w-2 h-2 rounded-full bg-amber-400"></span>
         <span id="firebaseStatusText" class="text-slate-600 dark:text-slate-300 font-mono hidden md:inline">Connecting...</span>
+        <button id="retryFirebaseBtn" onclick="retryFirebaseConnection()" class="hidden ml-1 px-1.5 py-0.5 bg-sky-500/20 hover:bg-sky-500 hover:text-white text-sky-600 dark:text-sky-300 rounded text-[10px] font-mono transition" title="Retry Cloud Connection">↻ Retry</button>
       </div>
 
       <!-- THEME TOGGLE BUTTON -->
@@ -868,21 +869,23 @@
           return;
         }
 
-        try {
-          const { doc, getDoc } = window.dbMethods;
-          const userRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'students', studentDocId);
-          const snap = await getDoc(userRef);
+        if (window.dbMethods && window.db) {
+          try {
+            const { doc, getDoc } = window.dbMethods;
+            const userRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'students', studentDocId);
+            const snap = await getDoc(userRef);
 
-          if (snap.exists() && snap.data().password === pass) {
-            window.currentUser = { name: snap.data().name, grade: snap.data().grade, role: "student", id: snap.id };
-            sessionStorage.setItem('edutrack_user', JSON.stringify(window.currentUser));
-            window.updateUserUI();
-            window.closeLoginModal();
-            window.showToast(`Welcome back, ${snap.data().name}!`);
-            return;
+            if (snap.exists() && snap.data().password === pass) {
+              window.currentUser = { name: snap.data().name, grade: snap.data().grade, role: "student", id: snap.id };
+              sessionStorage.setItem('edutrack_user', JSON.stringify(window.currentUser));
+              window.updateUserUI();
+              window.closeLoginModal();
+              window.showToast(`Welcome back, ${snap.data().name}!`);
+              return;
+            }
+          } catch(e) {
+            console.warn("Firestore auth lookup failed, local checked.", e);
           }
-        } catch(e) {
-          console.warn("Firestore auth lookup failed, local checked.", e);
         }
 
         window.showToast("Invalid Student Credentials!");
@@ -891,7 +894,9 @@
 
     window.handleAdminCreateUser = async function() {
       if (!window.currentUser || window.currentUser.role !== 'admin') {
-        window.showToast("Admin privileges required!");
+        window.showToast("Admin sign-in required! Opening login...");
+        window.selectLoginRole('admin');
+        window.openLoginModal();
         return;
       }
 
@@ -899,9 +904,9 @@
       const gradeInput = document.getElementById('newStudentGrade');
       const passInput = document.getElementById('newStudentPassword');
 
-      const name = nameInput.value.trim();
-      const grade = gradeInput.value.trim();
-      const password = passInput.value.trim();
+      const name = nameInput ? nameInput.value.trim() : '';
+      const grade = gradeInput ? gradeInput.value.trim() : '';
+      const password = passInput ? passInput.value.trim() : '';
 
       if (!name || !grade || !password) {
         window.showToast("Please fill all required student fields!");
@@ -917,34 +922,69 @@
         createdAt: new Date().toISOString()
       };
 
+      // Save locally immediately
       window.saveLocalStudent(studentDocId, newStudentObj);
 
       let firebaseSynced = false;
-      try {
-        const { doc, setDoc } = window.dbMethods;
-        const studentRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'students', studentDocId);
-        await setDoc(studentRef, newStudentObj);
-        firebaseSynced = true;
-      } catch(e) {
-        console.warn("Firestore save fallback triggered.", e);
+      // Only attempt Firestore write if authenticated
+      if (window.db && window.auth && window.auth.currentUser) {
+        try {
+          const { doc, setDoc } = window.dbMethods;
+          const studentRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'students', studentDocId);
+          await setDoc(studentRef, newStudentObj);
+          firebaseSynced = true;
+        } catch(e) {
+          console.warn("Firestore save fallback triggered.", e);
+        }
       }
 
       if (firebaseSynced) {
-        window.showToast(`Registered student '${name}' (Synced)!`);
+        window.showToast(`Registered student '${name}' (Synced to Cloud)!`);
       } else {
         window.showToast(`Registered student '${name}' (Saved Locally)!`);
       }
 
-      nameInput.value = "";
-      gradeInput.value = "";
-      passInput.value = "";
+      if (nameInput) nameInput.value = "";
+      if (gradeInput) gradeInput.value = "";
+      if (passInput) passInput.value = "";
       window.fetchStudentRoster();
     };
 
     window.fetchStudentRoster = async function() {
       const rosterList = document.getElementById('adminRosterList');
       if (!rosterList) return;
-      rosterList.innerHTML = '<div class="text-slate-400 italic text-center py-2">Syncing roster...</div>';
+
+      const renderRosterMap = (map) => {
+        rosterList.innerHTML = "";
+        if (map.size === 0) {
+          rosterList.innerHTML = '<div class="text-slate-400 text-center py-2">No students registered yet.</div>';
+          return;
+        }
+
+        map.forEach((s) => {
+          const progressCount = s.progress ? s.progress.length : 0;
+          const badgeColor = s.source === 'cloud' 
+            ? 'text-emerald-700 border-emerald-300 bg-emerald-100 dark:text-emerald-400 dark:border-emerald-800 dark:bg-emerald-950' 
+            : 'text-amber-700 border-amber-300 bg-amber-100 dark:text-amber-400 dark:border-amber-800 dark:bg-amber-950';
+          const badgeText = s.source === 'cloud' ? 'Cloud' : 'Local';
+
+          const card = document.createElement('div');
+          card.className = "p-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg flex items-center justify-between gap-2 shadow-sm";
+          card.innerHTML = `
+            <div class="truncate">
+              <div class="font-semibold text-slate-800 dark:text-slate-200 truncate flex items-center gap-1.5">
+                <span>${s.name}</span>
+                <span class="text-[9px] px-1.5 py-0.2 rounded border font-mono ${badgeColor}">${badgeText}</span>
+              </div>
+              <div class="text-[10px] text-slate-500 dark:text-slate-400">${s.grade} • ${progressCount} Tasks Done</div>
+            </div>
+            <button onclick="downloadPDFReport('${s.id}')" class="px-2 py-1 bg-sky-600/20 hover:bg-sky-600 text-sky-700 dark:text-sky-300 hover:text-white border border-sky-500/30 rounded text-[10px] font-semibold transition shrink-0">
+              📄 PDF
+            </button>
+          `;
+          rosterList.appendChild(card);
+        });
+      };
 
       const combinedMap = new Map();
       const localStudents = window.getLocalStudents();
@@ -952,45 +992,23 @@
         combinedMap.set(id, { ...localStudents[id], id, source: 'local' });
       });
 
-      try {
-        const { collection, getDocs } = window.dbMethods;
-        const studentsCol = collection(window.db, 'artifacts', window.appId, 'public', 'data', 'students');
-        const querySnapshot = await getDocs(studentsCol);
-        
-        querySnapshot.forEach((docSnap) => {
-          combinedMap.set(docSnap.id, { ...docSnap.data(), id: docSnap.id, source: 'cloud' });
-        });
-      } catch(e) {
-        console.warn("Firestore collection query notice:", e);
+      // Render local roster immediately
+      renderRosterMap(combinedMap);
+
+      if (window.dbMethods && window.db && window.auth && window.auth.currentUser) {
+        try {
+          const { collection, getDocs } = window.dbMethods;
+          const studentsCol = collection(window.db, 'artifacts', window.appId, 'public', 'data', 'students');
+          const querySnapshot = await getDocs(studentsCol);
+          
+          querySnapshot.forEach((docSnap) => {
+            combinedMap.set(docSnap.id, { ...docSnap.data(), id: docSnap.id, source: 'cloud' });
+          });
+          renderRosterMap(combinedMap);
+        } catch(e) {
+          console.warn("Firestore collection query notice:", e);
+        }
       }
-
-      rosterList.innerHTML = "";
-      if (combinedMap.size === 0) {
-        rosterList.innerHTML = '<div class="text-slate-400 text-center py-2">No students registered yet.</div>';
-        return;
-      }
-
-      combinedMap.forEach((s) => {
-        const progressCount = s.progress ? s.progress.length : 0;
-        const badgeColor = s.source === 'cloud' ? 'text-emerald-700 border-emerald-300 bg-emerald-100 dark:text-emerald-400 dark:border-emerald-800 dark:bg-emerald-950' : 'text-amber-700 border-amber-300 bg-amber-100 dark:text-amber-400 dark:border-amber-800 dark:bg-amber-950';
-        const badgeText = s.source === 'cloud' ? 'Cloud' : 'Local';
-
-        const card = document.createElement('div');
-        card.className = "p-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg flex items-center justify-between gap-2 shadow-sm";
-        card.innerHTML = `
-          <div class="truncate">
-            <div class="font-semibold text-slate-800 dark:text-slate-200 truncate flex items-center gap-1.5">
-              <span>${s.name}</span>
-              <span class="text-[9px] px-1.5 py-0.2 rounded border font-mono ${badgeColor}">${badgeText}</span>
-            </div>
-            <div class="text-[10px] text-slate-500 dark:text-slate-400">${s.grade} • ${progressCount} Tasks Done</div>
-          </div>
-          <button onclick="downloadPDFReport('${s.id}')" class="px-2 py-1 bg-sky-600/20 hover:bg-sky-600 text-sky-700 dark:text-sky-300 hover:text-white border border-sky-500/30 rounded text-[10px] font-semibold transition shrink-0">
-            📄 PDF
-          </button>
-        `;
-        rosterList.appendChild(card);
-      });
     };
 
     window.shareAnswerToAll = async function(studentName, answerText, slideTitle) {
@@ -1304,13 +1322,12 @@
 
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'edutrack-igcse-app';
     const defaultFirebaseConfig = {
-      apiKey: "AIzaSyDLbqoHebiXa6hf9wVxelU4eJx7eDWvBCA",
-      authDomain: "exam-48e13.firebaseapp.com",
-      projectId: "exam-48e13",
-      storageBucket: "exam-48e13.firebasestorage.app",
-      messagingSenderId: "501058275146",
-      appId: "1:501058275146:web:9dad39e721594d344ce3b3",
-      measurementId: "G-9DTPZCS2D2"
+      apiKey: "AIzaSyCidnvJ4NN7Xih4LPA0NIRBzB-iZzgNAVU",
+      authDomain: "nearpod-2.firebaseapp.com",
+      projectId: "nearpod-2",
+      storageBucket: "nearpod-2.firebasestorage.app",
+      messagingSenderId: "881651268912",
+      appId: "1:881651268912:web:c5c3bd18aedc8996979cf5"
     };
 
     const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : defaultFirebaseConfig;
@@ -1356,34 +1373,55 @@
     }
 
     async function initFirebaseAuth() {
+      const dot = document.getElementById('firebaseStatusDot');
+      const text = document.getElementById('firebaseStatusText');
+      const retryBtn = document.getElementById('retryFirebaseBtn');
+
+      if (dot) dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-pulse";
+      if (text) text.textContent = "Connecting Firebase...";
+      if (retryBtn) retryBtn.classList.add('hidden');
+
       try {
         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
           await signInWithCustomToken(auth, __initial_auth_token);
         } else {
           await signInAnonymously(auth);
         }
+        if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-400";
+        if (text) text.textContent = `Firebase Connected (${auth.currentUser.uid.slice(0, 5)}...)`;
       } catch (err) {
-        console.warn("Auth initial warning:", err);
-        try {
-          await signInAnonymously(auth);
-        } catch(e) {
-          console.error("Anonymous auth failed:", e);
+        console.warn("Firebase Authentication Notice:", err);
+        let errorMsg = "Local Mode (Auth Fallback)";
+        if (err.code === 'auth/operation-not-allowed') {
+          errorMsg = "Local Mode (Enable Anon Auth in Console)";
+        } else if (err.code === 'auth/network-request-failed') {
+          errorMsg = "Local Mode (Network/CORS Restricted)";
+        } else if (err.code) {
+          errorMsg = `Local Mode (${err.code})`;
         }
+        
+        if (dot) dot.className = "w-2 h-2 rounded-full bg-amber-400";
+        if (text) text.textContent = errorMsg;
+        if (retryBtn) retryBtn.classList.remove('hidden');
       }
     }
+
+    window.retryFirebaseConnection = function() {
+      if (typeof window.showToast === 'function') window.showToast("Re-attempting Firebase cloud connection...");
+      initFirebaseAuth();
+    };
 
     onAuthStateChanged(auth, (user) => {
       const dot = document.getElementById('firebaseStatusDot');
       const text = document.getElementById('firebaseStatusText');
+      const retryBtn = document.getElementById('retryFirebaseBtn');
       if (user) {
         if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-400";
-        if (text) text.textContent = `Firebase Connected (${user.uid.slice(0, 6)}...)`;
+        if (text) text.textContent = `Firebase Connected (${user.uid.slice(0, 5)}...)`;
+        if (retryBtn) retryBtn.classList.add('hidden');
         if (window.currentUser && window.currentUser.role === 'admin' && typeof window.fetchStudentRoster === 'function') {
           window.fetchStudentRoster();
         }
-      } else {
-        if (dot) dot.className = "w-2 h-2 rounded-full bg-amber-400";
-        if (text) text.textContent = "Connecting Auth...";
       }
     });
 
