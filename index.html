@@ -347,780 +347,14 @@
     <span id="toastMessage">Notification</span>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, getDocs, updateDoc, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-    // Application ID and Config setup according to platform environment
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'edutrack-igcse-app';
-    
-    // Default fallback config if environment config is not injected
-    const defaultFirebaseConfig = {
-      apiKey: "AIzaSyDLbqoHebiXa6hf9wVxelU4eJx7eDWvBCA",
-      authDomain: "exam-48e13.firebaseapp.com",
-      projectId: "exam-48e13",
-      storageBucket: "exam-48e13.firebasestorage.app",
-      messagingSenderId: "501058275146",
-      appId: "1:501058275146:web:9dad39e721594d344ce3b3"
-    };
-
-    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : defaultFirebaseConfig;
-
-    // Initialize Services
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // Global App References
-    window.appId = appId;
-    window.auth = auth;
-    window.db = db;
-    window.dbMethods = { doc, setDoc, getDoc, collection, getDocs, updateDoc, arrayUnion, onSnapshot };
-    window.currentUser = JSON.parse(sessionStorage.getItem('edutrack_user')) || null;
-    window.selectedAuthRole = 'student';
-    window.currentSlideIndex = 0;
-
-    // Authenticate with Firebase first before performing Firestore calls
-    async function initFirebaseAuth() {
-      try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
-          await signInAnonymously(auth);
-        }
-      } catch (err) {
-        console.warn("Auth initial error, falling back to anonymous auth:", err);
-        try {
-          await signInAnonymously(auth);
-        } catch(e) {
-          console.error("Anonymous auth failed:", e);
-        }
-      }
-    }
-
-    // Monitor Auth State
-    onAuthStateChanged(auth, (user) => {
-      const dot = document.getElementById('firebaseStatusDot');
-      const text = document.getElementById('firebaseStatusText');
-      if (user) {
-        if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-400";
-        if (text) text.textContent = `Firebase Connected (${user.uid.slice(0, 6)}...)`;
-        if (window.currentUser && window.currentUser.role === 'admin') {
-          fetchStudentRoster();
-        }
-      } else {
-        if (dot) dot.className = "w-2 h-2 rounded-full bg-amber-400";
-        if (text) text.textContent = "Connecting Auth...";
-      }
-    });
-
-    // Initialize Auth, Live Presentation Listener & App
-    initFirebaseAuth().then(() => {
-      initSlidesDropdown();
-      renderSlide(0, false);
-      listenToLivePresentation();
-      if (typeof window.updateUserUI === 'function') {
-        window.updateUserUI();
-      }
-    });
-
-    // LISTEN FOR LIVE TEACHER SLIDE CHANGES & SHARED STUDENT ANSWERS
-    function listenToLivePresentation() {
-      try {
-        const liveDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'presentation', 'liveSession');
-        onSnapshot(liveDocRef, (snap) => {
-          if (snap.exists()) {
-            const data = snap.data();
-
-            // 1. Live Slide Change
-            if (typeof data.currentSlide === 'number') {
-              if (window.followTeacherSync && (!window.currentUser || window.currentUser.role !== 'admin')) {
-                if (window.currentSlideIndex !== data.currentSlide) {
-                  renderSlide(data.currentSlide, false);
-                  showToast(`Teacher moved to Slide ${data.currentSlide + 1}`);
-                }
-              }
-            }
-
-            // 2. Broadcasted Student Answer Display
-            if (data.sharedAnswer) {
-              displaySharedAnswerOnScreen(data.sharedAnswer);
-            } else {
-              hideSharedAnswerOnScreen();
-            }
-          }
-        }, (err) => {
-          console.warn("Live presentation listener warning:", err);
-        });
-      } catch (e) {
-        console.error("Failed to set up live presentation listener:", e);
-      }
-    }
-  </script>
-
   <script>
     const ADMIN_PASSWORD = "Pakistan@1947";
     window.followTeacherSync = true;
     window.liveSubmissionsFeed = [];
+    window.currentSlideIndex = 0;
 
-    // Theme Management (Default Light Mode)
-    function initTheme() {
-      const savedTheme = localStorage.getItem('smartstudy_theme') || 'light';
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-        document.getElementById('themeToggleIcon').textContent = '🌙';
-      } else {
-        document.documentElement.classList.remove('dark');
-        document.getElementById('themeToggleIcon').textContent = '☀️';
-      }
-    }
-
-    window.toggleTheme = function() {
-      const isDark = document.documentElement.classList.toggle('dark');
-      localStorage.setItem('smartstudy_theme', isDark ? 'dark' : 'light');
-      document.getElementById('themeToggleIcon').textContent = isDark ? '🌙' : '☀️';
-      showToast(isDark ? "Switched to Dark Mode 🌙" : "Switched to Light Mode ☀️");
-    };
-
-    // Fullscreen Card Controller
-    window.toggleCardFullscreen = function() {
-      const card = document.getElementById('slideStageContainer');
-      const icon = document.getElementById('fullscreenIcon');
-      
-      if (!document.fullscreenElement) {
-        if (card.requestFullscreen) {
-          card.requestFullscreen();
-        } else if (card.webkitRequestFullscreen) {
-          card.webkitRequestFullscreen();
-        }
-        if (icon) icon.textContent = "↙";
-        showToast("Fullscreen mode activated");
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        }
-        if (icon) icon.textContent = "⛶";
-        showToast("Exited fullscreen mode");
-      }
-    };
-
-    // Admin Panel Minimization
-    window.toggleAdminMinimize = function() {
-      const content = document.getElementById('adminPanelContent');
-      const icon = document.getElementById('adminMinimizeIcon');
-      if (content.classList.contains('hidden')) {
-        content.classList.remove('hidden');
-        icon.textContent = "➖";
-      } else {
-        content.classList.add('hidden');
-        icon.textContent = "➕";
-      }
-    };
-
-    // Toggle Follow Teacher Mode
-    window.toggleTeacherSync = function() {
-      window.followTeacherSync = !window.followTeacherSync;
-      const statusText = document.getElementById('syncStatusText');
-      const toggleBtn = document.getElementById('teacherSyncToggle');
-
-      if (window.followTeacherSync) {
-        statusText.textContent = "Broadcasting Live";
-        toggleBtn.className = "px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 rounded-lg text-[11px] font-mono flex items-center gap-1.5 transition hover:bg-emerald-200 dark:hover:bg-emerald-900/50";
-        showToast("Live presentation broadcasting enabled");
-      } else {
-        statusText.textContent = "Broadcast Paused";
-        toggleBtn.className = "px-2.5 py-1 bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-800 rounded-lg text-[11px] font-mono flex items-center gap-1.5 transition hover:bg-slate-300";
-        showToast("Live presentation broadcast paused");
-      }
-    };
-
-    // User Interface State Updater (Hides Nav from Students, Shows to Admin)
-    window.updateUserUI = function() {
-      const infoDisplay = document.getElementById('userInfoDisplay');
-      const nameBadge = document.getElementById('userNameBadge');
-      const roleBadge = document.getElementById('userRoleBadge');
-      const authBtn = document.getElementById('authModalBtn');
-      const logoutBtn = document.getElementById('logoutBtn');
-      const adminToggle = document.getElementById('adminPanelToggle');
-      const adminDrawer = document.getElementById('adminControlDrawer');
-      const teacherNavControls = document.getElementById('teacherNavControls');
-      const teacherBottomNav = document.getElementById('teacherBottomNav');
-      const studentSyncIndicator = document.getElementById('studentSyncIndicator');
-      const closeSharedBtn = document.getElementById('closeSharedAnswerBtn');
-
-      const isAdmin = window.currentUser && window.currentUser.role === 'admin';
-
-      if (window.currentUser) {
-        if (infoDisplay) infoDisplay.classList.remove('hidden');
-        if (nameBadge) nameBadge.textContent = window.currentUser.name || 'User';
-        if (roleBadge) {
-          roleBadge.textContent = (window.currentUser.role || 'student').toUpperCase();
-          roleBadge.className = isAdmin 
-            ? "text-[10px] bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-800 px-2 py-0.5 rounded font-mono"
-            : "text-[10px] bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-400 px-2 py-0.5 rounded font-mono";
-        }
-        if (authBtn) authBtn.classList.add('hidden');
-        if (logoutBtn) logoutBtn.classList.remove('hidden');
-      } else {
-        if (infoDisplay) infoDisplay.classList.add('hidden');
-        if (authBtn) authBtn.classList.remove('hidden');
-        if (logoutBtn) logoutBtn.classList.add('hidden');
-      }
-
-      if (isAdmin) {
-        if (adminToggle) adminToggle.classList.remove('hidden');
-        if (teacherNavControls) teacherNavControls.classList.remove('hidden');
-        if (teacherBottomNav) teacherBottomNav.classList.remove('hidden');
-        if (studentSyncIndicator) studentSyncIndicator.classList.add('hidden');
-        if (closeSharedBtn) closeSharedBtn.classList.remove('hidden');
-      } else {
-        if (adminToggle) adminToggle.classList.add('hidden');
-        if (adminDrawer) adminDrawer.classList.add('hidden');
-        if (teacherNavControls) teacherNavControls.classList.add('hidden');
-        if (teacherBottomNav) teacherBottomNav.classList.add('hidden');
-        if (studentSyncIndicator) studentSyncIndicator.classList.remove('hidden');
-        if (closeSharedBtn) closeSharedBtn.classList.add('hidden');
-      }
-    };
-
-    // User Logout Handler
-    window.handleLogout = function() {
-      sessionStorage.removeItem('edutrack_user');
-      window.currentUser = null;
-      window.updateUserUI();
-      showToast("Signed out successfully.");
-    };
-
-    // Helper to get local fallback students
-    function getLocalStudents() {
-      try {
-        return JSON.parse(localStorage.getItem('smartstudy_students') || '{}');
-      } catch(e) {
-        return {};
-      }
-    }
-
-    // Helper to save local student
-    function saveLocalStudent(studentDocId, studentData) {
-      const current = getLocalStudents();
-      current[studentDocId] = studentData;
-      localStorage.setItem('smartstudy_students', JSON.stringify(current));
-    }
-
-    // Audio Feedback Function
-    let synth = null;
-    function playAudioCue(type = 'click') {
-      try {
-        if (!synth && window.Tone) {
-          synth = new Tone.Synth({
-            oscillator: { type: "triangle" },
-            envelope: { attack: 0.005, decay: 0.1, sustain: 0.05, release: 0.1 }
-          }).toDestination();
-        }
-        if (synth && Tone.context.state === 'running') {
-          if (type === 'success') synth.triggerAttackRelease("E5", "16n");
-          else synth.triggerAttackRelease("C5", "32n");
-        }
-      } catch(e) {}
-    }
-
-    function showToast(msg) {
-      const toast = document.getElementById('toastNotification');
-      const text = document.getElementById('toastMessage');
-      if (text) text.textContent = msg;
-      if (toast) {
-        toast.classList.remove('translate-y-20', 'opacity-0');
-        setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
-      }
-    }
-
-    // ROLE SELECTION & MODAL
-    function selectLoginRole(role) {
-      window.selectedAuthRole = role;
-      const sBtn = document.getElementById('roleSelectStudentBtn');
-      const aBtn = document.getElementById('roleSelectAdminBtn');
-      const sFields = document.getElementById('studentLoginFields');
-      const aFields = document.getElementById('adminLoginFields');
-
-      if (role === 'student') {
-        sBtn.className = "py-2 rounded-xl bg-sky-600 text-white font-bold border border-sky-400 transition";
-        aBtn.className = "py-2 rounded-xl bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-800 transition";
-        sFields.classList.remove('hidden');
-        aFields.classList.add('hidden');
-      } else {
-        aBtn.className = "py-2 rounded-xl bg-amber-600 text-white font-bold border border-amber-400 transition";
-        sBtn.className = "py-2 rounded-xl bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-800 transition";
-        aFields.classList.remove('hidden');
-        sFields.classList.add('hidden');
-      }
-    }
-
-    function openLoginModal() {
-      document.getElementById('loginModal').classList.remove('hidden');
-    }
-
-    function closeLoginModal() {
-      document.getElementById('loginModal').classList.add('hidden');
-    }
-
-    async function handleLoginSubmit() {
-      if (window.selectedAuthRole === 'admin') {
-        const pass = document.getElementById('loginAdminPassword').value;
-        if (pass === ADMIN_PASSWORD) {
-          window.currentUser = { name: "System Admin", role: "admin" };
-          sessionStorage.setItem('edutrack_user', JSON.stringify(window.currentUser));
-          updateUserUI();
-          closeLoginModal();
-          showToast("Authenticated as System Administrator");
-          fetchStudentRoster();
-        } else {
-          showToast("Incorrect Master Admin Password!");
-        }
-      } else {
-        const name = document.getElementById('loginStudentName').value.trim();
-        const pass = document.getElementById('loginStudentPassword').value.trim();
-
-        if (!name || !pass) {
-          showToast("Please enter Name and Password");
-          return;
-        }
-
-        const studentDocId = name.toLowerCase().replace(/\s+/g, "_");
-
-        // 1. Check local storage first
-        const localStudents = getLocalStudents();
-        if (localStudents[studentDocId] && localStudents[studentDocId].password === pass) {
-          const s = localStudents[studentDocId];
-          window.currentUser = { name: s.name, grade: s.grade, role: "student", id: studentDocId };
-          sessionStorage.setItem('edutrack_user', JSON.stringify(window.currentUser));
-          updateUserUI();
-          closeLoginModal();
-          showToast(`Welcome back, ${s.name}!`);
-          return;
-        }
-
-        // 2. Try Firestore lookup
-        try {
-          const { doc, getDoc } = window.dbMethods;
-          const userRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'students', studentDocId);
-          const snap = await getDoc(userRef);
-
-          if (snap.exists() && snap.data().password === pass) {
-            window.currentUser = { name: snap.data().name, grade: snap.data().grade, role: "student", id: snap.id };
-            sessionStorage.setItem('edutrack_user', JSON.stringify(window.currentUser));
-            updateUserUI();
-            closeLoginModal();
-            showToast(`Welcome back, ${snap.data().name}!`);
-            return;
-          }
-        } catch(e) {
-          console.warn("Firestore auth lookup failed, fallback local checked.", e);
-        }
-
-        showToast("Invalid Student Credentials!");
-      }
-    }
-
-    // ADMIN: REGISTER NEW STUDENT IN FIREBASE & LOCAL FALLBACK
-    async function handleAdminCreateUser() {
-      if (!window.currentUser || window.currentUser.role !== 'admin') {
-        showToast("Admin privileges required!");
-        return;
-      }
-
-      const nameInput = document.getElementById('newStudentName');
-      const gradeInput = document.getElementById('newStudentGrade');
-      const passInput = document.getElementById('newStudentPassword');
-
-      const name = nameInput.value.trim();
-      const grade = gradeInput.value.trim();
-      const password = passInput.value.trim();
-
-      if (!name || !grade || !password) {
-        showToast("Please fill all required student fields!");
-        return;
-      }
-
-      const studentDocId = name.toLowerCase().replace(/\s+/g, "_");
-      const newStudentObj = {
-        name: name,
-        grade: grade,
-        password: password,
-        progress: [],
-        createdAt: new Date().toISOString()
-      };
-
-      saveLocalStudent(studentDocId, newStudentObj);
-
-      let firebaseSynced = false;
-      try {
-        const { doc, setDoc } = window.dbMethods;
-        const studentRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'students', studentDocId);
-        await setDoc(studentRef, newStudentObj);
-        firebaseSynced = true;
-      } catch(e) {
-        console.warn("Firestore save fallback triggered.", e);
-      }
-
-      if (firebaseSynced) {
-        showToast(`Registered student '${name}' (Synced)!`);
-      } else {
-        showToast(`Registered student '${name}' (Saved Locally)!`);
-      }
-
-      nameInput.value = "";
-      gradeInput.value = "";
-      passInput.value = "";
-      fetchStudentRoster();
-    }
-
-    // FETCH STUDENT ROSTER
-    async function fetchStudentRoster() {
-      const rosterList = document.getElementById('adminRosterList');
-      if (!rosterList) return;
-      rosterList.innerHTML = '<div class="text-slate-400 italic text-center py-2">Syncing roster...</div>';
-
-      const combinedMap = new Map();
-
-      // 1. Load Local Storage Students
-      const localStudents = getLocalStudents();
-      Object.keys(localStudents).forEach(id => {
-        combinedMap.set(id, { ...localStudents[id], id, source: 'local' });
-      });
-
-      // 2. Load Firestore Students
-      try {
-        const { collection, getDocs } = window.dbMethods;
-        const studentsCol = collection(window.db, 'artifacts', window.appId, 'public', 'data', 'students');
-        const querySnapshot = await getDocs(studentsCol);
-        
-        querySnapshot.forEach((docSnap) => {
-          combinedMap.set(docSnap.id, { ...docSnap.data(), id: docSnap.id, source: 'cloud' });
-        });
-      } catch(e) {
-        console.warn("Firestore collection query notice:", e);
-      }
-
-      rosterList.innerHTML = "";
-      if (combinedMap.size === 0) {
-        rosterList.innerHTML = '<div class="text-slate-400 text-center py-2">No students registered yet.</div>';
-        return;
-      }
-
-      combinedMap.forEach((s) => {
-        const progressCount = s.progress ? s.progress.length : 0;
-        const badgeColor = s.source === 'cloud' ? 'text-emerald-700 border-emerald-300 bg-emerald-100 dark:text-emerald-400 dark:border-emerald-800 dark:bg-emerald-950' : 'text-amber-700 border-amber-300 bg-amber-100 dark:text-amber-400 dark:border-amber-800 dark:bg-amber-950';
-        const badgeText = s.source === 'cloud' ? 'Cloud' : 'Local';
-
-        const card = document.createElement('div');
-        card.className = "p-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg flex items-center justify-between gap-2 shadow-sm";
-        card.innerHTML = `
-          <div class="truncate">
-            <div class="font-semibold text-slate-800 dark:text-slate-200 truncate flex items-center gap-1.5">
-              <span>${s.name}</span>
-              <span class="text-[9px] px-1.5 py-0.2 rounded border font-mono ${badgeColor}">${badgeText}</span>
-            </div>
-            <div class="text-[10px] text-slate-500 dark:text-slate-400">${s.grade} • ${progressCount} Tasks Done</div>
-          </div>
-          <button onclick="downloadPDFReport('${s.id}')" class="px-2 py-1 bg-sky-600/20 hover:bg-sky-600 text-sky-700 dark:text-sky-300 hover:text-white border border-sky-500/30 rounded text-[10px] font-semibold transition shrink-0">
-            📄 PDF
-          </button>
-        `;
-        rosterList.appendChild(card);
-      });
-    }
-
-    // BROADCAST / SHARE STUDENT ANSWER TO ALL SCREENS
-    async function shareAnswerToAll(studentName, answerText, slideTitle) {
-      showToast(`Broadcasting ${studentName}'s answer to class...`);
-      const sharedData = {
-        studentName: studentName,
-        answer: answerText,
-        slideTitle: slideTitle || slidesData[window.currentSlideIndex].title,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      // Always update local broadcast state
-      displaySharedAnswerOnScreen(sharedData);
-
-      // Push to Firebase live presentation session
-      if (window.db) {
-        try {
-          const { doc, setDoc } = window.dbMethods;
-          const liveDocRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'presentation', 'liveSession');
-          await setDoc(liveDocRef, {
-            sharedAnswer: sharedData,
-            updatedBy: window.currentUser ? window.currentUser.name : 'Teacher',
-            updatedAt: new Date().toISOString()
-          }, { merge: true });
-        } catch(e) {
-          console.warn("Firestore live broadcast answer failed:", e);
-        }
-      }
-    }
-
-    async function clearSharedAnswer() {
-      hideSharedAnswerOnScreen();
-      showToast("Cleared broadcast from screens");
-      if (window.db) {
-        try {
-          const { doc, setDoc } = window.dbMethods;
-          const liveDocRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'presentation', 'liveSession');
-          await setDoc(liveDocRef, {
-            sharedAnswer: null,
-            updatedAt: new Date().toISOString()
-          }, { merge: true });
-        } catch(e) {}
-      }
-    }
-
-    function displaySharedAnswerOnScreen(shared) {
-      const banner = document.getElementById('sharedAnswerBanner');
-      const nameEl = document.getElementById('sharedStudentName');
-      const textEl = document.getElementById('sharedStudentText');
-      if (banner && nameEl && textEl && shared) {
-        nameEl.textContent = shared.studentName;
-        textEl.textContent = `"${shared.answer}"`;
-        banner.classList.remove('hidden');
-      }
-    }
-
-    function hideSharedAnswerOnScreen() {
-      const banner = document.getElementById('sharedAnswerBanner');
-      if (banner) banner.classList.add('hidden');
-    }
-
-    // SUBMIT ANSWER AND UPDATE LIVE ADMIN FEED
-    async function submitSlideAnswer(answerText, typeLabel) {
-      playAudioCue('success');
-
-      const studentName = window.currentUser ? window.currentUser.name : "Guest Student";
-      const progressEntry = {
-        studentName: studentName,
-        slideIndex: window.currentSlideIndex,
-        slideTitle: slidesData[window.currentSlideIndex].title,
-        answer: answerText,
-        type: typeLabel,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      // Add to live feeds
-      addSubmissionToLiveFeed(progressEntry);
-
-      if (!window.currentUser || window.currentUser.role !== 'student') {
-        showToast("Answer submitted to teacher! 🎓");
-        return;
-      }
-
-      // 1. Update local storage record
-      const localStudents = getLocalStudents();
-      const sId = window.currentUser.id;
-      if (localStudents[sId]) {
-        if (!localStudents[sId].progress) localStudents[sId].progress = [];
-        localStudents[sId].progress.push(progressEntry);
-        saveLocalStudent(sId, localStudents[sId]);
-      }
-
-      // 2. Attempt Firestore sync
-      try {
-        const { doc, updateDoc, arrayUnion } = window.dbMethods;
-        const studentRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'students', sId);
-        await updateDoc(studentRef, {
-          progress: arrayUnion(progressEntry)
-        });
-        showToast("Answer saved & sent to teacher! 🎓");
-      } catch(e) {
-        showToast("Answer saved locally 🎓");
-      }
-    }
-
-    function addSubmissionToLiveFeed(sub) {
-      window.liveSubmissionsFeed.unshift(sub);
-      const feed = document.getElementById('adminLiveFeed');
-      if (!feed) return;
-
-      feed.innerHTML = "";
-      window.liveSubmissionsFeed.slice(0, 10).forEach((item) => {
-        const card = document.createElement('div');
-        card.className = "p-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg space-y-1 shadow-sm";
-        card.innerHTML = `
-          <div class="flex items-center justify-between text-[11px] font-bold text-slate-800 dark:text-slate-200">
-            <span>${item.studentName}</span>
-            <span class="text-[9px] text-slate-400 font-mono">${item.timestamp}</span>
-          </div>
-          <p class="text-[11px] text-slate-600 dark:text-slate-300 font-serif italic truncate">"${item.answer}"</p>
-          <button onclick="shareAnswerToAll('${item.studentName.replace(/'/g, "\\'")}', '${item.answer.replace(/'/g, "\\'")}', '${item.slideTitle.replace(/'/g, "\\'")}')" class="mt-1 w-full py-1 bg-amber-500/20 hover:bg-amber-500 hover:text-white border border-amber-500/40 text-amber-700 dark:text-amber-300 rounded font-semibold text-[10px] transition flex items-center justify-center gap-1">
-            <span>📢 Share to All Screens</span>
-          </button>
-        `;
-        feed.appendChild(card);
-      });
-    }
-
-    async function downloadPDFReport(studentDocId) {
-      showToast("Generating PDF Report...");
-      try {
-        let data = null;
-
-        const localStudents = getLocalStudents();
-        if (localStudents[studentDocId]) {
-          data = localStudents[studentDocId];
-        } else {
-          const { doc, getDoc } = window.dbMethods;
-          const studentRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'students', studentDocId);
-          const snap = await getDoc(studentRef);
-          if (snap.exists()) data = snap.data();
-        }
-
-        if (!data) {
-          showToast("Student data not found.");
-          return;
-        }
-
-        document.getElementById('pdfStudentName').textContent = data.name;
-        document.getElementById('pdfStudentGrade').textContent = data.grade;
-        document.getElementById('pdfTotalSubmissions').textContent = data.progress ? data.progress.length : 0;
-        document.getElementById('pdfReportDate').textContent = "Date: " + new Date().toISOString().split('T')[0];
-
-        const list = document.getElementById('pdfSubmissionsList');
-        list.innerHTML = "";
-
-        if (data.progress && data.progress.length > 0) {
-          data.progress.forEach((p) => {
-            const item = document.createElement('div');
-            item.className = "p-3 bg-slate-50 rounded border border-slate-200 space-y-1";
-            item.innerHTML = `
-              <div class="flex justify-between font-bold text-slate-700">
-                <span>Slide ${p.slideIndex + 1}: ${p.slideTitle}</span>
-                <span class="text-slate-400 text-[10px]">${p.timestamp || ''}</span>
-              </div>
-              <div class="text-slate-600 font-serif italic">"${p.answer}"</div>
-            `;
-            list.appendChild(item);
-          });
-        } else {
-          list.innerHTML = '<div class="text-slate-400 italic">No exercise progress recorded yet.</div>';
-        }
-
-        const element = document.getElementById('pdfReportTemplate');
-        const canvas = await html2canvas(element, { scale: 2 });
-        const imgData = canvas.toDataURL('image/png');
-        
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgProps = pdf.getImageProperties(imgData);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save(`${data.name.replace(/\s+/g, '_')}_Progress_Report.pdf`);
-        showToast("PDF report saved!");
-
-      } catch(e) {
-        console.error(e);
-        showToast("Failed to generate PDF report.");
-      }
-    }
-
-    function toggleAdminDrawer() {
-      document.getElementById('adminControlDrawer').classList.toggle('hidden');
-    }
-
-    // NAVIGATION CONTROLLER WITH TEACHER BROADCASTING
-    function initSlidesDropdown() {
-      const drop = document.getElementById('slideSelectDropdown');
-      if (!drop) return;
-      drop.innerHTML = "";
-      slidesData.forEach((s, idx) => {
-        const opt = document.createElement('option');
-        opt.value = idx;
-        opt.textContent = `${idx + 1}. ${s.title}`;
-        drop.appendChild(opt);
-      });
-    }
-
-    async function broadcastTeacherSlide(idx) {
-      if (window.currentUser && window.currentUser.role === 'admin' && window.db) {
-        try {
-          const { doc, setDoc } = window.dbMethods;
-          const liveDocRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'presentation', 'liveSession');
-          await setDoc(liveDocRef, {
-            currentSlide: idx,
-            updatedBy: window.currentUser.name || 'Admin',
-            updatedAt: new Date().toISOString()
-          }, { merge: true });
-        } catch(e) {
-          console.warn("Broadcasting live slide position failed:", e);
-        }
-      }
-    }
-
-    function renderSlide(idx, shouldBroadcast = true) {
-      if (idx < 0 || idx >= slidesData.length) return;
-      window.currentSlideIndex = idx;
-
-      document.getElementById('slideCounterLabel').textContent = `Slide ${idx + 1} / ${slidesData.length}`;
-      document.getElementById('slideTitleHeader').textContent = slidesData[idx].title;
-      document.getElementById('slideTagBadge').textContent = slidesData[idx].module;
-      document.getElementById('slideTypeBadge').textContent = slidesData[idx].type;
-      const drop = document.getElementById('slideSelectDropdown');
-      if (drop) drop.value = idx;
-
-      const pct = ((idx + 1) / slidesData.length) * 100;
-      document.getElementById('slideProgressBar').style.width = `${pct}%`;
-
-      const body = document.getElementById('slideDynamicBody');
-      body.innerHTML = slidesData[idx].render();
-
-      if (shouldBroadcast) {
-        broadcastTeacherSlide(idx);
-      }
-    }
-
-    function nextSlide() {
-      if (window.currentSlideIndex < slidesData.length - 1) {
-        renderSlide(window.currentSlideIndex + 1, true);
-        playAudioCue('click');
-      }
-    }
-
-    function prevSlide() {
-      if (window.currentSlideIndex > 0) {
-        renderSlide(window.currentSlideIndex - 1, true);
-        playAudioCue('click');
-      }
-    }
-
-    function goToSlide(idx) {
-      renderSlide(idx, true);
-    }
-
-    // SPECIFIC TASK INPUT SUBMITTERS
-    function submitSlide5Sentence() {
-      const val = document.getElementById('slide5Input').value;
-      if (val.trim()) submitSlideAnswer(val, "Sentence Upgrade");
-    }
-
-    function submitSlide9Sentence() {
-      const val = document.getElementById('slide9Input').value;
-      if (val.trim()) submitSlideAnswer(val, "Sentence Combining");
-    }
-
-    function submitSlide12Support() {
-      const val = document.getElementById('slide12Input').value;
-      if (val.trim()) submitSlideAnswer(val, "Adding Support");
-    }
-
-    function submitSlide15Generalization() {
-      const val = document.getElementById('slide15Input').value;
-      if (val.trim()) submitSlideAnswer(val, "Generalization");
-    }
-
-    // Initialize Theme on load
-    window.addEventListener('DOMContentLoaded', initTheme);
-
-    const slidesData = [
+    // Slide Content Definitions
+    window.slidesData = [
       {
         title: "Title & Exam Specs",
         module: "Module 1: Foundations",
@@ -1398,6 +632,799 @@
         `
       }))
     ];
+
+    // Theme Management
+    window.initTheme = function() {
+      const savedTheme = localStorage.getItem('smartstudy_theme') || 'light';
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        const icon = document.getElementById('themeToggleIcon');
+        if (icon) icon.textContent = '🌙';
+      } else {
+        document.documentElement.classList.remove('dark');
+        const icon = document.getElementById('themeToggleIcon');
+        if (icon) icon.textContent = '☀️';
+      }
+    };
+
+    window.toggleTheme = function() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('smartstudy_theme', isDark ? 'dark' : 'light');
+      const icon = document.getElementById('themeToggleIcon');
+      if (icon) icon.textContent = isDark ? '🌙' : '☀️';
+      window.showToast(isDark ? "Switched to Dark Mode 🌙" : "Switched to Light Mode ☀️");
+    };
+
+    // Fullscreen Card Controller
+    window.toggleCardFullscreen = function() {
+      const card = document.getElementById('slideStageContainer');
+      const icon = document.getElementById('fullscreenIcon');
+      
+      if (!document.fullscreenElement) {
+        if (card.requestFullscreen) {
+          card.requestFullscreen();
+        } else if (card.webkitRequestFullscreen) {
+          card.webkitRequestFullscreen();
+        }
+        if (icon) icon.textContent = "↙";
+        window.showToast("Fullscreen mode activated");
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+        if (icon) icon.textContent = "⛶";
+        window.showToast("Exited fullscreen mode");
+      }
+    };
+
+    // Admin Panel Minimization
+    window.toggleAdminMinimize = function() {
+      const content = document.getElementById('adminPanelContent');
+      const icon = document.getElementById('adminMinimizeIcon');
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.textContent = "➖";
+      } else {
+        content.classList.add('hidden');
+        icon.textContent = "➕";
+      }
+    };
+
+    // Toggle Follow Teacher Sync
+    window.toggleTeacherSync = function() {
+      window.followTeacherSync = !window.followTeacherSync;
+      const statusText = document.getElementById('syncStatusText');
+      const toggleBtn = document.getElementById('teacherSyncToggle');
+
+      if (window.followTeacherSync) {
+        if (statusText) statusText.textContent = "Broadcasting Live";
+        if (toggleBtn) toggleBtn.className = "px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 rounded-lg text-[11px] font-mono flex items-center gap-1.5 transition hover:bg-emerald-200 dark:hover:bg-emerald-900/50";
+        window.showToast("Live presentation broadcasting enabled");
+      } else {
+        if (statusText) statusText.textContent = "Broadcast Paused";
+        if (toggleBtn) toggleBtn.className = "px-2.5 py-1 bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-800 rounded-lg text-[11px] font-mono flex items-center gap-1.5 transition hover:bg-slate-300";
+        window.showToast("Live presentation broadcast paused");
+      }
+    };
+
+    // User Interface State Updater
+    window.updateUserUI = function() {
+      const infoDisplay = document.getElementById('userInfoDisplay');
+      const nameBadge = document.getElementById('userNameBadge');
+      const roleBadge = document.getElementById('userRoleBadge');
+      const authBtn = document.getElementById('authModalBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const adminToggle = document.getElementById('adminPanelToggle');
+      const adminDrawer = document.getElementById('adminControlDrawer');
+      const teacherNavControls = document.getElementById('teacherNavControls');
+      const teacherBottomNav = document.getElementById('teacherBottomNav');
+      const studentSyncIndicator = document.getElementById('studentSyncIndicator');
+      const closeSharedBtn = document.getElementById('closeSharedAnswerBtn');
+
+      const isAdmin = window.currentUser && window.currentUser.role === 'admin';
+
+      if (window.currentUser) {
+        if (infoDisplay) infoDisplay.classList.remove('hidden');
+        if (nameBadge) nameBadge.textContent = window.currentUser.name || 'User';
+        if (roleBadge) {
+          roleBadge.textContent = (window.currentUser.role || 'student').toUpperCase();
+          roleBadge.className = isAdmin 
+            ? "text-[10px] bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-800 px-2 py-0.5 rounded font-mono"
+            : "text-[10px] bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-400 px-2 py-0.5 rounded font-mono";
+        }
+        if (authBtn) authBtn.classList.add('hidden');
+        if (logoutBtn) logoutBtn.classList.remove('hidden');
+      } else {
+        if (infoDisplay) infoDisplay.classList.add('hidden');
+        if (authBtn) authBtn.classList.remove('hidden');
+        if (logoutBtn) logoutBtn.classList.add('hidden');
+      }
+
+      if (isAdmin) {
+        if (adminToggle) adminToggle.classList.remove('hidden');
+        if (teacherNavControls) teacherNavControls.classList.remove('hidden');
+        if (teacherBottomNav) teacherBottomNav.classList.remove('hidden');
+        if (studentSyncIndicator) studentSyncIndicator.classList.add('hidden');
+        if (closeSharedBtn) closeSharedBtn.classList.remove('hidden');
+      } else {
+        if (adminToggle) adminToggle.classList.add('hidden');
+        if (adminDrawer) adminDrawer.classList.add('hidden');
+        if (teacherNavControls) teacherNavControls.classList.add('hidden');
+        if (teacherBottomNav) teacherBottomNav.classList.add('hidden');
+        if (studentSyncIndicator) studentSyncIndicator.classList.remove('hidden');
+        if (closeSharedBtn) closeSharedBtn.classList.add('hidden');
+      }
+    };
+
+    // User Logout Handler
+    window.handleLogout = function() {
+      sessionStorage.removeItem('edutrack_user');
+      window.currentUser = null;
+      window.updateUserUI();
+      window.showToast("Signed out successfully.");
+    };
+
+    window.getLocalStudents = function() {
+      try {
+        return JSON.parse(localStorage.getItem('smartstudy_students') || '{}');
+      } catch(e) {
+        return {};
+      }
+    };
+
+    window.saveLocalStudent = function(studentDocId, studentData) {
+      const current = window.getLocalStudents();
+      current[studentDocId] = studentData;
+      localStorage.setItem('smartstudy_students', JSON.stringify(current));
+    };
+
+    let synth = null;
+    window.playAudioCue = function(type = 'click') {
+      try {
+        if (!synth && window.Tone) {
+          synth = new Tone.Synth({
+            oscillator: { type: "triangle" },
+            envelope: { attack: 0.005, decay: 0.1, sustain: 0.05, release: 0.1 }
+          }).toDestination();
+        }
+        if (synth && Tone.context.state === 'running') {
+          if (type === 'success') synth.triggerAttackRelease("E5", "16n");
+          else synth.triggerAttackRelease("C5", "32n");
+        }
+      } catch(e) {}
+    };
+
+    window.showToast = function(msg) {
+      const toast = document.getElementById('toastNotification');
+      const text = document.getElementById('toastMessage');
+      if (text) text.textContent = msg;
+      if (toast) {
+        toast.classList.remove('translate-y-20', 'opacity-0');
+        setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+      }
+    };
+
+    window.selectLoginRole = function(role) {
+      window.selectedAuthRole = role;
+      const sBtn = document.getElementById('roleSelectStudentBtn');
+      const aBtn = document.getElementById('roleSelectAdminBtn');
+      const sFields = document.getElementById('studentLoginFields');
+      const aFields = document.getElementById('adminLoginFields');
+
+      if (role === 'student') {
+        if (sBtn) sBtn.className = "py-2 rounded-xl bg-sky-600 text-white font-bold border border-sky-400 transition";
+        if (aBtn) aBtn.className = "py-2 rounded-xl bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-800 transition";
+        if (sFields) sFields.classList.remove('hidden');
+        if (aFields) aFields.classList.add('hidden');
+      } else {
+        if (aBtn) aBtn.className = "py-2 rounded-xl bg-amber-600 text-white font-bold border border-amber-400 transition";
+        if (sBtn) sBtn.className = "py-2 rounded-xl bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-800 transition";
+        if (aFields) aFields.classList.remove('hidden');
+        if (sFields) sFields.classList.add('hidden');
+      }
+    };
+
+    window.openLoginModal = function() {
+      const m = document.getElementById('loginModal');
+      if (m) m.classList.remove('hidden');
+    };
+
+    window.closeLoginModal = function() {
+      const m = document.getElementById('loginModal');
+      if (m) m.classList.add('hidden');
+    };
+
+    window.handleLoginSubmit = async function() {
+      if (window.selectedAuthRole === 'admin') {
+        const pass = document.getElementById('loginAdminPassword').value;
+        if (pass === ADMIN_PASSWORD) {
+          window.currentUser = { name: "System Admin", role: "admin" };
+          sessionStorage.setItem('edutrack_user', JSON.stringify(window.currentUser));
+          window.updateUserUI();
+          window.closeLoginModal();
+          window.showToast("Authenticated as System Administrator");
+          window.fetchStudentRoster();
+        } else {
+          window.showToast("Incorrect Master Admin Password!");
+        }
+      } else {
+        const name = document.getElementById('loginStudentName').value.trim();
+        const pass = document.getElementById('loginStudentPassword').value.trim();
+
+        if (!name || !pass) {
+          window.showToast("Please enter Name and Password");
+          return;
+        }
+
+        const studentDocId = name.toLowerCase().replace(/\s+/g, "_");
+        const localStudents = window.getLocalStudents();
+        if (localStudents[studentDocId] && localStudents[studentDocId].password === pass) {
+          const s = localStudents[studentDocId];
+          window.currentUser = { name: s.name, grade: s.grade, role: "student", id: studentDocId };
+          sessionStorage.setItem('edutrack_user', JSON.stringify(window.currentUser));
+          window.updateUserUI();
+          window.closeLoginModal();
+          window.showToast(`Welcome back, ${s.name}!`);
+          return;
+        }
+
+        try {
+          const { doc, getDoc } = window.dbMethods;
+          const userRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'students', studentDocId);
+          const snap = await getDoc(userRef);
+
+          if (snap.exists() && snap.data().password === pass) {
+            window.currentUser = { name: snap.data().name, grade: snap.data().grade, role: "student", id: snap.id };
+            sessionStorage.setItem('edutrack_user', JSON.stringify(window.currentUser));
+            window.updateUserUI();
+            window.closeLoginModal();
+            window.showToast(`Welcome back, ${snap.data().name}!`);
+            return;
+          }
+        } catch(e) {
+          console.warn("Firestore auth lookup failed, local checked.", e);
+        }
+
+        window.showToast("Invalid Student Credentials!");
+      }
+    };
+
+    window.handleAdminCreateUser = async function() {
+      if (!window.currentUser || window.currentUser.role !== 'admin') {
+        window.showToast("Admin privileges required!");
+        return;
+      }
+
+      const nameInput = document.getElementById('newStudentName');
+      const gradeInput = document.getElementById('newStudentGrade');
+      const passInput = document.getElementById('newStudentPassword');
+
+      const name = nameInput.value.trim();
+      const grade = gradeInput.value.trim();
+      const password = passInput.value.trim();
+
+      if (!name || !grade || !password) {
+        window.showToast("Please fill all required student fields!");
+        return;
+      }
+
+      const studentDocId = name.toLowerCase().replace(/\s+/g, "_");
+      const newStudentObj = {
+        name: name,
+        grade: grade,
+        password: password,
+        progress: [],
+        createdAt: new Date().toISOString()
+      };
+
+      window.saveLocalStudent(studentDocId, newStudentObj);
+
+      let firebaseSynced = false;
+      try {
+        const { doc, setDoc } = window.dbMethods;
+        const studentRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'students', studentDocId);
+        await setDoc(studentRef, newStudentObj);
+        firebaseSynced = true;
+      } catch(e) {
+        console.warn("Firestore save fallback triggered.", e);
+      }
+
+      if (firebaseSynced) {
+        window.showToast(`Registered student '${name}' (Synced)!`);
+      } else {
+        window.showToast(`Registered student '${name}' (Saved Locally)!`);
+      }
+
+      nameInput.value = "";
+      gradeInput.value = "";
+      passInput.value = "";
+      window.fetchStudentRoster();
+    };
+
+    window.fetchStudentRoster = async function() {
+      const rosterList = document.getElementById('adminRosterList');
+      if (!rosterList) return;
+      rosterList.innerHTML = '<div class="text-slate-400 italic text-center py-2">Syncing roster...</div>';
+
+      const combinedMap = new Map();
+      const localStudents = window.getLocalStudents();
+      Object.keys(localStudents).forEach(id => {
+        combinedMap.set(id, { ...localStudents[id], id, source: 'local' });
+      });
+
+      try {
+        const { collection, getDocs } = window.dbMethods;
+        const studentsCol = collection(window.db, 'artifacts', window.appId, 'public', 'data', 'students');
+        const querySnapshot = await getDocs(studentsCol);
+        
+        querySnapshot.forEach((docSnap) => {
+          combinedMap.set(docSnap.id, { ...docSnap.data(), id: docSnap.id, source: 'cloud' });
+        });
+      } catch(e) {
+        console.warn("Firestore collection query notice:", e);
+      }
+
+      rosterList.innerHTML = "";
+      if (combinedMap.size === 0) {
+        rosterList.innerHTML = '<div class="text-slate-400 text-center py-2">No students registered yet.</div>';
+        return;
+      }
+
+      combinedMap.forEach((s) => {
+        const progressCount = s.progress ? s.progress.length : 0;
+        const badgeColor = s.source === 'cloud' ? 'text-emerald-700 border-emerald-300 bg-emerald-100 dark:text-emerald-400 dark:border-emerald-800 dark:bg-emerald-950' : 'text-amber-700 border-amber-300 bg-amber-100 dark:text-amber-400 dark:border-amber-800 dark:bg-amber-950';
+        const badgeText = s.source === 'cloud' ? 'Cloud' : 'Local';
+
+        const card = document.createElement('div');
+        card.className = "p-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg flex items-center justify-between gap-2 shadow-sm";
+        card.innerHTML = `
+          <div class="truncate">
+            <div class="font-semibold text-slate-800 dark:text-slate-200 truncate flex items-center gap-1.5">
+              <span>${s.name}</span>
+              <span class="text-[9px] px-1.5 py-0.2 rounded border font-mono ${badgeColor}">${badgeText}</span>
+            </div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400">${s.grade} • ${progressCount} Tasks Done</div>
+          </div>
+          <button onclick="downloadPDFReport('${s.id}')" class="px-2 py-1 bg-sky-600/20 hover:bg-sky-600 text-sky-700 dark:text-sky-300 hover:text-white border border-sky-500/30 rounded text-[10px] font-semibold transition shrink-0">
+            📄 PDF
+          </button>
+        `;
+        rosterList.appendChild(card);
+      });
+    };
+
+    window.shareAnswerToAll = async function(studentName, answerText, slideTitle) {
+      window.showToast(`Broadcasting ${studentName}'s answer to class...`);
+      const sharedData = {
+        studentName: studentName,
+        answer: answerText,
+        slideTitle: slideTitle || window.slidesData[window.currentSlideIndex].title,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      window.displaySharedAnswerOnScreen(sharedData);
+
+      if (window.liveChannel) {
+        window.liveChannel.postMessage({ type: 'SHARED_ANSWER', sharedAnswer: sharedData });
+      }
+
+      if (window.db) {
+        try {
+          const { doc, setDoc } = window.dbMethods;
+          const liveDocRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'presentation', 'liveSession');
+          await setDoc(liveDocRef, {
+            sharedAnswer: sharedData,
+            updatedBy: window.currentUser ? window.currentUser.name : 'Teacher',
+            updatedAt: new Date().toISOString()
+          }, { merge: true });
+        } catch(e) {
+          console.warn("Firestore live broadcast answer failed:", e);
+        }
+      }
+    };
+
+    window.clearSharedAnswer = async function() {
+      window.hideSharedAnswerOnScreen();
+      window.showToast("Cleared broadcast from screens");
+
+      if (window.liveChannel) {
+        window.liveChannel.postMessage({ type: 'SHARED_ANSWER', sharedAnswer: null });
+      }
+
+      if (window.db) {
+        try {
+          const { doc, setDoc } = window.dbMethods;
+          const liveDocRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'presentation', 'liveSession');
+          await setDoc(liveDocRef, {
+            sharedAnswer: null,
+            updatedAt: new Date().toISOString()
+          }, { merge: true });
+        } catch(e) {}
+      }
+    };
+
+    window.displaySharedAnswerOnScreen = function(shared) {
+      const banner = document.getElementById('sharedAnswerBanner');
+      const nameEl = document.getElementById('sharedStudentName');
+      const textEl = document.getElementById('sharedStudentText');
+      if (banner && nameEl && textEl && shared) {
+        nameEl.textContent = shared.studentName;
+        textEl.textContent = `"${shared.answer}"`;
+        banner.classList.remove('hidden');
+      }
+    };
+
+    window.hideSharedAnswerOnScreen = function() {
+      const banner = document.getElementById('sharedAnswerBanner');
+      if (banner) banner.classList.add('hidden');
+    };
+
+    window.submitSlideAnswer = async function(answerText, typeLabel) {
+      window.playAudioCue('success');
+
+      const studentName = window.currentUser ? window.currentUser.name : "Guest Student";
+      const progressEntry = {
+        studentName: studentName,
+        slideIndex: window.currentSlideIndex,
+        slideTitle: window.slidesData[window.currentSlideIndex].title,
+        answer: answerText,
+        type: typeLabel,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      window.addSubmissionToLiveFeed(progressEntry);
+
+      if (window.liveChannel) {
+        window.liveChannel.postMessage({ type: 'STUDENT_SUBMISSION', submission: progressEntry });
+      }
+
+      if (!window.currentUser || window.currentUser.role !== 'student') {
+        window.showToast("Answer submitted to teacher! 🎓");
+        return;
+      }
+
+      const localStudents = window.getLocalStudents();
+      const sId = window.currentUser.id;
+      if (localStudents[sId]) {
+        if (!localStudents[sId].progress) localStudents[sId].progress = [];
+        localStudents[sId].progress.push(progressEntry);
+        window.saveLocalStudent(sId, localStudents[sId]);
+      }
+
+      try {
+        const { doc, updateDoc, arrayUnion } = window.dbMethods;
+        const studentRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'students', sId);
+        await updateDoc(studentRef, {
+          progress: arrayUnion(progressEntry)
+        });
+        window.showToast("Answer saved & sent to teacher! 🎓");
+      } catch(e) {
+        window.showToast("Answer saved locally 🎓");
+      }
+    };
+
+    window.addSubmissionToLiveFeed = function(sub) {
+      window.liveSubmissionsFeed.unshift(sub);
+      const feed = document.getElementById('adminLiveFeed');
+      if (!feed) return;
+
+      feed.innerHTML = "";
+      window.liveSubmissionsFeed.slice(0, 10).forEach((item) => {
+        const card = document.createElement('div');
+        card.className = "p-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg space-y-1 shadow-sm";
+        card.innerHTML = `
+          <div class="flex items-center justify-between text-[11px] font-bold text-slate-800 dark:text-slate-200">
+            <span>${item.studentName}</span>
+            <span class="text-[9px] text-slate-400 font-mono">${item.timestamp}</span>
+          </div>
+          <p class="text-[11px] text-slate-600 dark:text-slate-300 font-serif italic truncate">"${item.answer}"</p>
+          <button onclick="shareAnswerToAll('${item.studentName.replace(/'/g, "\\'")}', '${item.answer.replace(/'/g, "\\'")}', '${item.slideTitle.replace(/'/g, "\\'")}')" class="mt-1 w-full py-1 bg-amber-500/20 hover:bg-amber-500 hover:text-white border border-amber-500/40 text-amber-700 dark:text-amber-300 rounded font-semibold text-[10px] transition flex items-center justify-center gap-1">
+            <span>📢 Share to All Screens</span>
+          </button>
+        `;
+        feed.appendChild(card);
+      });
+    };
+
+    window.downloadPDFReport = async function(studentDocId) {
+      window.showToast("Generating PDF Report...");
+      try {
+        let data = null;
+        const localStudents = window.getLocalStudents();
+        if (localStudents[studentDocId]) {
+          data = localStudents[studentDocId];
+        } else {
+          const { doc, getDoc } = window.dbMethods;
+          const studentRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'students', studentDocId);
+          const snap = await getDoc(studentRef);
+          if (snap.exists()) data = snap.data();
+        }
+
+        if (!data) {
+          window.showToast("Student data not found.");
+          return;
+        }
+
+        document.getElementById('pdfStudentName').textContent = data.name;
+        document.getElementById('pdfStudentGrade').textContent = data.grade;
+        document.getElementById('pdfTotalSubmissions').textContent = data.progress ? data.progress.length : 0;
+        document.getElementById('pdfReportDate').textContent = "Date: " + new Date().toISOString().split('T')[0];
+
+        const list = document.getElementById('pdfSubmissionsList');
+        list.innerHTML = "";
+
+        if (data.progress && data.progress.length > 0) {
+          data.progress.forEach((p) => {
+            const item = document.createElement('div');
+            item.className = "p-3 bg-slate-50 rounded border border-slate-200 space-y-1";
+            item.innerHTML = `
+              <div class="flex justify-between font-bold text-slate-700">
+                <span>Slide ${p.slideIndex + 1}: ${p.slideTitle}</span>
+                <span class="text-slate-400 text-[10px]">${p.timestamp || ''}</span>
+              </div>
+              <div class="text-slate-600 font-serif italic">"${p.answer}"</div>
+            `;
+            list.appendChild(item);
+          });
+        } else {
+          list.innerHTML = '<div class="text-slate-400 italic">No exercise progress recorded yet.</div>';
+        }
+
+        const element = document.getElementById('pdfReportTemplate');
+        const canvas = await html2canvas(element, { scale: 2 });
+        const imgData = canvas.toDataURL('image/png');
+        
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`${data.name.replace(/\s+/g, '_')}_Progress_Report.pdf`);
+        window.showToast("PDF report saved!");
+
+      } catch(e) {
+        console.error(e);
+        window.showToast("Failed to generate PDF report.");
+      }
+    };
+
+    window.toggleAdminDrawer = function() {
+      const drawer = document.getElementById('adminControlDrawer');
+      if (drawer) drawer.classList.toggle('hidden');
+    };
+
+    window.initSlidesDropdown = function() {
+      const drop = document.getElementById('slideSelectDropdown');
+      if (!drop) return;
+      drop.innerHTML = "";
+      window.slidesData.forEach((s, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = `${idx + 1}. ${s.title}`;
+        drop.appendChild(opt);
+      });
+    };
+
+    window.broadcastTeacherSlide = async function(idx) {
+      if (window.liveChannel) {
+        window.liveChannel.postMessage({ type: 'SLIDE_CHANGE', slideIndex: idx });
+      }
+
+      if (window.currentUser && window.currentUser.role === 'admin' && window.db) {
+        try {
+          const { doc, setDoc } = window.dbMethods;
+          const liveDocRef = doc(window.db, 'artifacts', window.appId, 'public', 'data', 'presentation', 'liveSession');
+          await setDoc(liveDocRef, {
+            currentSlide: idx,
+            updatedBy: window.currentUser.name || 'Admin',
+            updatedAt: new Date().toISOString()
+          }, { merge: true });
+        } catch(e) {
+          console.warn("Broadcasting live slide position failed:", e);
+        }
+      }
+    };
+
+    window.renderSlide = function(idx, shouldBroadcast = true) {
+      if (idx < 0 || idx >= window.slidesData.length) return;
+      window.currentSlideIndex = idx;
+
+      const counter = document.getElementById('slideCounterLabel');
+      const title = document.getElementById('slideTitleHeader');
+      const mod = document.getElementById('slideTagBadge');
+      const type = document.getElementById('slideTypeBadge');
+      const progress = document.getElementById('slideProgressBar');
+
+      if (counter) counter.textContent = `Slide ${idx + 1} / ${window.slidesData.length}`;
+      if (title) title.textContent = window.slidesData[idx].title;
+      if (mod) mod.textContent = window.slidesData[idx].module;
+      if (type) type.textContent = window.slidesData[idx].type;
+
+      const drop = document.getElementById('slideSelectDropdown');
+      if (drop) drop.value = idx;
+
+      const pct = ((idx + 1) / window.slidesData.length) * 100;
+      if (progress) progress.style.width = `${pct}%`;
+
+      const body = document.getElementById('slideDynamicBody');
+      if (body) body.innerHTML = window.slidesData[idx].render();
+
+      if (shouldBroadcast) {
+        window.broadcastTeacherSlide(idx);
+      }
+    };
+
+    window.nextSlide = function() {
+      if (window.currentSlideIndex < window.slidesData.length - 1) {
+        window.renderSlide(window.currentSlideIndex + 1, true);
+        window.playAudioCue('click');
+      }
+    };
+
+    window.prevSlide = function() {
+      if (window.currentSlideIndex > 0) {
+        window.renderSlide(window.currentSlideIndex - 1, true);
+        window.playAudioCue('click');
+      }
+    };
+
+    window.goToSlide = function(idx) {
+      window.renderSlide(idx, true);
+    };
+
+    window.submitSlide5Sentence = function() {
+      const val = document.getElementById('slide5Input').value;
+      if (val.trim()) window.submitSlideAnswer(val, "Sentence Upgrade");
+    };
+
+    window.submitSlide9Sentence = function() {
+      const val = document.getElementById('slide9Input').value;
+      if (val.trim()) window.submitSlideAnswer(val, "Sentence Combining");
+    };
+
+    window.submitSlide12Support = function() {
+      const val = document.getElementById('slide12Input').value;
+      if (val.trim()) window.submitSlideAnswer(val, "Adding Support");
+    };
+
+    window.submitSlide15Generalization = function() {
+      const val = document.getElementById('slide15Input').value;
+      if (val.trim()) window.submitSlideAnswer(val, "Generalization");
+    };
+
+    window.addEventListener('DOMContentLoaded', window.initTheme);
+  </script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, getDocs, updateDoc, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'edutrack-igcse-app';
+    const defaultFirebaseConfig = {
+      apiKey: "AIzaSyDLbqoHebiXa6hf9wVxelU4eJx7eDWvBCA",
+      authDomain: "exam-48e13.firebaseapp.com",
+      projectId: "exam-48e13",
+      storageBucket: "exam-48e13.firebasestorage.app",
+      messagingSenderId: "501058275146",
+      appId: "1:501058275146:web:9dad39e721594d344ce3b3",
+      measurementId: "G-9DTPZCS2D2"
+    };
+
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : defaultFirebaseConfig;
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.appId = appId;
+    window.auth = auth;
+    window.db = db;
+    window.dbMethods = { doc, setDoc, getDoc, collection, getDocs, updateDoc, arrayUnion, onSnapshot };
+    window.currentUser = JSON.parse(sessionStorage.getItem('edutrack_user')) || null;
+    window.selectedAuthRole = 'student';
+
+    const liveChannel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('smartstudy_live_sync') : null;
+    window.liveChannel = liveChannel;
+
+    if (liveChannel) {
+      liveChannel.onmessage = (event) => {
+        const data = event.data;
+        if (!data) return;
+
+        if (data.type === 'SLIDE_CHANGE' && typeof data.slideIndex === 'number') {
+          if (window.followTeacherSync && (!window.currentUser || window.currentUser.role !== 'admin')) {
+            if (window.currentSlideIndex !== data.slideIndex) {
+              if (typeof window.renderSlide === 'function') window.renderSlide(data.slideIndex, false);
+              if (typeof window.showToast === 'function') window.showToast(`Teacher moved to Slide ${data.slideIndex + 1}`);
+            }
+          }
+        }
+        else if (data.type === 'SHARED_ANSWER') {
+          if (data.sharedAnswer) {
+            if (typeof window.displaySharedAnswerOnScreen === 'function') window.displaySharedAnswerOnScreen(data.sharedAnswer);
+          } else {
+            if (typeof window.hideSharedAnswerOnScreen === 'function') window.hideSharedAnswerOnScreen();
+          }
+        }
+        else if (data.type === 'STUDENT_SUBMISSION' && data.submission) {
+          if (typeof window.addSubmissionToLiveFeed === 'function') window.addSubmissionToLiveFeed(data.submission);
+        }
+      };
+    }
+
+    async function initFirebaseAuth() {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      } catch (err) {
+        console.warn("Auth initial warning:", err);
+        try {
+          await signInAnonymously(auth);
+        } catch(e) {
+          console.error("Anonymous auth failed:", e);
+        }
+      }
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      const dot = document.getElementById('firebaseStatusDot');
+      const text = document.getElementById('firebaseStatusText');
+      if (user) {
+        if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-400";
+        if (text) text.textContent = `Firebase Connected (${user.uid.slice(0, 6)}...)`;
+        if (window.currentUser && window.currentUser.role === 'admin' && typeof window.fetchStudentRoster === 'function') {
+          window.fetchStudentRoster();
+        }
+      } else {
+        if (dot) dot.className = "w-2 h-2 rounded-full bg-amber-400";
+        if (text) text.textContent = "Connecting Auth...";
+      }
+    });
+
+    function listenToLivePresentation() {
+      try {
+        const liveDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'presentation', 'liveSession');
+        onSnapshot(liveDocRef, (snap) => {
+          if (snap.exists()) {
+            const data = snap.data();
+
+            if (typeof data.currentSlide === 'number') {
+              if (window.followTeacherSync && (!window.currentUser || window.currentUser.role !== 'admin')) {
+                if (window.currentSlideIndex !== data.currentSlide) {
+                  if (typeof window.renderSlide === 'function') window.renderSlide(data.currentSlide, false);
+                  if (typeof window.showToast === 'function') window.showToast(`Teacher moved to Slide ${data.currentSlide + 1}`);
+                }
+              }
+            }
+
+            if (data.sharedAnswer) {
+              if (typeof window.displaySharedAnswerOnScreen === 'function') window.displaySharedAnswerOnScreen(data.sharedAnswer);
+            } else {
+              if (typeof window.hideSharedAnswerOnScreen === 'function') window.hideSharedAnswerOnScreen();
+            }
+          }
+        }, (err) => {
+          console.warn("Live presentation listener info:", err.message);
+        });
+      } catch (e) {
+        console.error("Failed to set up live presentation listener:", e);
+      }
+    }
+
+    initFirebaseAuth().then(() => {
+      if (typeof window.initSlidesDropdown === 'function') window.initSlidesDropdown();
+      if (typeof window.renderSlide === 'function') window.renderSlide(0, false);
+      listenToLivePresentation();
+      if (typeof window.updateUserUI === 'function') {
+        window.updateUserUI();
+      }
+    });
   </script>
 </body>
 </html>
