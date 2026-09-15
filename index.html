@@ -65,7 +65,9 @@
         <h1 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white tracking-wide flex items-center gap-2">
           SmartStudyGrid.com <span class="text-[10px] bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-400 border border-sky-300 dark:border-sky-800 px-2 py-0.5 rounded-full font-mono">IGCSE 0510/0511</span>
         </h1>
-        <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">Interactive Student Progress & Teacher-Led Platform</p>
+        <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+          Created by Amanullah Khan, amankhan@smartstudygrid.com, +966568959394
+        </p>
       </div>
     </div>
 
@@ -77,6 +79,12 @@
         <span id="firebaseStatusText" class="text-slate-600 dark:text-slate-300 font-mono hidden md:inline">Connecting...</span>
       </div>
 
+      <!-- ADMIN PANEL TOGGLE (IN TOP HEADER) -->
+      <button id="adminHeaderToggleBtn" onclick="toggleAdminDrawer()" class="hidden px-2.5 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-700 dark:text-amber-300 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+        <span>🛡️</span>
+        <span class="hidden sm:inline">Admin Panel</span>
+      </button>
+
       <!-- THEME TOGGLE BUTTON -->
       <button onclick="toggleTheme()" class="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-xs transition" title="Toggle Light / Dark Mode">
         <span id="themeToggleIcon">☀️</span>
@@ -86,6 +94,7 @@
         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
         <span id="userNameBadge" class="font-semibold text-slate-800 dark:text-slate-200">Guest User</span>
         <span id="userRoleBadge" class="text-[10px] bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-400 px-2 py-0.5 rounded font-mono">Student</span>
+        <span id="userScoreBadge" class="text-[10px] bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded font-mono font-bold">0 Marks</span>
       </div>
 
       <button id="authModalBtn" onclick="openLoginModal()" class="px-3.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-semibold shadow-md transition flex items-center gap-1.5">
@@ -102,9 +111,9 @@
   <!-- SLIDE CONTROL BAR -->
   <div class="bg-slate-200 dark:bg-[#0b1329] border-b border-slate-300 dark:border-edu-border px-4 py-2 flex flex-wrap items-center justify-between text-xs gap-2">
     <div class="flex items-center gap-3 overflow-x-auto py-0.5">
-      <span id="slideCounterLabel" class="text-sky-700 dark:text-sky-400 font-mono text-xs font-bold whitespace-nowrap">Slide 1 / 28</span>
+      <span id="slideCounterLabel" class="text-sky-700 dark:text-sky-400 font-mono text-xs font-bold whitespace-nowrap">Slide 1 / 20</span>
       <div class="w-28 sm:w-48 bg-slate-300 dark:bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-300 dark:border-slate-800">
-        <div id="slideProgressBar" class="bg-gradient-to-r from-sky-500 to-emerald-400 h-full w-[3.5%] transition-all duration-300"></div>
+        <div id="slideProgressBar" class="bg-gradient-to-r from-sky-500 to-emerald-400 h-full w-[5%] transition-all duration-300"></div>
       </div>
       <span id="slideTitleHeader" class="text-slate-800 dark:text-slate-200 font-medium truncate max-w-[180px] sm:max-w-xs">Title & Exam Specs</span>
     </div>
@@ -141,10 +150,10 @@
   <main class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
     
     <!-- LEFT: SLIDE CONTENT STAGE -->
-    <section id="slideStageContainer" class="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col items-center justify-start transition-all duration-300">
-      <div id="slideCard" class="w-full max-w-4xl bg-white dark:bg-edu-card border border-slate-200 dark:border-edu-border rounded-2xl p-5 sm:p-8 shadow-xl dark:shadow-2xl relative flex flex-col min-h-[580px] transition-colors duration-200">
+    <section id="slideStageContainer" class="flex-1 overflow-y-auto p-3 sm:p-5 flex flex-col items-center justify-start transition-all duration-300 w-full min-w-0">
+      <div id="slideCard" class="w-full max-w-4xl bg-white dark:bg-edu-card border border-slate-200 dark:border-edu-border rounded-2xl p-4 sm:p-7 shadow-xl dark:shadow-2xl relative flex flex-col min-h-[540px] transition-all duration-300">
         
-        <div class="flex items-center justify-between border-b border-slate-200 dark:border-edu-border pb-3 mb-6">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-edu-border pb-3 mb-4">
           <div class="flex items-center gap-2">
             <span id="slideTagBadge" class="px-2.5 py-0.5 text-[11px] font-bold uppercase rounded-md bg-sky-100 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-sky-500/30">Module 1</span>
             <span id="slideTypeBadge" class="px-2.5 py-0.5 text-[11px] font-bold uppercase rounded-md bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">Interactive Task</span>
@@ -155,14 +164,10 @@
               <span id="fullscreenIcon">⛶</span>
               <span class="hidden sm:inline">Fullscreen</span>
             </button>
-
-            <button id="adminPanelToggle" onclick="toggleAdminDrawer()" class="hidden px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-300 rounded-lg text-xs font-semibold hover:bg-amber-500/20 transition flex items-center gap-1.5">
-              ⚡ Admin Panel
-            </button>
           </div>
         </div>
 
-        <!-- BROADCASTED STUDENT ANSWER BANNER (FADE ANIMATION REMOVED) -->
+        <!-- BROADCASTED STUDENT ANSWER BANNER (NO PULSE/FADE ANIMATION) -->
         <div id="sharedAnswerBanner" class="hidden mb-6 p-4 bg-gradient-to-r from-amber-500/15 via-sky-500/15 to-emerald-500/15 border-2 border-amber-500/40 rounded-xl relative shadow-lg cursor-pointer hover:border-amber-500/80 transition" onclick="openAnswerModalFromShared()">
           <div class="flex items-center justify-between mb-2">
             <span class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
@@ -196,7 +201,7 @@
     </section>
 
     <!-- RIGHT: ADMIN CONTROL & ROSTER MANAGEMENT -->
-    <aside id="adminControlDrawer" class="w-full lg:w-96 bg-white dark:bg-edu-card border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-edu-border p-4 overflow-y-auto flex flex-col gap-4 shadow-2xl transition-all duration-300 hidden">
+    <aside id="adminControlDrawer" class="w-full lg:w-[380px] xl:w-[410px] bg-white dark:bg-edu-card border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-edu-border p-3.5 overflow-y-auto flex flex-col gap-3.5 shadow-2xl transition-all duration-300 shrink-0 hidden">
       <div class="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-edu-border">
         <div class="flex items-center gap-2">
           <span class="p-1.5 bg-amber-500/20 text-amber-500 dark:text-amber-400 rounded-lg text-xs">🛡️</span>
@@ -206,28 +211,36 @@
           <button onclick="toggleAdminMinimize()" class="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded text-slate-500 dark:text-slate-400 text-xs font-bold" title="Minimize / Expand Panel">
             <span id="adminMinimizeIcon">➖</span>
           </button>
-          <span class="text-[10px] bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 px-2 py-0.5 rounded font-mono">Authenticated</span>
+          <button onclick="toggleAdminDrawer()" class="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded text-slate-400 hover:text-slate-200 text-xs font-bold" title="Close Drawer">
+            ✕
+          </button>
         </div>
       </div>
 
-      <div id="adminPanelContent" class="space-y-4 flex-1 flex flex-col">
-        <!-- LIVE INCOMING STUDENT SUBMISSIONS FEED (EXTRA ROOM) -->
-        <div class="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 space-y-2.5 flex-1 flex flex-col min-h-[220px]">
+      <div id="adminPanelContent" class="space-y-3.5 flex-1 flex flex-col">
+        <!-- LIVE INCOMING STUDENT SUBMISSIONS FEED (FILTERED TO CURRENT SLIDE) -->
+        <div class="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 space-y-2 flex-1 flex flex-col min-h-[240px]">
           <div class="flex items-center justify-between">
-            <h3 class="font-bold text-xs text-amber-600 dark:text-amber-400 uppercase tracking-wide flex items-center gap-1">
-              <span>💬</span> Live Student Submissions
-            </h3>
+            <div class="flex items-center gap-1.5">
+              <h3 class="font-bold text-xs text-amber-600 dark:text-amber-400 uppercase tracking-wide flex items-center gap-1">
+                <span>💬</span> Current Slide Responses
+              </h3>
+              <span id="currentSlideSubmissionBadge" class="text-[10px] bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-800 px-1.5 rounded-full font-mono font-bold">0</span>
+            </div>
             <button onclick="clearSharedAnswer()" class="text-[10px] text-rose-500 hover:underline">Clear Broadcast</button>
           </div>
+          <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono truncate" id="adminActiveSlideFilterLabel">
+            Showing Slide 1 answers
+          </div>
           <div id="adminLiveFeed" class="space-y-2 flex-1 overflow-y-auto text-xs pr-1 max-h-[300px]">
-            <div class="text-slate-400 italic text-center py-4">No live responses received yet.</div>
+            <div class="text-slate-400 italic text-center py-4">No responses for this slide yet.</div>
           </div>
         </div>
 
         <!-- STUDENT ROSTER LIST WITH ADD STUDENT BUTTON -->
-        <div class="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 space-y-2.5 flex-1 flex flex-col min-h-[200px]">
+        <div class="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 space-y-2 flex-1 flex flex-col min-h-[200px]">
           <div class="flex items-center justify-between">
-            <h3 class="font-bold text-xs text-sky-600 dark:text-sky-400 uppercase tracking-wide">Student Progress Roster</h3>
+            <h3 class="font-bold text-xs text-sky-600 dark:text-sky-400 uppercase tracking-wide">Student Roster</h3>
             <div class="flex items-center gap-2">
               <button onclick="openAddStudentModal()" class="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[10px] font-bold transition shadow-sm">
                 + Add Student
@@ -291,25 +304,44 @@
       </div>
 
       <div class="space-y-3 text-xs">
-        <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 space-y-1">
-          <div class="text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-wider font-semibold">Student Name</div>
-          <div id="modalAnswerStudent" class="font-bold text-sm text-sky-600 dark:text-sky-400">Name</div>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="bg-slate-50 dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 space-y-0.5">
+            <div class="text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-wider font-semibold">Student Name</div>
+            <div id="modalAnswerStudent" class="font-bold text-xs text-sky-600 dark:text-sky-400 truncate">Name</div>
+          </div>
+          <div class="bg-slate-50 dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 space-y-0.5">
+            <div class="text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-wider font-semibold">Grading Status</div>
+            <div id="modalAnswerGradeStatus" class="font-bold text-xs text-amber-500 font-mono">Pending</div>
+          </div>
         </div>
 
-        <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 space-y-1">
+        <div class="bg-slate-50 dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 space-y-0.5">
           <div class="text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-wider font-semibold">Slide Task</div>
-          <div id="modalAnswerSlide" class="font-semibold text-slate-800 dark:text-slate-200">Slide Title</div>
+          <div id="modalAnswerSlide" class="font-semibold text-slate-800 dark:text-slate-200 truncate">Slide Title</div>
         </div>
 
         <div class="space-y-1">
           <div class="text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-wider font-semibold">Submitted Response</div>
-          <div id="modalAnswerText" class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-serif italic text-slate-800 dark:text-slate-100 leading-relaxed max-h-60 overflow-y-auto">
+          <div id="modalAnswerText" class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm font-serif italic text-slate-800 dark:text-slate-100 leading-relaxed max-h-52 overflow-y-auto whitespace-pre-wrap">
             "Answer content..."
           </div>
         </div>
 
-        <div class="flex justify-end gap-2 pt-2">
-          <button id="modalBroadcastBtn" onclick="broadcastModalAnswer()" class="w-full py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+        <!-- ADMIN TEACHER GRADING CONTROLS (ONLY VISIBLE TO ADMIN) -->
+        <div id="adminGradingControls" class="hidden p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl space-y-2">
+          <span class="text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">Teacher Evaluation</span>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="gradeCurrentModalAnswer(1)" class="py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg shadow-sm transition flex items-center justify-center gap-1.5 text-xs">
+              <span>✅ Award 1 Mark</span>
+            </button>
+            <button onclick="gradeCurrentModalAnswer(0)" class="py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-lg shadow-sm transition flex items-center justify-center gap-1.5 text-xs">
+              <span>❌ Award 0 Marks</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-1">
+          <button id="modalBroadcastBtn" onclick="broadcastModalAnswer()" class="w-full py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2">
             <span>📢 Broadcast Response to Class</span>
           </button>
         </div>
@@ -406,13 +438,15 @@
     window.liveSubmissionsFeed = [];
     window.currentSlideIndex = 0;
     window.currentSelectedModalAnswer = null;
+    window.studentScore = 0;
 
-    // Slide Content Definitions
+    // Slide Content Definitions with answer validation keys
     window.slidesData = [
       {
         title: "Title & Exam Specs",
         module: "Module 1: Foundations",
         type: "Class Poll",
+        correctAnswer: "Increased risk of structural & language errors",
         render: () => `
           <div class="text-center py-2 space-y-4">
             <span class="px-3 py-1 bg-sky-100 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 text-xs font-bold rounded-full border border-sky-300 dark:border-sky-500/30">IGCSE English 0510 / 0511</span>
@@ -426,13 +460,16 @@
               <p class="text-xs text-slate-700 dark:text-slate-200 font-medium">"What happens if a candidate writes 250 words instead of the requested 120–160 words?"</p>
               
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                <button onclick="submitSlideAnswer('Increased risk of structural & language errors', 'MCQ')" class="p-3 bg-white dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-xl text-left text-slate-800 dark:text-slate-200 transition font-medium shadow-sm">
-                  A. Increased risk of language errors & poor structure
+                <button id="btnOptionA" onclick="submitSlideAnswer('Increased risk of structural & language errors', 'MCQ', 'Increased risk of structural & language errors', false)" class="p-3 bg-white dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-xl text-left text-slate-800 dark:text-slate-200 transition font-medium shadow-sm flex items-center justify-between">
+                  <span>A. Increased risk of language errors & poor structure</span>
+                  <span class="feedback-icon font-bold"></span>
                 </button>
-                <button onclick="submitSlideAnswer('Extra bonus marks are awarded', 'MCQ')" class="p-3 bg-white dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-xl text-left text-slate-800 dark:text-slate-200 transition font-medium shadow-sm">
-                  B. Extra bonus marks are awarded for length
+                <button id="btnOptionB" onclick="submitSlideAnswer('Extra bonus marks are awarded', 'MCQ', 'Increased risk of structural & language errors', false)" class="p-3 bg-white dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-xl text-left text-slate-800 dark:text-slate-200 transition font-medium shadow-sm flex items-center justify-between">
+                  <span>B. Extra bonus marks are awarded for length</span>
+                  <span class="feedback-icon font-bold"></span>
                 </button>
               </div>
+              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
             </div>
           </div>
         `
@@ -441,6 +478,7 @@
         title: "Language Type & Factors",
         module: "Module 1: Foundations",
         type: "Concept Map",
+        correctAnswer: "Formal Article Register",
         render: () => `
           <div class="space-y-4">
             <h3 class="text-xl font-bold text-slate-900 dark:text-white">Determining Your Writing Register</h3>
@@ -457,9 +495,10 @@
             <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 text-xs text-center space-y-2">
               <span class="text-slate-700 dark:text-slate-300 font-semibold block">Select required register:</span>
               <div class="flex justify-center gap-2">
-                <button onclick="submitSlideAnswer('Casual Dialogue', 'Register')" class="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-lg text-slate-800 dark:text-slate-200 font-medium">Casual Dialogue</button>
-                <button onclick="submitSlideAnswer('Formal Article Register', 'Register')" class="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-lg text-slate-800 dark:text-slate-200 font-medium">Formal Article Register</button>
+                <button onclick="submitSlideAnswer('Casual Dialogue', 'Register', 'Formal Article Register', false)" class="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-lg text-slate-800 dark:text-slate-200 font-medium transition">Casual Dialogue</button>
+                <button onclick="submitSlideAnswer('Formal Article Register', 'Register', 'Formal Article Register', false)" class="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-lg text-slate-800 dark:text-slate-200 font-medium transition">Formal Article Register</button>
               </div>
+              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
             </div>
           </div>
         `
@@ -468,6 +507,7 @@
         title: "What Formal Language Means",
         module: "Module 1: Foundations",
         type: "Rule Classifier",
+        correctAnswer: "It is high time authorities implemented measures",
         render: () => `
           <div class="space-y-4">
             <h3 class="text-xl font-bold text-slate-900 dark:text-white">4 Pillars of Formal Style</h3>
@@ -480,9 +520,10 @@
             <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
               <span class="font-bold text-sky-600 dark:text-sky-400 block">Which phrase fits a formal IGCSE article?</span>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <button onclick="submitSlideAnswer('They can\'t do it like that', 'Classifier')" class="p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-xl text-slate-800 dark:text-slate-200 font-medium shadow-sm">"They can't do it like that"</button>
-                <button onclick="submitSlideAnswer('It is high time authorities implemented measures', 'Classifier')" class="p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-xl text-slate-800 dark:text-slate-200 font-medium shadow-sm">"It is high time authorities implemented measures"</button>
+                <button onclick="submitSlideAnswer('They can\\'t do it like that', 'Classifier', 'It is high time authorities implemented measures', false)" class="p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-xl text-slate-800 dark:text-slate-200 font-medium shadow-sm transition">"They can't do it like that"</button>
+                <button onclick="submitSlideAnswer('It is high time authorities implemented measures', 'Classifier', 'It is high time authorities implemented measures', false)" class="p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-sky-500 rounded-xl text-slate-800 dark:text-slate-200 font-medium shadow-sm transition">"It is high time authorities implemented measures"</button>
               </div>
+              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
             </div>
           </div>
         `
@@ -515,10 +556,12 @@
             <p class="text-slate-600 dark:text-slate-300">Anchor your argument across time: <em>Nowadays, In recent years, Historically speaking...</em></p>
             <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
               <span class="font-bold text-amber-600 dark:text-amber-400 block">Upgrade Statement: "Most schools are digital now."</span>
+              <p class="text-[11px] text-slate-500">Short answer task: Requires teacher grading.</p>
               <div class="flex gap-2">
                 <input id="slide5Input" type="text" placeholder="e.g. In recent years, an increasing number of schools have adopted digital platforms..." class="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-100 outline-none" />
-                <button onclick="submitSlide5Sentence()" class="px-4 py-1.5 bg-sky-600 text-white font-semibold rounded-lg shadow-sm">Submit</button>
+                <button onclick="submitSlide5Sentence()" class="px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-white font-semibold rounded-lg shadow-sm transition">Submit</button>
               </div>
+              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
             </div>
           </div>
         `
@@ -527,6 +570,7 @@
         title: "Tool 2: Introducing Points",
         module: "Module 2: In-Depth",
         type: "Class Poll",
+        correctAnswer: "2 to 3 points",
         render: () => `
           <div class="space-y-4 text-xs">
             <h3 class="text-xl font-bold text-slate-900 dark:text-white">Tool 2: Introducing Points</h3>
@@ -534,9 +578,10 @@
             <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
               <span class="text-slate-800 dark:text-slate-200 font-semibold block">Ideal number of core points for high marks?</span>
               <div class="flex gap-2">
-                <button onclick="submitSlideAnswer('1 point', 'Poll')" class="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 font-medium">1 Point</button>
-                <button onclick="submitSlideAnswer('2 to 3 points', 'Poll')" class="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 font-medium">2 to 3 Points</button>
+                <button onclick="submitSlideAnswer('1 point', 'Poll', '2 to 3 points', false)" class="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 font-medium transition">1 Point</button>
+                <button onclick="submitSlideAnswer('2 to 3 points', 'Poll', '2 to 3 points', false)" class="px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 font-medium transition">2 to 3 Points</button>
               </div>
+              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
             </div>
           </div>
         `
@@ -545,6 +590,7 @@
         title: "Film Review Gap-Fill",
         module: "Module 2: Practice",
         type: "Multiple Choice",
+        correctAnswer: "In conclusion",
         render: () => `
           <div class="space-y-4 text-xs">
             <h3 class="text-xl font-bold text-slate-900 dark:text-white">Concluding Gap-Fill Exercise</h3>
@@ -552,9 +598,10 @@
               "...[ Blank ], a truly compelling film is a perfect synthesis of evocative storytelling, well-developed characters, and technical mastery."
             </div>
             <div class="grid grid-cols-2 gap-2">
-              <button onclick="submitSlideAnswer('First of all', 'MCQ')" class="p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 font-medium">A. First of all</button>
-              <button onclick="submitSlideAnswer('In conclusion', 'MCQ')" class="p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 font-medium">B. In conclusion</button>
+              <button onclick="submitSlideAnswer('First of all', 'MCQ', 'In conclusion', false)" class="p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 font-medium transition">A. First of all</button>
+              <button onclick="submitSlideAnswer('In conclusion', 'MCQ', 'In conclusion', false)" class="p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 font-medium transition">B. In conclusion</button>
             </div>
+            <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
           </div>
         `
       },
@@ -582,7 +629,8 @@
             <p class="text-slate-600 dark:text-slate-300">Combine: "Technology accelerates learning access" AND "Technology can increase classroom distraction".</p>
             <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
               <input id="slide9Input" type="text" placeholder="Type combined sentence with formal connector..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-100 outline-none" />
-              <button onclick="submitSlide9Sentence()" class="px-4 py-1.5 bg-sky-600 text-white rounded-lg font-semibold">Submit</button>
+              <button onclick="submitSlide9Sentence()" class="px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg font-semibold transition">Submit</button>
+              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
             </div>
           </div>
         `
@@ -618,7 +666,8 @@
             <h3 class="text-xl font-bold text-slate-900 dark:text-white">Support Plastic Pollution Statement</h3>
             <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
               <input id="slide12Input" type="text" placeholder="e.g. This means marine life ingests harmful particles..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-100 outline-none" />
-              <button onclick="submitSlide12Support()" class="px-4 py-1.5 bg-sky-600 text-white rounded-lg font-semibold">Submit</button>
+              <button onclick="submitSlide12Support()" class="px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg font-semibold transition">Submit</button>
+              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
             </div>
           </div>
         `
@@ -653,7 +702,8 @@
             <h3 class="text-xl font-bold text-slate-900 dark:text-white">Upgrade: "All teenagers waste time online."</h3>
             <div class="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
               <input id="slide15Input" type="text" placeholder="e.g. A considerable number of young people spend substantial time online..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-100 outline-none" />
-              <button onclick="submitSlide15Generalization()" class="px-4 py-1.5 bg-sky-600 text-white rounded-lg font-semibold">Submit</button>
+              <button onclick="submitSlide15Generalization()" class="px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg font-semibold transition">Submit</button>
+              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
             </div>
           </div>
         `
@@ -669,37 +719,146 @@
           </div>
         `
       },
-      ...Array.from({ length: 12 }, (_, i) => ({
-        title: `Advanced Module Unit ${i + 1}`,
+      {
+        title: "Exam Drill 1: Intro Hook",
         module: "Module 3: Exam Mastery",
-        type: "Exam Drill",
+        type: "Written Drill",
         render: () => `
           <div class="space-y-4 text-xs">
-            <h3 class="text-xl font-bold text-slate-900 dark:text-white font-sans">Exam Drill ${i + 1}</h3>
-            <p class="text-slate-600 dark:text-slate-300">Practice writing formal expressions adhering strictly to Cambridge mark scheme criteria.</p>
+            <div class="flex items-center justify-between">
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white font-sans">Exam Drill 1: Engaging Introduction</h3>
+              <span class="px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 font-mono text-[10px] font-bold">Teacher Graded</span>
+            </div>
+            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
+              <strong class="text-sky-600 dark:text-sky-400">Prompt:</strong> Write a 30–45 word formal introduction for a school magazine article discussing whether mandatory school uniforms cultivate discipline or restrict individuality. Include a Time Fixer and a thought-provoking rhetorical question.
+            </p>
             <div class="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
-              <span class="text-sky-600 dark:text-sky-400 font-bold block">Quick Response Task:</span>
-              <p class="text-slate-800 dark:text-slate-200">Express an opinion on school uniforms using formal vocabulary.</p>
-              <button onclick="submitSlideAnswer('Completed Drill Unit ' + (${i + 1}), 'Drill')" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white font-semibold rounded-lg shadow-md transition">Complete Unit ${i + 1}</button>
+              <label class="block font-semibold text-slate-700 dark:text-slate-200 text-xs">Your Introduction Response:</label>
+              <textarea id="slide17DrillText" rows="4" placeholder="In recent years, the debate surrounding compulsory school attire has intensified..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-slate-800 dark:text-slate-100 outline-none focus:ring-1 focus:ring-sky-500 font-serif leading-relaxed"></textarea>
+              <div class="flex items-center justify-between pt-1">
+                <span class="text-[10px] text-slate-400">Aim for 30–45 formal words</span>
+                <button onclick="submitDrillResponse('slide17DrillText', 'Exam Drill 1: Intro Hook')" class="px-5 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl shadow-md transition">Submit for Review</button>
+              </div>
+              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
             </div>
           </div>
         `
-      }))
+      },
+      {
+        title: "Exam Drill 2: Counter-Arguments",
+        module: "Module 3: Exam Mastery",
+        type: "Written Drill",
+        render: () => `
+          <div class="space-y-4 text-xs">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white font-sans">Exam Drill 2: Counter-Arguments & Contrast</h3>
+              <span class="px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 font-mono text-[10px] font-bold">Teacher Graded</span>
+            </div>
+            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
+              <strong class="text-sky-600 dark:text-sky-400">Prompt:</strong> Some claim electronic tablets should replace printed textbooks. Write a 40–50 word body paragraph acknowledging the convenience of tablets, while using contrast connectors (e.g., <em>However, On the contrary</em>) to emphasize the risk of screen fatigue and distraction.
+            </p>
+            <div class="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
+              <label class="block font-semibold text-slate-700 dark:text-slate-200 text-xs">Your Balanced Paragraph:</label>
+              <textarea id="slide18DrillText" rows="4" placeholder="Advocates argue that digital tablets provide instant access to limitless pedagogical materials. Nevertheless, unmoderated screen time..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-slate-800 dark:text-slate-100 outline-none focus:ring-1 focus:ring-sky-500 font-serif leading-relaxed"></textarea>
+              <div class="flex items-center justify-between pt-1">
+                <span class="text-[10px] text-slate-400">Must include 1 contrast connector</span>
+                <button onclick="submitDrillResponse('slide18DrillText', 'Exam Drill 2: Counter-Arguments')" class="px-5 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl shadow-md transition">Submit for Review</button>
+              </div>
+              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Exam Drill 3: Formal Suggestions",
+        module: "Module 3: Exam Mastery",
+        type: "Written Drill",
+        render: () => `
+          <div class="space-y-4 text-xs">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white font-sans">Exam Drill 3: Recommendations & Subjunctive Mood</h3>
+              <span class="px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 font-mono text-[10px] font-bold">Teacher Graded</span>
+            </div>
+            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
+              <strong class="text-sky-600 dark:text-sky-400">Prompt:</strong> Write a 35–45 word formal recommendation proposing improvements for your school's physical fitness and sports facilities. Employ subjunctive grammar (e.g., <em>"It is imperative that school leaders allocate..."</em> or <em>"It is high time students received..."</em>).
+            </p>
+            <div class="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
+              <label class="block font-semibold text-slate-700 dark:text-slate-200 text-xs">Your Formal Recommendation:</label>
+              <textarea id="slide19DrillText" rows="4" placeholder="To bolster student wellbeing, it is imperative that the school board invest in modernized fitness facilities..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-slate-800 dark:text-slate-100 outline-none focus:ring-1 focus:ring-sky-500 font-serif leading-relaxed"></textarea>
+              <div class="flex items-center justify-between pt-1">
+                <span class="text-[10px] text-slate-400">Use formal subjunctive structures</span>
+                <button onclick="submitDrillResponse('slide19DrillText', 'Exam Drill 3: Formal Suggestions')" class="px-5 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl shadow-md transition">Submit for Review</button>
+              </div>
+              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Exam Drill 4: Concluding Action",
+        module: "Module 3: Exam Mastery",
+        type: "Written Drill",
+        render: () => `
+          <div class="space-y-4 text-xs">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white font-sans">Exam Drill 4: Concluding Call to Action</h3>
+              <span class="px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 font-mono text-[10px] font-bold">Teacher Graded</span>
+            </div>
+            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
+              <strong class="text-sky-600 dark:text-sky-400">Prompt:</strong> Conclude a formal article about community environmental preservation. Write a 30–45 word closing statement summarizing the collective urgency to reduce plastic consumption.
+            </p>
+            <div class="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
+              <label class="block font-semibold text-slate-700 dark:text-slate-200 text-xs">Your Concluding Call to Action:</label>
+              <textarea id="slide20DrillText" rows="4" placeholder="In summary, safeguarding our natural habitat requires proactive community engagement..." class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl p-3 text-slate-800 dark:text-slate-100 outline-none focus:ring-1 focus:ring-sky-500 font-serif leading-relaxed"></textarea>
+              <div class="flex items-center justify-between pt-1">
+                <span class="text-[10px] text-slate-400">Synthesize points with a strong final sentence</span>
+                <button onclick="submitDrillResponse('slide20DrillText', 'Exam Drill 4: Concluding Action')" class="px-5 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl shadow-md transition">Submit for Review</button>
+              </div>
+              <div id="slideAnswerFeedback" class="hidden p-2.5 rounded-lg text-xs font-semibold"></div>
+            </div>
+          </div>
+        `
+      }
     ];
 
     // Pop-up Answer View Handlers
-    window.openAnswerModal = function(studentName, answerText, slideTitle) {
-      window.currentSelectedModalAnswer = { studentName, answerText, slideTitle };
+    window.openAnswerModal = function(studentName, answerText, slideTitle, submissionObj = null) {
+      window.currentSelectedModalAnswer = { studentName, answerText, slideTitle, submissionObj };
       const m = document.getElementById('answerViewModal');
       document.getElementById('modalAnswerStudent').textContent = studentName;
       document.getElementById('modalAnswerSlide').textContent = slideTitle || window.slidesData[window.currentSlideIndex].title;
-      document.getElementById('modalAnswerText').textContent = `"${answerText}"`;
+      document.getElementById('modalAnswerText').textContent = answerText;
       
+      const statusEl = document.getElementById('modalAnswerGradeStatus');
+      const gradingControls = document.getElementById('adminGradingControls');
       const broadcastBtn = document.getElementById('modalBroadcastBtn');
-      if (window.currentUser && window.currentUser.role === 'admin') {
+      const isAdmin = window.currentUser && window.currentUser.role === 'admin';
+
+      if (submissionObj) {
+        if (submissionObj.isGraded) {
+          statusEl.textContent = `Graded: ${submissionObj.awardedMarks} Mark(s)`;
+          statusEl.className = submissionObj.awardedMarks > 0 
+            ? "font-bold text-xs text-emerald-500 font-mono" 
+            : "font-bold text-xs text-rose-500 font-mono";
+        } else {
+          statusEl.textContent = "Pending Teacher Review";
+          statusEl.className = "font-bold text-xs text-amber-500 font-mono";
+        }
+      } else {
+        statusEl.textContent = "Live Response";
+        statusEl.className = "font-bold text-xs text-slate-400 font-mono";
+      }
+
+      if (isAdmin) {
         broadcastBtn.classList.remove('hidden');
+        if (submissionObj && submissionObj.isShortAnswer) {
+          gradingControls.classList.remove('hidden');
+        } else {
+          gradingControls.classList.add('hidden');
+        }
       } else {
         broadcastBtn.classList.add('hidden');
+        gradingControls.classList.add('hidden');
       }
 
       if (m) m.classList.remove('hidden');
@@ -727,395 +886,85 @@
       }
     };
 
-    // Add Student Modal Controls
-    window.openAddStudentModal = function() {
-      const modal = document.getElementById('addStudentModal');
-      if (modal) modal.classList.remove('hidden');
-    };
-
-    window.closeAddStudentModal = function() {
-      const modal = document.getElementById('addStudentModal');
-      if (modal) modal.classList.add('hidden');
-    };
-
-    // Theme Management
-    window.initTheme = function() {
-      const savedTheme = localStorage.getItem('smartstudy_theme') || 'light';
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-        const icon = document.getElementById('themeToggleIcon');
-        if (icon) icon.textContent = '🌙';
-      } else {
-        document.documentElement.classList.remove('dark');
-        const icon = document.getElementById('themeToggleIcon');
-        if (icon) icon.textContent = '☀️';
-      }
-    };
-
-    window.toggleTheme = function() {
-      const isDark = document.documentElement.classList.toggle('dark');
-      localStorage.setItem('smartstudy_theme', isDark ? 'dark' : 'light');
-      const icon = document.getElementById('themeToggleIcon');
-      if (icon) icon.textContent = isDark ? '🌙' : '☀️';
-      window.showToast(isDark ? "Switched to Dark Mode 🌙" : "Switched to Light Mode ☀️");
-    };
-
-    // Fullscreen Card Controller
-    window.toggleCardFullscreen = function() {
-      const card = document.getElementById('slideStageContainer');
-      const icon = document.getElementById('fullscreenIcon');
-      
-      if (!document.fullscreenElement) {
-        if (card.requestFullscreen) {
-          card.requestFullscreen();
-        } else if (card.webkitRequestFullscreen) {
-          card.webkitRequestFullscreen();
-        }
-        if (icon) icon.textContent = "↙";
-        window.showToast("Fullscreen mode activated");
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        }
-        if (icon) icon.textContent = "⛶";
-        window.showToast("Exited fullscreen mode");
-      }
-    };
-
-    // Admin Panel Minimization
-    window.toggleAdminMinimize = function() {
-      const content = document.getElementById('adminPanelContent');
-      const icon = document.getElementById('adminMinimizeIcon');
-      if (content.classList.contains('hidden')) {
-        content.classList.remove('hidden');
-        icon.textContent = "➖";
-      } else {
-        content.classList.add('hidden');
-        icon.textContent = "➕";
-      }
-    };
-
-    // Toggle Follow Teacher Sync
-    window.toggleTeacherSync = function() {
-      window.followTeacherSync = !window.followTeacherSync;
-      const statusText = document.getElementById('syncStatusText');
-      const toggleBtn = document.getElementById('teacherSyncToggle');
-
-      if (window.followTeacherSync) {
-        if (statusText) statusText.textContent = "Broadcasting Live";
-        if (toggleBtn) toggleBtn.className = "px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 rounded-lg text-[11px] font-mono flex items-center gap-1.5 transition hover:bg-emerald-200 dark:hover:bg-emerald-900/50";
-        window.showToast("Live presentation broadcasting enabled");
-      } else {
-        if (statusText) statusText.textContent = "Broadcast Paused";
-        if (toggleBtn) toggleBtn.className = "px-2.5 py-1 bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-800 rounded-lg text-[11px] font-mono flex items-center gap-1.5 transition hover:bg-slate-300";
-        window.showToast("Live presentation broadcast paused");
-      }
-    };
-
-    // User Interface State Updater
-    window.updateUserUI = function() {
-      const infoDisplay = document.getElementById('userInfoDisplay');
-      const nameBadge = document.getElementById('userNameBadge');
-      const roleBadge = document.getElementById('userRoleBadge');
-      const authBtn = document.getElementById('authModalBtn');
-      const logoutBtn = document.getElementById('logoutBtn');
-      const adminToggle = document.getElementById('adminPanelToggle');
-      const adminDrawer = document.getElementById('adminControlDrawer');
-      const teacherNavControls = document.getElementById('teacherNavControls');
-      const teacherBottomNav = document.getElementById('teacherBottomNav');
-      const studentSyncIndicator = document.getElementById('studentSyncIndicator');
-      const closeSharedBtn = document.getElementById('closeSharedAnswerBtn');
-
-      const isAdmin = window.currentUser && window.currentUser.role === 'admin';
-
-      if (window.currentUser) {
-        if (infoDisplay) infoDisplay.classList.remove('hidden');
-        if (nameBadge) nameBadge.textContent = window.currentUser.name || 'User';
-        if (roleBadge) {
-          roleBadge.textContent = (window.currentUser.role || 'student').toUpperCase();
-          roleBadge.className = isAdmin 
-            ? "text-[10px] bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-800 px-2 py-0.5 rounded font-mono"
-            : "text-[10px] bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-400 px-2 py-0.5 rounded font-mono";
-        }
-        if (authBtn) authBtn.classList.add('hidden');
-        if (logoutBtn) logoutBtn.classList.remove('hidden');
-      } else {
-        if (infoDisplay) infoDisplay.classList.add('hidden');
-        if (authBtn) authBtn.classList.remove('hidden');
-        if (logoutBtn) logoutBtn.classList.add('hidden');
-      }
-
-      if (isAdmin) {
-        if (adminToggle) adminToggle.classList.remove('hidden');
-        if (teacherNavControls) teacherNavControls.classList.remove('hidden');
-        if (teacherBottomNav) teacherBottomNav.classList.remove('hidden');
-        if (studentSyncIndicator) studentSyncIndicator.classList.add('hidden');
-        if (closeSharedBtn) closeSharedBtn.classList.remove('hidden');
-      } else {
-        if (adminToggle) adminToggle.classList.add('hidden');
-        if (adminDrawer) adminDrawer.classList.add('hidden');
-        if (teacherNavControls) teacherNavControls.classList.add('hidden');
-        if (teacherBottomNav) teacherBottomNav.classList.add('hidden');
-        if (studentSyncIndicator) studentSyncIndicator.classList.remove('hidden');
-        if (closeSharedBtn) closeSharedBtn.classList.add('hidden');
-      }
-    };
-
-    window.handleLogout = function() {
-      sessionStorage.removeItem('edutrack_user');
-      window.currentUser = null;
-      window.updateUserUI();
-      window.showToast("Signed out successfully.");
-    };
-
-    window.getLocalStudents = function() {
-      try {
-        return JSON.parse(localStorage.getItem('smartstudy_students') || '{}');
-      } catch(e) {
-        return {};
-      }
-    };
-
-    window.saveLocalStudent = function(studentDocId, studentData) {
-      const current = window.getLocalStudents();
-      current[studentDocId] = studentData;
-      localStorage.setItem('smartstudy_students', JSON.stringify(current));
-    };
-
-    let synth = null;
-    window.playAudioCue = function(type = 'click') {
-      try {
-        if (!synth && window.Tone) {
-          synth = new Tone.Synth({
-            oscillator: { type: "triangle" },
-            envelope: { attack: 0.005, decay: 0.1, sustain: 0.05, release: 0.1 }
-          }).toDestination();
-        }
-        if (synth && Tone.context.state === 'running') {
-          if (type === 'success') synth.triggerAttackRelease("E5", "16n");
-          else synth.triggerAttackRelease("C5", "32n");
-        }
-      } catch(e) {}
-    };
-
-    window.showToast = function(msg) {
-      const toast = document.getElementById('toastNotification');
-      const text = document.getElementById('toastMessage');
-      if (text) text.textContent = msg;
-      if (toast) {
-        toast.classList.remove('translate-y-20', 'opacity-0');
-        setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3500);
-      }
-    };
-
-    window.selectLoginRole = function(role) {
-      window.selectedAuthRole = role;
-      const sBtn = document.getElementById('roleSelectStudentBtn');
-      const aBtn = document.getElementById('roleSelectAdminBtn');
-      const sFields = document.getElementById('studentLoginFields');
-      const aFields = document.getElementById('adminLoginFields');
-
-      if (role === 'student') {
-        if (sBtn) sBtn.className = "py-2 rounded-xl bg-sky-600 text-white font-bold border border-sky-400 transition";
-        if (aBtn) aBtn.className = "py-2 rounded-xl bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-800 transition";
-        if (sFields) sFields.classList.remove('hidden');
-        if (aFields) aFields.classList.add('hidden');
-      } else {
-        if (aBtn) aBtn.className = "py-2 rounded-xl bg-amber-600 text-white font-bold border border-amber-400 transition";
-        if (sBtn) sBtn.className = "py-2 rounded-xl bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-800 transition";
-        if (aFields) aFields.classList.remove('hidden');
-        if (sFields) sFields.classList.add('hidden');
-      }
-    };
-
-    window.openLoginModal = function() {
-      const m = document.getElementById('loginModal');
-      if (m) m.classList.remove('hidden');
-    };
-
-    window.closeLoginModal = function() {
-      const m = document.getElementById('loginModal');
-      if (m) m.classList.add('hidden');
-    };
-
-    window.handleLoginSubmit = async function() {
-      if (window.selectedAuthRole === 'admin') {
-        const pass = document.getElementById('loginAdminPassword').value;
-        if (pass === ADMIN_PASSWORD) {
-          window.currentUser = { name: "System Admin", role: "admin" };
-          sessionStorage.setItem('edutrack_user', JSON.stringify(window.currentUser));
-          window.updateUserUI();
-          window.closeLoginModal();
-          window.showToast("Authenticated as System Administrator");
-          window.fetchStudentRoster(true);
-        } else {
-          window.showToast("Incorrect Master Admin Password!");
-        }
-      } else {
-        const name = document.getElementById('loginStudentName').value.trim();
-        const pass = document.getElementById('loginStudentPassword').value.trim();
-
-        if (!name || !pass) {
-          window.showToast("Please enter Name and Password");
-          return;
-        }
-
-        const studentDocId = name.toLowerCase().replace(/\s+/g, "_");
-        const localStudents = window.getLocalStudents();
-        if (localStudents[studentDocId] && localStudents[studentDocId].password === pass) {
-          const s = localStudents[studentDocId];
-          window.currentUser = { name: s.name, grade: s.grade, role: "student", id: studentDocId };
-          sessionStorage.setItem('edutrack_user', JSON.stringify(window.currentUser));
-          window.updateUserUI();
-          window.closeLoginModal();
-          window.showToast(`Welcome back, ${s.name}!`);
-          return;
-        }
-
-        if (window.dbMethods && window.db) {
-          try {
-            const { doc, getDoc } = window.dbMethods;
-            const userRef = doc(window.db, 'students', studentDocId);
-            const snap = await getDoc(userRef);
-
-            if (snap.exists() && snap.data().password === pass) {
-              window.currentUser = { name: snap.data().name, grade: snap.data().grade, role: "student", id: snap.id };
-              sessionStorage.setItem('edutrack_user', JSON.stringify(window.currentUser));
-              window.updateUserUI();
-              window.closeLoginModal();
-              window.showToast(`Welcome back, ${snap.data().name}!`);
-              return;
-            }
-          } catch(e) {
-            console.warn("Firestore auth lookup failed, local checked.", e);
-          }
-        }
-
-        window.showToast("Invalid Student Credentials!");
-      }
-    };
-
-    window.handleAdminCreateUser = async function() {
-      if (!window.currentUser || window.currentUser.role !== 'admin') {
-        window.showToast("Admin sign-in required! Opening login...");
-        window.selectLoginRole('admin');
-        window.openLoginModal();
+    // Teacher grades a student's submission from modal
+    window.gradeCurrentModalAnswer = async function(marksAwarded) {
+      if (!window.currentSelectedModalAnswer || !window.currentSelectedModalAnswer.submissionObj) {
+        window.showToast("No active submission targeted for grading.");
         return;
       }
 
-      const nameInput = document.getElementById('newStudentName');
-      const gradeInput = document.getElementById('newStudentGrade');
-      const passInput = document.getElementById('newStudentPassword');
+      const targetSub = window.currentSelectedModalAnswer.submissionObj;
+      targetSub.awardedMarks = marksAwarded;
+      targetSub.isGraded = true;
+      targetSub.isCorrect = (marksAwarded > 0);
 
-      const name = nameInput ? nameInput.value.trim() : '';
-      const grade = gradeInput ? gradeInput.value.trim() : '';
-      const password = passInput ? passInput.value.trim() : '';
-
-      if (!name || !grade || !password) {
-        window.showToast("Please fill all required student fields!");
-        return;
+      const statusEl = document.getElementById('modalAnswerGradeStatus');
+      if (statusEl) {
+        statusEl.textContent = `Graded: ${marksAwarded} Mark(s)`;
+        statusEl.className = (marksAwarded > 0) ? "font-bold text-xs text-emerald-500 font-mono" : "font-bold text-xs text-rose-500 font-mono";
       }
 
-      const studentDocId = name.toLowerCase().replace(/\s+/g, "_");
-      const newStudentObj = {
-        name: name,
-        grade: grade,
-        password: password,
-        progress: [],
-        createdAt: new Date().toISOString()
-      };
+      // Update in live feed
+      const matched = window.liveSubmissionsFeed.find(s => s.id === targetSub.id || (s.studentName === targetSub.studentName && s.slideIndex === targetSub.slideIndex && s.answer === targetSub.answer));
+      if (matched) {
+        matched.awardedMarks = marksAwarded;
+        matched.isGraded = true;
+        matched.isCorrect = (marksAwarded > 0);
+      }
 
-      // Save locally first
-      window.saveLocalStudent(studentDocId, newStudentObj);
+      // Update student local record
+      const studentDocId = targetSub.studentName.toLowerCase().replace(/\s+/g, "_");
+      const localStudents = window.getLocalStudents();
+      if (localStudents[studentDocId] && localStudents[studentDocId].progress) {
+        const pItem = localStudents[studentDocId].progress.find(p => p.slideIndex === targetSub.slideIndex && p.answer === targetSub.answer);
+        if (pItem) {
+          pItem.awardedMarks = marksAwarded;
+          pItem.isGraded = true;
+          pItem.isCorrect = (marksAwarded > 0);
+          window.saveLocalStudent(studentDocId, localStudents[studentDocId]);
+        }
+      }
 
-      let firebaseSynced = false;
-      // Write to simplified Firestore collection 'students'
-      if (window.dbMethods && window.db) {
+      // Sync updated score to Firestore
+      if (window.db && window.dbMethods) {
         try {
           const { doc, setDoc } = window.dbMethods;
-          const studentRef = doc(window.db, 'students', studentDocId);
-          await setDoc(studentRef, newStudentObj);
-          firebaseSynced = true;
+          if (localStudents[studentDocId]) {
+            await setDoc(doc(window.db, 'students', studentDocId), localStudents[studentDocId], { merge: true });
+          }
         } catch(e) {
-          console.error("Firestore save error:", e);
-          window.showToast("Firebase write blocked! Please check Firestore rules in Console.");
+          console.warn("Grading cloud sync fallback:", e);
         }
       }
 
-      if (firebaseSynced) {
-        window.showToast(`Student '${name}' registered and synced to Cloud!`);
-      } else {
-        window.showToast(`Student '${name}' saved locally (offline mode).`);
+      // Broadcast grade update to all connected tabs/students
+      if (window.liveChannel) {
+        window.liveChannel.postMessage({
+          type: 'GRADE_NOTIFICATION',
+          studentName: targetSub.studentName,
+          slideIndex: targetSub.slideIndex,
+          awardedMarks: marksAwarded
+        });
       }
 
-      if (nameInput) nameInput.value = "";
-      if (gradeInput) gradeInput.value = "";
-      if (passInput) passInput.value = "";
-      
-      window.closeAddStudentModal();
-      window.fetchStudentRoster(true);
+      window.showToast(`Graded ${targetSub.studentName}'s response: ${marksAwarded} Mark(s) 📝`);
+      window.renderFilteredLiveSubmissions();
+      window.fetchStudentRoster(false);
+      setTimeout(() => window.closeAnswerModal(), 700);
     };
 
-    // FIXED STUDENT ROSTER SYNC FUNCTION
-    window.fetchStudentRoster = async function(showToastNotice = false) {
-      const rosterList = document.getElementById('adminRosterList');
-      if (!rosterList) return;
-
-      const renderRosterMap = (map) => {
-        rosterList.innerHTML = "";
-        if (map.size === 0) {
-          rosterList.innerHTML = '<div class="text-slate-400 text-center py-4 text-xs">No students registered yet. Click "+ Add Student" to start.</div>';
-          return;
-        }
-
-        map.forEach((s) => {
-          const progressCount = s.progress ? s.progress.length : 0;
-          const badgeColor = s.source === 'cloud' 
-            ? 'text-emerald-700 border-emerald-300 bg-emerald-100 dark:text-emerald-400 dark:border-emerald-800 dark:bg-emerald-950' 
-            : 'text-amber-700 border-amber-300 bg-amber-100 dark:text-amber-400 dark:border-amber-800 dark:bg-amber-950';
-          const badgeText = s.source === 'cloud' ? 'Cloud' : 'Local';
-
-          const card = document.createElement('div');
-          card.className = "p-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg flex items-center justify-between gap-2 shadow-sm";
-          card.innerHTML = `
-            <div class="truncate">
-              <div class="font-semibold text-slate-800 dark:text-slate-200 truncate flex items-center gap-1.5">
-                <span>${s.name}</span>
-                <span class="text-[9px] px-1.5 py-0.2 rounded border font-mono ${badgeColor}">${badgeText}</span>
-              </div>
-              <div class="text-[10px] text-slate-500 dark:text-slate-400">${s.grade} • ${progressCount} Tasks Done</div>
-            </div>
-            <button onclick="downloadPDFReport('${s.id}')" class="px-2 py-1 bg-sky-600/20 hover:bg-sky-600 text-sky-700 dark:text-sky-300 hover:text-white border border-sky-500/30 rounded text-[10px] font-semibold transition shrink-0">
-              📄 PDF
-            </button>
-          `;
-          rosterList.appendChild(card);
-        });
-      };
-
-      const combinedMap = new Map();
+    // Calculate current student score from local progress
+    window.recalculateStudentScore = function() {
+      if (!window.currentUser || window.currentUser.role !== 'student') return;
+      const sId = window.currentUser.id || window.currentUser.name.toLowerCase().replace(/\s+/g, "_");
       const localStudents = window.getLocalStudents();
-      Object.keys(localStudents).forEach(id => {
-        combinedMap.set(id, { ...localStudents[id], id, source: 'local' });
-      });
-
-      if (window.dbMethods && window.db) {
-        try {
-          const { collection, getDocs } = window.dbMethods;
-          const studentsCol = collection(window.db, 'students');
-          const querySnapshot = await getDocs(studentsCol);
-          
-          querySnapshot.forEach((docSnap) => {
-            combinedMap.set(docSnap.id, { ...docSnap.data(), id: docSnap.id, source: 'cloud' });
-          });
-          if (showToastNotice) window.showToast("Roster synced successfully!");
-        } catch(e) {
-          console.warn("Firestore collection query notice:", e);
-          if (showToastNotice) window.showToast("Cloud sync failed. Check Firestore Rules!");
+      if (localStudents[sId] && Array.isArray(localStudents[sId].progress)) {
+        window.studentScore = localStudents[sId].progress.reduce((acc, curr) => acc + (curr.awardedMarks || 0), 0);
+        const scoreBadge = document.getElementById('userScoreBadge');
+        if (scoreBadge) {
+          scoreBadge.textContent = `${window.studentScore} Mark${(window.studentScore === 1) ? '' : 's'}`;
         }
       }
-
-      renderRosterMap(combinedMap);
     };
 
     window.shareAnswerToAll = async function(studentName, answerText, slideTitle) {
@@ -1164,7 +1013,9 @@
             sharedAnswer: null,
             updatedAt: new Date().toISOString()
           }, { merge: true });
-        } catch(e) {}
+        } catch(e) {
+          console.warn("Failed to clear shared answer in database:", e);
+        }
       }
     };
 
@@ -1184,16 +1035,77 @@
       if (banner) banner.classList.add('hidden');
     };
 
-    window.submitSlideAnswer = async function(answerText, typeLabel) {
-      window.playAudioCue('success');
+    // Submissions with Correct/Wrong validation for MCQs and Teacher Grading for Short Answers
+    window.submitSlideAnswer = async function(answerText, typeLabel, expectedAnswer = null, isShortAnswer = false) {
+      const currentSlide = window.slidesData[window.currentSlideIndex];
+      const targetAnswer = expectedAnswer || currentSlide.correctAnswer;
+      let isCorrect = null;
+      let awardedMarks = 0;
+      let isGraded = false;
+
+      if (isShortAnswer) {
+        // Short answers are NOT automatically marked; teacher evaluates them
+        awardedMarks = 0;
+        isGraded = false;
+        window.playAudioCue('click');
+
+        const feedbackEl = document.getElementById('slideAnswerFeedback');
+        if (feedbackEl) {
+          feedbackEl.classList.remove('hidden');
+          feedbackEl.className = "p-3 rounded-xl text-xs font-semibold border bg-amber-50 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800 flex items-center justify-between";
+          feedbackEl.innerHTML = `
+            <span>📝 Response submitted! Pending teacher review & grading.</span>
+            <span class="font-mono text-[11px] font-bold">⏳ Awaiting Grade</span>
+          `;
+        }
+      } else if (targetAnswer) {
+        isCorrect = (answerText.trim().toLowerCase() === targetAnswer.trim().toLowerCase());
+        awardedMarks = isCorrect ? 1 : 0;
+        isGraded = true;
+
+        if (isCorrect) {
+          window.studentScore = (window.studentScore || 0) + 1;
+          window.playAudioCue('success');
+        } else {
+          window.playAudioCue('error');
+        }
+
+        const scoreBadge = document.getElementById('userScoreBadge');
+        if (scoreBadge) {
+          scoreBadge.textContent = `${window.studentScore} Mark${(window.studentScore === 1) ? '' : 's'}`;
+        }
+
+        const feedbackEl = document.getElementById('slideAnswerFeedback');
+        if (feedbackEl) {
+          feedbackEl.classList.remove('hidden');
+          if (isCorrect) {
+            feedbackEl.className = "p-3 rounded-xl text-xs font-semibold border bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800 flex items-center justify-between";
+            feedbackEl.innerHTML = `
+              <span>✅ Correct! +1 Mark awarded</span>
+              <span class="font-mono text-[11px] font-bold">Total: ${window.studentScore} Mark(s)</span>
+            `;
+          } else {
+            feedbackEl.className = "p-3 rounded-xl text-xs font-semibold border bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-800 flex items-center justify-between";
+            feedbackEl.innerHTML = `
+              <span>❌ Incorrect. (Correct: ${targetAnswer})</span>
+              <span class="font-mono text-[11px] font-bold">0 Marks</span>
+            `;
+          }
+        }
+      }
 
       const studentName = window.currentUser ? window.currentUser.name : "Guest Student";
       const progressEntry = {
+        id: "sub_" + Date.now() + "_" + Math.random().toString(36).substr(2, 4),
         studentName: studentName,
         slideIndex: window.currentSlideIndex,
-        slideTitle: window.slidesData[window.currentSlideIndex].title,
+        slideTitle: currentSlide.title,
         answer: answerText,
         type: typeLabel,
+        isShortAnswer: isShortAnswer,
+        isGraded: isGraded,
+        isCorrect: isCorrect,
+        awardedMarks: awardedMarks,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
@@ -1203,7 +1115,6 @@
         window.liveChannel.postMessage({ type: 'STUDENT_SUBMISSION', submission: progressEntry });
       }
 
-      // Sync submission to Firestore live feed collection
       if (window.db && window.dbMethods) {
         try {
           const { collection, addDoc } = window.dbMethods;
@@ -1217,7 +1128,7 @@
       }
 
       if (!window.currentUser || window.currentUser.role !== 'student') {
-        window.showToast("Answer submitted to teacher! 🎓");
+        window.showToast(isShortAnswer ? "Response logged for teacher review 📝" : (isCorrect ? "Response logged! +1 Mark 🎓" : "Response logged ⚠️"));
         return;
       }
 
@@ -1235,42 +1146,292 @@
         await updateDoc(studentRef, {
           progress: arrayUnion(progressEntry)
         });
-        window.showToast("Answer saved & sent to teacher! 🎓");
+        window.showToast(isShortAnswer ? "Submitted to teacher for grading 📝" : (isCorrect ? "Saved & sent! +1 Mark 🎓" : "Saved ⚠️"));
       } catch(e) {
-        window.showToast("Answer saved locally 🎓");
+        window.showToast(isShortAnswer ? "Saved locally for review 📝" : "Answer saved locally 🎓");
       }
     };
 
+    // Renders submissions filtered strictly to the active slide
+    window.renderFilteredLiveSubmissions = function() {
+      const feed = document.getElementById('adminLiveFeed');
+      const badge = document.getElementById('currentSlideSubmissionBadge');
+      const filterLabel = document.getElementById('adminActiveSlideFilterLabel');
+      if (!feed) return;
+
+      if (filterLabel) {
+        filterLabel.textContent = `Showing Slide ${window.currentSlideIndex + 1}: ${window.slidesData[window.currentSlideIndex].title}`;
+      }
+
+      const filtered = window.liveSubmissionsFeed.filter(sub => sub.slideIndex === window.currentSlideIndex);
+
+      if (badge) {
+        badge.textContent = filtered.length;
+      }
+
+      feed.innerHTML = "";
+      if (filtered.length === 0) {
+        feed.innerHTML = '<div class="text-slate-400 italic text-center py-4 text-xs">No responses for this slide yet.</div>';
+        return;
+      }
+
+      filtered.forEach((item) => {
+        const card = document.createElement('div');
+        let statusPill = "";
+
+        if (item.isShortAnswer && !item.isGraded) {
+          statusPill = '<span class="text-[9px] px-1.5 py-0.2 bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 rounded font-mono font-bold">⏳ Needs Grade</span>';
+        } else if (item.awardedMarks > 0) {
+          statusPill = `<span class="text-[9px] px-1.5 py-0.2 bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 rounded font-mono font-bold">✅ +${item.awardedMarks} Mark</span>`;
+        } else {
+          statusPill = '<span class="text-[9px] px-1.5 py-0.2 bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 rounded font-mono font-bold">0 Marks</span>';
+        }
+
+        card.className = "p-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg space-y-1 shadow-sm hover:border-sky-500 cursor-pointer transition";
+        card.onclick = () => window.openAnswerModal(item.studentName, item.answer, item.slideTitle, item);
+        card.innerHTML = `
+          <div class="flex items-center justify-between text-[11px] font-bold text-slate-800 dark:text-slate-200">
+            <span class="truncate">${item.studentName}</span>
+            <div class="flex items-center gap-1 shrink-0">
+              ${statusPill}
+              <span class="text-[9px] text-slate-400 font-mono">${item.timestamp}</span>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-600 dark:text-slate-300 font-serif italic truncate">"${item.answer}"</p>
+          <div class="flex items-center justify-between text-[9px] text-slate-400 pt-0.5">
+            <span>${item.type || 'Response'}</span>
+            <span class="text-sky-500 font-semibold">${item.isShortAnswer && !item.isGraded ? 'Review & Grade ✍️' : 'View Detail 🔍'}</span>
+          </div>
+        `;
+        feed.appendChild(card);
+      });
+    };
+
     window.addSubmissionToLiveFeed = function(sub) {
-      // Check if already in feed by timestamp & student
       const exists = window.liveSubmissionsFeed.some(
         s => s.studentName === sub.studentName && s.answer === sub.answer && s.slideIndex === sub.slideIndex
       );
       if (!exists) {
         window.liveSubmissionsFeed.unshift(sub);
       }
+      window.renderFilteredLiveSubmissions();
+    };
 
-      const feed = document.getElementById('adminLiveFeed');
-      if (!feed) return;
+    window.openAddStudentModal = function() {
+      const m = document.getElementById('addStudentModal');
+      if (m) m.classList.remove('hidden');
+    };
 
-      feed.innerHTML = "";
-      window.liveSubmissionsFeed.slice(0, 15).forEach((item) => {
-        const card = document.createElement('div');
-        card.className = "p-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg space-y-1 shadow-sm hover:border-sky-500 cursor-pointer transition";
-        card.onclick = () => window.openAnswerModal(item.studentName, item.answer, item.slideTitle);
-        card.innerHTML = `
-          <div class="flex items-center justify-between text-[11px] font-bold text-slate-800 dark:text-slate-200">
-            <span>${item.studentName}</span>
-            <span class="text-[9px] text-slate-400 font-mono">${item.timestamp}</span>
-          </div>
-          <p class="text-[11px] text-slate-600 dark:text-slate-300 font-serif italic truncate">"${item.answer}"</p>
-          <div class="flex items-center justify-between text-[9px] text-slate-400 pt-0.5">
-            <span>${item.slideTitle}</span>
-            <span class="text-sky-500 font-semibold">View Detail 🔍</span>
-          </div>
-        `;
-        feed.appendChild(card);
+    window.closeAddStudentModal = function() {
+      const m = document.getElementById('addStudentModal');
+      if (m) m.classList.add('hidden');
+    };
+
+    window.openLoginModal = function() {
+      const m = document.getElementById('loginModal');
+      if (m) m.classList.remove('hidden');
+    };
+
+    window.closeLoginModal = function() {
+      const m = document.getElementById('loginModal');
+      if (m) m.classList.add('hidden');
+    };
+
+    window.selectLoginRole = function(role) {
+      window.selectedAuthRole = role;
+      const sBtn = document.getElementById('roleSelectStudentBtn');
+      const aBtn = document.getElementById('roleSelectAdminBtn');
+      const sFields = document.getElementById('studentLoginFields');
+      const aFields = document.getElementById('adminLoginFields');
+
+      if (role === 'student') {
+        if (sBtn) sBtn.className = "py-2 rounded-xl bg-sky-600 text-white font-bold border border-sky-400 transition";
+        if (aBtn) aBtn.className = "py-2 rounded-xl bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-800 transition";
+        if (sFields) sFields.classList.remove('hidden');
+        if (aFields) aFields.classList.add('hidden');
+      } else {
+        if (aBtn) aBtn.className = "py-2 rounded-xl bg-amber-600 text-white font-bold border border-amber-400 transition";
+        if (sBtn) sBtn.className = "py-2 rounded-xl bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-800 transition";
+        if (aFields) aFields.classList.remove('hidden');
+        if (sFields) sFields.classList.add('hidden');
+      }
+    };
+
+    window.handleLoginSubmit = async function() {
+      if (window.selectedAuthRole === 'admin') {
+        const pass = document.getElementById('loginAdminPassword').value;
+        if (pass === ADMIN_PASSWORD) {
+          window.currentUser = { name: "System Admin", role: "admin" };
+          sessionStorage.setItem('edutrack_user', JSON.stringify(window.currentUser));
+          window.updateUserUI();
+          window.closeLoginModal();
+          window.showToast("Authenticated as System Administrator");
+          window.fetchStudentRoster(true);
+        } else {
+          window.showToast("Incorrect Master Admin Password!");
+        }
+      } else {
+        const name = document.getElementById('loginStudentName').value.trim();
+        const pass = document.getElementById('loginStudentPassword').value.trim();
+
+        if (!name || !pass) {
+          window.showToast("Please enter Name and Password");
+          return;
+        }
+
+        const studentDocId = name.toLowerCase().replace(/\s+/g, "_");
+        const localStudents = window.getLocalStudents();
+        if (localStudents[studentDocId] && localStudents[studentDocId].password === pass) {
+          const s = localStudents[studentDocId];
+          window.currentUser = { name: s.name, grade: s.grade, role: "student", id: studentDocId };
+          sessionStorage.setItem('edutrack_user', JSON.stringify(window.currentUser));
+          window.updateUserUI();
+          window.closeLoginModal();
+          window.showToast(`Welcome back, ${s.name}!`);
+          window.recalculateStudentScore();
+          return;
+        }
+
+        if (window.dbMethods && window.db) {
+          try {
+            const { doc, getDoc } = window.dbMethods;
+            const userRef = doc(window.db, 'students', studentDocId);
+            const snap = await getDoc(userRef);
+
+            if (snap.exists() && snap.data().password === pass) {
+              window.currentUser = { name: snap.data().name, grade: snap.data().grade, role: "student", id: snap.id };
+              sessionStorage.setItem('edutrack_user', JSON.stringify(window.currentUser));
+              window.updateUserUI();
+              window.closeLoginModal();
+              window.showToast(`Welcome back, ${snap.data().name}!`);
+              window.recalculateStudentScore();
+              return;
+            }
+          } catch(e) {
+            console.warn("Firestore student lookup notice:", e);
+          }
+        }
+
+        window.showToast("Invalid Student Credentials!");
+      }
+    };
+
+    window.handleAdminCreateUser = async function() {
+      if (!window.currentUser || window.currentUser.role !== 'admin') {
+        window.showToast("Admin sign-in required! Opening login...");
+        window.selectLoginRole('admin');
+        window.openLoginModal();
+        return;
+      }
+
+      const nameInput = document.getElementById('newStudentName');
+      const gradeInput = document.getElementById('newStudentGrade');
+      const passInput = document.getElementById('newStudentPassword');
+
+      const name = nameInput ? nameInput.value.trim() : '';
+      const grade = gradeInput ? gradeInput.value.trim() : '';
+      const password = passInput ? passInput.value.trim() : '';
+
+      if (!name || !grade || !password) {
+        window.showToast("Please fill all student fields!");
+        return;
+      }
+
+      const studentDocId = name.toLowerCase().replace(/\s+/g, "_");
+      const newStudentObj = {
+        name: name,
+        grade: grade,
+        password: password,
+        progress: [],
+        createdAt: new Date().toISOString()
+      };
+
+      // Save locally
+      window.saveLocalStudent(studentDocId, newStudentObj);
+
+      let syncedToCloud = false;
+      if (window.db && window.dbMethods) {
+        try {
+          const { doc, setDoc } = window.dbMethods;
+          await setDoc(doc(window.db, 'students', studentDocId), newStudentObj);
+          syncedToCloud = true;
+        } catch (e) {
+          console.warn("Could not sync student directly to Firestore:", e);
+        }
+      }
+
+      if (syncedToCloud) {
+        window.showToast(`Student '${name}' registered & synced to cloud!`);
+      } else {
+        window.showToast(`Student '${name}' saved locally!`);
+      }
+
+      if (nameInput) nameInput.value = "";
+      if (gradeInput) gradeInput.value = "";
+      if (passInput) passInput.value = "";
+
+      window.closeAddStudentModal();
+      window.fetchStudentRoster(true);
+    };
+
+    window.fetchStudentRoster = async function(showToastNotice = false) {
+      const rosterList = document.getElementById('adminRosterList');
+      if (!rosterList) return;
+
+      const renderRosterMap = (map) => {
+        rosterList.innerHTML = "";
+        if (map.size === 0) {
+          rosterList.innerHTML = '<div class="text-slate-400 text-center py-2 text-xs italic">No students registered yet.</div>';
+          return;
+        }
+
+        map.forEach((s) => {
+          const progressCount = s.progress ? s.progress.length : 0;
+          const totalMarks = s.progress ? s.progress.reduce((acc, p) => acc + (p.awardedMarks || 0), 0) : 0;
+          const badgeColor = s.source === 'cloud' 
+            ? 'text-emerald-700 border-emerald-300 bg-emerald-100 dark:text-emerald-400 dark:border-emerald-800 dark:bg-emerald-950' 
+            : 'text-amber-700 border-amber-300 bg-amber-100 dark:text-amber-400 dark:border-amber-800 dark:bg-amber-950';
+          const badgeText = s.source === 'cloud' ? 'Cloud' : 'Local';
+
+          const card = document.createElement('div');
+          card.className = "p-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg flex items-center justify-between gap-2 shadow-sm";
+          card.innerHTML = `
+            <div class="truncate">
+              <div class="font-semibold text-slate-800 dark:text-slate-200 truncate flex items-center gap-1.5">
+                <span>${s.name}</span>
+                <span class="text-[9px] px-1.5 py-0.2 rounded border font-mono ${badgeColor}">${badgeText}</span>
+              </div>
+              <div class="text-[10px] text-slate-500 dark:text-slate-400">${s.grade} • ${progressCount} Tasks • <strong class="text-emerald-600">${totalMarks} Mks</strong></div>
+            </div>
+            <button onclick="downloadPDFReport('${s.id}')" class="px-2 py-1 bg-sky-600/20 hover:bg-sky-600 text-sky-700 dark:text-sky-300 hover:text-white border border-sky-500/30 rounded text-[10px] font-semibold transition shrink-0">
+              📄 PDF
+            </button>
+          `;
+          rosterList.appendChild(card);
+        });
+      };
+
+      const combinedMap = new Map();
+      const localStudents = window.getLocalStudents();
+      Object.keys(localStudents).forEach(id => {
+        combinedMap.set(id, { ...localStudents[id], id, source: 'local' });
       });
+
+      renderRosterMap(combinedMap);
+
+      if (window.db && window.dbMethods) {
+        try {
+          const { collection, getDocs } = window.dbMethods;
+          const querySnapshot = await getDocs(collection(window.db, 'students'));
+          querySnapshot.forEach((docSnap) => {
+            combinedMap.set(docSnap.id, { ...docSnap.data(), id: docSnap.id, source: 'cloud' });
+          });
+          renderRosterMap(combinedMap);
+          if (showToastNotice) window.showToast("Student roster synced from Cloud!");
+        } catch(e) {
+          console.warn("Cloud student roster sync fallback:", e);
+        }
+      }
     };
 
     window.downloadPDFReport = async function(studentDocId) {
@@ -1307,7 +1468,7 @@
             item.innerHTML = `
               <div class="flex justify-between font-bold text-slate-700">
                 <span>Slide ${p.slideIndex + 1}: ${p.slideTitle}</span>
-                <span class="text-slate-400 text-[10px]">${p.timestamp || ''}</span>
+                <span class="text-slate-400 text-[10px]">${p.timestamp || ''} • Marks: ${p.awardedMarks || 0}</span>
               </div>
               <div class="text-slate-600 font-serif italic">"${p.answer}"</div>
             `;
@@ -1340,6 +1501,165 @@
     window.toggleAdminDrawer = function() {
       const drawer = document.getElementById('adminControlDrawer');
       if (drawer) drawer.classList.toggle('hidden');
+    };
+
+    window.toggleAdminMinimize = function() {
+      const content = document.getElementById('adminPanelContent');
+      const icon = document.getElementById('adminMinimizeIcon');
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.textContent = "➖";
+      } else {
+        content.classList.add('hidden');
+        icon.textContent = "➕";
+      }
+    };
+
+    window.toggleCardFullscreen = function() {
+      const card = document.getElementById('slideStageContainer');
+      const icon = document.getElementById('fullscreenIcon');
+      if (!document.fullscreenElement) {
+        if (card.requestFullscreen) card.requestFullscreen();
+        else if (card.webkitRequestFullscreen) card.webkitRequestFullscreen();
+        if (icon) icon.textContent = "↙";
+        window.showToast("Fullscreen mode activated");
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+        if (icon) icon.textContent = "⛶";
+        window.showToast("Exited fullscreen mode");
+      }
+    };
+
+    window.initTheme = function() {
+      const savedTheme = localStorage.getItem('smartstudy_theme') || 'light';
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        const icon = document.getElementById('themeToggleIcon');
+        if (icon) icon.textContent = '🌙';
+      } else {
+        document.documentElement.classList.remove('dark');
+        const icon = document.getElementById('themeToggleIcon');
+        if (icon) icon.textContent = '☀️';
+      }
+    };
+
+    window.toggleTheme = function() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('smartstudy_theme', isDark ? 'dark' : 'light');
+      const icon = document.getElementById('themeToggleIcon');
+      if (icon) icon.textContent = isDark ? '🌙' : '☀️';
+      window.showToast(isDark ? "Switched to Dark Mode 🌙" : "Switched to Light Mode ☀️");
+    };
+
+    window.toggleTeacherSync = function() {
+      window.followTeacherSync = !window.followTeacherSync;
+      const statusText = document.getElementById('syncStatusText');
+      const toggleBtn = document.getElementById('teacherSyncToggle');
+
+      if (window.followTeacherSync) {
+        if (statusText) statusText.textContent = "Broadcasting Live";
+        if (toggleBtn) toggleBtn.className = "px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 rounded-lg text-[11px] font-mono flex items-center gap-1.5 transition hover:bg-emerald-200 dark:hover:bg-emerald-900/50";
+        window.showToast("Live presentation broadcast active");
+      } else {
+        if (statusText) statusText.textContent = "Broadcast Paused";
+        if (toggleBtn) toggleBtn.className = "px-2.5 py-1 bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-800 rounded-lg text-[11px] font-mono flex items-center gap-1.5 transition hover:bg-slate-300";
+        window.showToast("Presentation broadcast paused");
+      }
+    };
+
+    window.updateUserUI = function() {
+      const infoDisplay = document.getElementById('userInfoDisplay');
+      const nameBadge = document.getElementById('userNameBadge');
+      const roleBadge = document.getElementById('userRoleBadge');
+      const authBtn = document.getElementById('authModalBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const adminHeaderBtn = document.getElementById('adminHeaderToggleBtn');
+      const teacherNavControls = document.getElementById('teacherNavControls');
+      const teacherBottomNav = document.getElementById('teacherBottomNav');
+      const studentSyncIndicator = document.getElementById('studentSyncIndicator');
+      const closeSharedBtn = document.getElementById('closeSharedAnswerBtn');
+
+      const isAdmin = window.currentUser && window.currentUser.role === 'admin';
+
+      if (window.currentUser) {
+        if (infoDisplay) infoDisplay.classList.remove('hidden');
+        if (nameBadge) nameBadge.textContent = window.currentUser.name || 'User';
+        if (roleBadge) {
+          roleBadge.textContent = (window.currentUser.role || 'student').toUpperCase();
+          roleBadge.className = isAdmin 
+            ? "text-[10px] bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-800 px-2 py-0.5 rounded font-mono"
+            : "text-[10px] bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-400 px-2 py-0.5 rounded font-mono";
+        }
+        if (authBtn) authBtn.classList.add('hidden');
+        if (logoutBtn) logoutBtn.classList.remove('hidden');
+      } else {
+        if (infoDisplay) infoDisplay.classList.add('hidden');
+        if (authBtn) authBtn.classList.remove('hidden');
+        if (logoutBtn) logoutBtn.classList.add('hidden');
+      }
+
+      if (isAdmin) {
+        if (adminHeaderBtn) adminHeaderBtn.classList.remove('hidden');
+        if (teacherNavControls) teacherNavControls.classList.remove('hidden');
+        if (teacherBottomNav) teacherBottomNav.classList.remove('hidden');
+        if (studentSyncIndicator) studentSyncIndicator.classList.add('hidden');
+        if (closeSharedBtn) closeSharedBtn.classList.remove('hidden');
+      } else {
+        if (adminHeaderBtn) adminHeaderBtn.classList.add('hidden');
+        if (teacherNavControls) teacherNavControls.classList.add('hidden');
+        if (teacherBottomNav) teacherBottomNav.classList.add('hidden');
+        if (studentSyncIndicator) studentSyncIndicator.classList.remove('hidden');
+        if (closeSharedBtn) closeSharedBtn.classList.add('hidden');
+      }
+    };
+
+    window.handleLogout = function() {
+      sessionStorage.removeItem('edutrack_user');
+      window.currentUser = null;
+      window.studentScore = 0;
+      window.updateUserUI();
+      window.showToast("Signed out successfully.");
+    };
+
+    window.getLocalStudents = function() {
+      try {
+        return JSON.parse(localStorage.getItem('smartstudy_students') || '{}');
+      } catch(e) {
+        return {};
+      }
+    };
+
+    window.saveLocalStudent = function(studentDocId, studentData) {
+      const current = window.getLocalStudents();
+      current[studentDocId] = studentData;
+      localStorage.setItem('smartstudy_students', JSON.stringify(current));
+    };
+
+    let synth = null;
+    window.playAudioCue = function(type = 'click') {
+      try {
+        if (!synth && window.Tone) {
+          synth = new Tone.Synth({
+            oscillator: { type: "triangle" },
+            envelope: { attack: 0.005, decay: 0.1, sustain: 0.05, release: 0.1 }
+          }).toDestination();
+        }
+        if (synth && Tone.context.state === 'running') {
+          if (type === 'success') synth.triggerAttackRelease("E5", "16n");
+          else if (type === 'error') synth.triggerAttackRelease("C3", "16n");
+          else synth.triggerAttackRelease("C5", "32n");
+        }
+      } catch(e) {}
+    };
+
+    window.showToast = function(msg) {
+      const toast = document.getElementById('toastNotification');
+      const text = document.getElementById('toastMessage');
+      if (text) text.textContent = msg;
+      if (toast) {
+        toast.classList.remove('translate-y-20', 'opacity-0');
+        setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+      }
     };
 
     window.initSlidesDropdown = function() {
@@ -1398,6 +1718,8 @@
       const body = document.getElementById('slideDynamicBody');
       if (body) body.innerHTML = window.slidesData[idx].render();
 
+      window.renderFilteredLiveSubmissions();
+
       if (shouldBroadcast) {
         window.broadcastTeacherSlide(idx);
       }
@@ -1423,31 +1745,43 @@
 
     window.submitSlide5Sentence = function() {
       const val = document.getElementById('slide5Input').value;
-      if (val.trim()) window.submitSlideAnswer(val, "Sentence Upgrade");
+      if (val.trim()) window.submitSlideAnswer(val, "Sentence Upgrade", null, true);
     };
 
     window.submitSlide9Sentence = function() {
       const val = document.getElementById('slide9Input').value;
-      if (val.trim()) window.submitSlideAnswer(val, "Sentence Combining");
+      if (val.trim()) window.submitSlideAnswer(val, "Sentence Combining", null, true);
     };
 
     window.submitSlide12Support = function() {
       const val = document.getElementById('slide12Input').value;
-      if (val.trim()) window.submitSlideAnswer(val, "Adding Support");
+      if (val.trim()) window.submitSlideAnswer(val, "Adding Support", null, true);
     };
 
     window.submitSlide15Generalization = function() {
       const val = document.getElementById('slide15Input').value;
-      if (val.trim()) window.submitSlideAnswer(val, "Generalization");
+      if (val.trim()) window.submitSlideAnswer(val, "Generalization", null, true);
     };
 
-    window.addEventListener('DOMContentLoaded', window.initTheme);
+    window.submitDrillResponse = function(textareaId, drillType) {
+      const el = document.getElementById(textareaId);
+      if (el && el.value.trim()) {
+        window.submitSlideAnswer(el.value.trim(), drillType, null, true);
+      } else {
+        window.showToast("Please write a response before submitting!");
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      window.initTheme();
+      window.recalculateStudentScore();
+    });
   </script>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, getDocs, updateDoc, arrayUnion, onSnapshot, addDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, getDocs, updateDoc, arrayUnion, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const defaultFirebaseConfig = {
       apiKey: "AIzaSyCidnvJ4NN7Xih4LPA0NIRBzB-iZzgNAVU",
@@ -1495,6 +1829,12 @@
         else if (data.type === 'STUDENT_SUBMISSION' && data.submission) {
           if (typeof window.addSubmissionToLiveFeed === 'function') window.addSubmissionToLiveFeed(data.submission);
         }
+        else if (data.type === 'GRADE_NOTIFICATION' && data.studentName) {
+          if (window.currentUser && window.currentUser.name === data.studentName) {
+            window.showToast(`Teacher graded Slide ${data.slideIndex + 1}: +${data.awardedMarks} Mark(s)! 🎓`);
+            if (typeof window.recalculateStudentScore === 'function') window.recalculateStudentScore();
+          }
+        }
       };
     }
 
@@ -1518,7 +1858,6 @@
         if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-400";
         if (text) text.textContent = `Online (${user.uid.slice(0, 5)}...)`;
         
-        // Start real-time listeners for presentation and roster
         listenToLivePresentation();
         listenToLiveSubmissions();
         listenToStudentsCollection();
@@ -1561,7 +1900,6 @@
     function listenToLiveSubmissions() {
       try {
         const subCol = collection(db, 'submissions');
-        // Simple collection snapshot avoiding composite index requirements
         onSnapshot(subCol, (snapshot) => {
           snapshot.docChanges().forEach((change) => {
             if (change.type === 'added') {
