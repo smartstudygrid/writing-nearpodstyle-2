@@ -382,7 +382,7 @@
           <strong id="adminSessionLabel" class="text-sky-600 dark:text-sky-400 font-mono text-[11px]">Today's Live Class</strong>
         </div>
         <div class="flex items-center gap-1.5">
-          <button onclick="startNewClassSession()" class="px-2 py-1 bg-sky-600/20 hover:bg-sky-600 text-sky-700 dark:text-sky-300 hover:text-white rounded text-[10px] font-bold transition">
+          <button onclick="openNewSessionModal()" class="px-2 py-1 bg-sky-600/20 hover:bg-sky-600 text-sky-700 dark:text-sky-300 hover:text-white rounded text-[10px] font-bold transition">
             🔄 New Session
           </button>
           <button onclick="openEndSessionConfirmModal()" class="px-2 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded text-[10px] font-bold transition">
@@ -863,6 +863,35 @@
           Yes, End Session
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- START NEW SESSION MODAL -->
+  <div id="newSessionModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-edu-card border border-slate-200 dark:border-edu-border rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-edu-border pb-3">
+        <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+          <span>🔄</span> Start New Session
+        </h3>
+        <button type="button" onclick="closeNewSessionModal()" class="text-slate-400 hover:text-slate-200">✕</button>
+      </div>
+
+      <form onsubmit="event.preventDefault(); handleNewSessionSubmit();" class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-600 dark:text-slate-400 mb-1 font-medium">Session Name / Identifier</label>
+          <input id="newSessionNameInput" type="text" placeholder="e.g. Session-02-Grade-10" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-slate-800 dark:text-slate-100 outline-none focus:ring-1 focus:ring-sky-500 font-mono text-xs" />
+          <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Only submitted answers and activities from this session will be visible.</p>
+        </div>
+
+        <div class="flex items-center gap-2 pt-2">
+          <button type="button" onclick="closeNewSessionModal()" class="w-1/2 py-2.5 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition">
+            Cancel
+          </button>
+          <button type="submit" class="w-1/2 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl shadow-lg transition">
+            Start Session
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -1769,7 +1798,8 @@
       const sId = window.currentUser.id || window.currentUser.name.toLowerCase().replace(/\s+/g, "_");
       const localStudents = window.getLocalStudents();
       if (localStudents[sId] && Array.isArray(localStudents[sId].progress)) {
-        window.studentScore = localStudents[sId].progress.reduce((acc, curr) => acc + (curr.awardedMarks || 0), 0);
+        const sessionProgress = localStudents[sId].progress.filter(p => p.sessionId === window.currentSessionId);
+        window.studentScore = sessionProgress.reduce((acc, curr) => acc + (curr.awardedMarks || 0), 0);
         const scoreBadge = document.getElementById('userScoreBadge');
         if (scoreBadge) {
           scoreBadge.textContent = `${window.studentScore} Mark${(window.studentScore === 1) ? '' : 's'}`;
@@ -1948,7 +1978,7 @@
       if (!feed) return;
 
       if (filterLabel) {
-        filterLabel.textContent = `Showing Session [${window.currentSessionId.slice(-6)}] • Slide ${window.currentSlideIndex + 1}`;
+        filterLabel.textContent = `Showing Session [${window.currentSessionId}] • Slide ${window.currentSlideIndex + 1}`;
       }
 
       const filtered = window.liveSubmissionsFeed.filter(sub => 
@@ -2007,15 +2037,47 @@
       window.renderFilteredLiveSubmissions();
     };
 
-    window.startNewClassSession = async function() {
+    window.openNewSessionModal = function() {
+      const modal = document.getElementById('newSessionModal');
+      const input = document.getElementById('newSessionNameInput');
+      if (input) {
+        input.value = window.formatSessionName(window.sessionCounter + 1);
+      }
+      if (modal) modal.classList.remove('hidden');
+    };
+
+    window.closeNewSessionModal = function() {
+      const modal = document.getElementById('newSessionModal');
+      if (modal) modal.classList.add('hidden');
+    };
+
+    window.handleNewSessionSubmit = function() {
+      const input = document.getElementById('newSessionNameInput');
+      const customName = input ? input.value.trim() : '';
+      window.closeNewSessionModal();
+      window.startNewClassSession(customName);
+    };
+
+    window.startNewClassSession = async function(customSessionName) {
       window.sessionCounter = (window.sessionCounter || 1) + 1;
-      const newSessionId = window.formatSessionName(window.sessionCounter);
+      const newSessionId = (customSessionName && customSessionName.trim()) 
+        ? customSessionName.trim() 
+        : window.formatSessionName(window.sessionCounter);
+      
       window.currentSessionId = newSessionId;
       window.isSessionEnded = false;
       window.studentAnsweredSlides = {}; // Reset attempts for new session
+      window.studentScore = 0;
+      window.clearSharedAnswer();
 
       const adminLabel = document.getElementById('adminSessionLabel');
       if (adminLabel) adminLabel.textContent = newSessionId;
+
+      const sessionBadge = document.getElementById('sessionActiveBadge');
+      if (sessionBadge) sessionBadge.textContent = `Session: ${newSessionId}`;
+
+      const banner = document.getElementById('sessionEndedStudentBanner');
+      if (banner) banner.classList.add('hidden');
 
       if (window.db && window.dbMethods) {
         try {
@@ -2037,7 +2099,8 @@
         window.liveChannel.postMessage({ type: 'SESSION_CHANGE', sessionId: newSessionId, isEnded: false });
       }
 
-      window.showToast(`Started ${newSessionId}! 🚀`);
+      window.recalculateStudentScore();
+      window.showToast(`Started new session: ${newSessionId}! 🚀`);
       window.renderSlide(0, true);
       window.renderFilteredLiveSubmissions();
     };
@@ -2096,9 +2159,9 @@
       let submissions = [];
 
       if (sId && localStudents[sId] && Array.isArray(localStudents[sId].progress)) {
-        submissions = localStudents[sId].progress;
+        submissions = localStudents[sId].progress.filter(s => s.sessionId === window.currentSessionId);
       } else {
-        submissions = window.liveSubmissionsFeed.filter(s => s.studentName === studentName);
+        submissions = window.liveSubmissionsFeed.filter(s => s.studentName === studentName && s.sessionId === window.currentSessionId);
       }
 
       const totalMarks = submissions.reduce((acc, curr) => acc + (curr.awardedMarks || 0), 0);
@@ -2161,8 +2224,9 @@
 
       Object.keys(localStudents).forEach(key => {
         const s = localStudents[key];
-        const marks = (s.progress || []).reduce((acc, p) => acc + (p.awardedMarks || 0), 0);
-        studentsList.push({ name: s.name, grade: s.grade, marks: marks, tasks: (s.progress || []).length });
+        const sessionProgress = (s.progress || []).filter(p => p.sessionId === window.currentSessionId);
+        const marks = sessionProgress.reduce((acc, p) => acc + (p.awardedMarks || 0), 0);
+        studentsList.push({ name: s.name, grade: s.grade, marks: marks, tasks: sessionProgress.length });
       });
 
       studentsList.sort((a, b) => b.marks - a.marks);
@@ -2314,7 +2378,8 @@
         }
 
         const candidateName = data.name || "Student Candidate";
-        const progressItems = Array.isArray(data.progress) ? data.progress : [];
+        const allProgressItems = Array.isArray(data.progress) ? data.progress : [];
+        const progressItems = allProgressItems.filter(p => p.sessionId === window.currentSessionId);
         const totalScore = progressItems.reduce((acc, p) => acc + (p.awardedMarks || 0), 0);
 
         const totalTasksAssessed = progressItems.length;
@@ -2840,8 +2905,9 @@
         }
 
         map.forEach((s) => {
-          const progressCount = s.progress ? s.progress.length : 0;
-          const totalMarks = s.progress ? s.progress.reduce((acc, p) => acc + (p.awardedMarks || 0), 0) : 0;
+          const sessionProgress = (s.progress || []).filter(p => p.sessionId === window.currentSessionId);
+          const progressCount = sessionProgress.length;
+          const totalMarks = sessionProgress.reduce((acc, p) => acc + (p.awardedMarks || 0), 0);
           const badgeColor = s.source === 'cloud' 
             ? 'text-emerald-700 border-emerald-300 bg-emerald-100 dark:text-emerald-400 dark:border-emerald-800 dark:bg-emerald-950' 
             : 'text-amber-700 border-amber-300 bg-amber-100 dark:text-amber-400 dark:border-amber-800 dark:bg-amber-950';
@@ -3359,8 +3425,18 @@
         else if (data.type === 'SESSION_CHANGE' && data.sessionId) {
           window.currentSessionId = data.sessionId;
           window.isSessionEnded = false;
+          window.studentAnsweredSlides = {};
+          window.clearSharedAnswer();
+          const adminLabel = document.getElementById('adminSessionLabel');
+          if (adminLabel) adminLabel.textContent = data.sessionId;
+          const sessionBadge = document.getElementById('sessionActiveBadge');
+          if (sessionBadge) sessionBadge.textContent = `Session: ${data.sessionId}`;
           const banner = document.getElementById('sessionEndedStudentBanner');
           if (banner) banner.classList.add('hidden');
+          window.recalculateStudentScore();
+          window.renderSlide(0, false);
+          window.renderFilteredLiveSubmissions();
+          window.showToast(`Joined session: ${data.sessionId}`);
         }
       };
     }
@@ -3513,6 +3589,13 @@
 
             if (data.sessionId && data.sessionId !== window.currentSessionId) {
               window.currentSessionId = data.sessionId;
+              window.studentAnsweredSlides = {};
+              window.clearSharedAnswer();
+              const adminLabel = document.getElementById('adminSessionLabel');
+              if (adminLabel) adminLabel.textContent = data.sessionId;
+              const sessionBadge = document.getElementById('sessionActiveBadge');
+              if (sessionBadge) sessionBadge.textContent = `Session: ${data.sessionId}`;
+              window.recalculateStudentScore();
               window.renderFilteredLiveSubmissions();
             }
 
