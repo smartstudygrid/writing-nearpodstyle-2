@@ -415,7 +415,10 @@
         <div class="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 space-y-2 flex-1 flex flex-col min-h-[200px]">
           <div class="flex items-center justify-between">
             <h3 class="font-bold text-xs text-sky-600 dark:text-sky-400 uppercase tracking-wide">Student Roster</h3>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <button onclick="openCsvUploadModal()" class="px-2 py-0.5 bg-sky-600 hover:bg-sky-500 text-white rounded text-[10px] font-bold transition shadow-sm flex items-center gap-1" title="Upload Student Roster via CSV">
+                <span>📁</span> Upload CSV
+              </button>
               <button onclick="openAddStudentModal()" class="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[10px] font-bold transition shadow-sm">
                 + Add Student
               </button>
@@ -898,6 +901,52 @@
     </div>
   </div>
 
+  <!-- CSV ROSTER UPLOAD MODAL -->
+  <div id="csvUploadModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-edu-card border border-slate-200 dark:border-edu-border rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-edu-border pb-3">
+        <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+          <span>📁</span> Upload Student Roster (CSV)
+        </h3>
+        <button type="button" onclick="closeCsvUploadModal()" class="text-slate-400 hover:text-slate-200">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <p class="text-slate-600 dark:text-slate-300">
+          Upload a CSV file containing your student roster. The file must include columns for <strong class="text-slate-900 dark:text-white">Name</strong>, <strong class="text-slate-900 dark:text-white">Grade</strong>, and <strong class="text-slate-900 dark:text-white">Password</strong>.
+        </p>
+
+        <!-- DOWNLOAD TEMPLATE BANNER -->
+        <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+          <div>
+            <div class="font-semibold text-slate-800 dark:text-slate-200">Need the CSV Template?</div>
+            <div class="text-[10px] text-slate-500 dark:text-slate-400">Download formatted sample file</div>
+          </div>
+          <button type="button" onclick="downloadCsvTemplate()" class="px-2.5 py-1.5 bg-sky-600/15 hover:bg-sky-600 text-sky-700 dark:text-sky-300 hover:text-white border border-sky-500/30 rounded-lg text-[11px] font-bold transition flex items-center gap-1">
+            <span>📥</span> Download Template
+          </button>
+        </div>
+
+        <div>
+          <label class="block text-slate-600 dark:text-slate-400 mb-1.5 font-medium">Select .CSV File</label>
+          <input id="csvRosterFileInput" type="file" accept=".csv,text/csv" class="w-full text-xs text-slate-600 dark:text-slate-300 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-50 dark:file:bg-sky-950 file:text-sky-700 dark:file:text-sky-300 hover:file:bg-sky-100 dark:hover:file:bg-sky-900/60 file:cursor-pointer cursor-pointer border border-slate-300 dark:border-slate-700 rounded-xl p-1 bg-slate-50 dark:bg-slate-950" />
+        </div>
+
+        <div id="csvPreviewArea" class="hidden p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl max-h-36 overflow-y-auto font-mono text-[10px] space-y-1">
+        </div>
+
+        <div class="flex items-center gap-2 pt-2">
+          <button type="button" onclick="closeCsvUploadModal()" class="w-1/2 py-2.5 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition">
+            Cancel
+          </button>
+          <button type="button" onclick="handleCsvRosterUpload()" class="w-1/2 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg transition">
+            Import Students
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ANSWER POP-UP VIEW & GRADING MODAL -->
   <div id="answerViewModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white dark:bg-edu-card border border-slate-200 dark:border-edu-border rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
@@ -1260,7 +1309,7 @@
               <div class="p-5 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl text-slate-800 dark:text-cyan-100 shadow-sm"><strong class="text-sky-700 dark:text-cyan-300 dark:neon-cyan block text-base sm:text-lg font-bold mb-1">3. Connectors</strong>Seamless addition and contrast devices.</div>
               <div class="p-5 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl text-slate-800 dark:text-cyan-100 shadow-sm"><strong class="text-sky-700 dark:text-cyan-300 dark:neon-cyan block text-base sm:text-lg font-bold mb-1">4. Adding Support</strong>Cause & effect rationale and evidence.</div>
               <div class="p-5 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl text-slate-800 dark:text-cyan-100 shadow-sm"><strong class="text-sky-700 dark:text-cyan-300 dark:neon-cyan block text-base sm:text-lg font-bold mb-1">5. Generalization</strong>Softens sweeping, unverified claims.</div>
-              <div class="p-5 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl text-slate-800 dark:text-cyan-100 shadow-sm"><strong class="text-sky-700 dark:text-cyan-300 dark:neon-cyan block text-base sm:text-lg font-bold mb-1">6. Formal Suggestions</strong>Advanced subjunctive grammar.</div>
+              <div class="p-5 bg-slate-50 dark:bg-[#0b1b36] border border-slate-300 dark:border-cyan-500/40 rounded-2xl text-slate-800 dark:text-cyan-300 dark:neon-cyan block text-base sm:text-lg font-bold mb-1">6. Formal Suggestions</strong>Advanced subjunctive grammar.</div>
             </div>
           </div>
         `
@@ -1886,7 +1935,7 @@
         await updateDoc(studentRef, {
           progress: arrayUnion(progressEntry)
         });
-        window.showToast(isShortAnswer ? "Submitted to teacher for grading 📝" : (isCorrect ? "Saved & sent! +1 Mark 🎓" : "Saved ⚠️"));
+        window.showToast(isShortAnswer ? "Submitted to teacher for grading 📝" : (isCorrect ? "Saved & sent! +1 Mark 🎓" : "Saved ⚠️️"));
       } catch(e) {
         window.showToast(isShortAnswer ? "Saved locally for review 📝" : "Answer saved locally 🎓");
       }
@@ -2476,6 +2525,168 @@
     window.closeAddStudentModal = function() {
       const m = document.getElementById('addStudentModal');
       if (m) m.classList.add('hidden');
+    };
+
+    // CSV ROSTER UPLOAD & TEMPLATE DOWNLOAD FUNCTIONS
+    window.openCsvUploadModal = function() {
+      if (!window.currentUser || window.currentUser.role !== 'admin') {
+        window.showToast("Admin access required to upload roster!");
+        window.selectLoginRole('admin');
+        window.openLoginModal();
+        return;
+      }
+      const m = document.getElementById('csvUploadModal');
+      const fileInput = document.getElementById('csvRosterFileInput');
+      const previewArea = document.getElementById('csvPreviewArea');
+      if (fileInput) fileInput.value = '';
+      if (previewArea) {
+        previewArea.classList.add('hidden');
+        previewArea.innerHTML = '';
+      }
+      if (m) m.classList.remove('hidden');
+    };
+
+    window.closeCsvUploadModal = function() {
+      const m = document.getElementById('csvUploadModal');
+      if (m) m.classList.add('hidden');
+    };
+
+    window.downloadCsvTemplate = function() {
+      const templateHeaders = "Name,Grade,Password\n";
+      const sampleRows = "Sarah Khan,Grade 10-A,pass123\nAli Ahmed,Grade 10-B,pass456\nZainab Fatima,Grade 10-A,pass789\nOmar Al-Mansoor,Grade 10-C,pass321\n";
+      const csvContent = templateHeaders + sampleRows;
+      
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "student_roster_template.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      window.showToast("Downloaded student roster CSV template 📥");
+    };
+
+    // Robust CSV row splitter supporting quotes
+    function parseCsvLineTokens(line) {
+      const tokens = [];
+      let current = '';
+      let insideQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"' || char === "'") {
+          insideQuotes = !insideQuotes;
+        } else if (char === ',' && !insideQuotes) {
+          tokens.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      tokens.push(current.trim());
+      return tokens;
+    }
+
+    window.handleCsvRosterUpload = async function() {
+      if (!window.currentUser || window.currentUser.role !== 'admin') {
+        window.showToast("Admin access required!");
+        return;
+      }
+
+      const fileInput = document.getElementById('csvRosterFileInput');
+      if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+        window.showToast("Please choose a CSV file first!");
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      reader.onload = async function(e) {
+        try {
+          const text = e.target.result;
+          const rawLines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+
+          if (rawLines.length === 0) {
+            window.showToast("The selected CSV file is empty!");
+            return;
+          }
+
+          // Parse header to identify column indices
+          const headerTokens = parseCsvLineTokens(rawLines[0]).map(h => h.toLowerCase().replace(/[^a-z]/g, ''));
+          
+          let nameIdx = headerTokens.findIndex(h => h.includes('name') || h.includes('student'));
+          let gradeIdx = headerTokens.findIndex(h => h.includes('grade') || h.includes('class') || h.includes('section'));
+          let passIdx = headerTokens.findIndex(h => h.includes('pass'));
+
+          let startIndex = 1;
+
+          // If headers couldn't be detected, assume default columns 0=Name, 1=Grade, 2=Password
+          if (nameIdx === -1 && passIdx === -1) {
+            nameIdx = 0;
+            gradeIdx = 1;
+            passIdx = 2;
+            startIndex = 0;
+          } else {
+            if (nameIdx === -1) nameIdx = 0;
+            if (gradeIdx === -1) gradeIdx = 1;
+            if (passIdx === -1) passIdx = 2;
+          }
+
+          let addedCount = 0;
+          const localStudents = window.getLocalStudents();
+          const firestorePromises = [];
+
+          for (let i = startIndex; i < rawLines.length; i++) {
+            const tokens = parseCsvLineTokens(rawLines[i]);
+            if (!tokens || tokens.length === 0) continue;
+
+            const name = (tokens[nameIdx] || "").trim();
+            const grade = (tokens[gradeIdx] || "Grade 10").trim();
+            const password = (tokens[passIdx] || "123456").trim();
+
+            if (!name) continue;
+
+            const studentDocId = name.toLowerCase().replace(/\s+/g, "_");
+            const existing = localStudents[studentDocId] || {};
+
+            const studentObj = {
+              name: name,
+              grade: grade || (existing.grade || "Grade 10"),
+              password: password || (existing.password || "123456"),
+              progress: existing.progress || [],
+              createdAt: existing.createdAt || new Date().toISOString()
+            };
+
+            window.saveLocalStudent(studentDocId, studentObj);
+            addedCount++;
+
+            // Cloud Firestore sync if connected
+            if (window.db && window.dbMethods) {
+              const { doc, setDoc } = window.dbMethods;
+              const p = setDoc(doc(window.db, 'students', studentDocId), studentObj, { merge: true }).catch(err => {
+                console.warn("Firestore CSV upload student notice:", err);
+              });
+              firestorePromises.push(p);
+            }
+          }
+
+          if (firestorePromises.length > 0) {
+            await Promise.all(firestorePromises);
+          }
+
+          window.showToast(`Successfully imported ${addedCount} student(s) from CSV! 🎓`);
+          window.closeCsvUploadModal();
+          window.fetchStudentRoster(true);
+
+        } catch (err) {
+          console.error("CSV parse error:", err);
+          window.showToast("Failed to parse CSV file. Ensure valid comma-separated format.");
+        }
+      };
+
+      reader.readAsText(file);
     };
 
     window.openLoginModal = function() {
